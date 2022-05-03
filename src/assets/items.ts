@@ -172,6 +172,10 @@ export const items = {
         variant: 'human_ylside',
       },
     },
+    chicken: {
+      src: 'npc/chicken_base/chicken_base.teo',
+      native: true,
+    },
   },
   shape: {
     cube: {
