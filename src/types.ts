@@ -16,6 +16,12 @@ export type Vertex3 = {
   z: number
 }
 
+export type RotationVertex3 = {
+  a: number
+  b: number
+  g: number
+}
+
 export type AbsoluteCoords = {
   type: 'absolute'
   coords: Vector3
@@ -54,3 +60,7 @@ export type FloatRgb = {
   g: number
   b: number
 }
+
+export type KVPair<T> = { [key: string]: T }
+
+export type RecursiceKVPair<T> = { [key: string]: T | RecursiceKVPair<T> }

@@ -22,7 +22,13 @@ import {
 } from 'ramda'
 import { padCharsStart } from 'ramda-adjunct'
 import { declare } from '../scripting'
-import { RelativeCoords, RotationVector3 } from '../types'
+import {
+  RecursiceKVPair,
+  RelativeCoords,
+  RotationVector3,
+  RotationVertex3,
+  Vertex3,
+} from '../types'
 import { getRootPath } from '../../rootpath'
 import { PLAYER_HEIGHT_ADJUSTMENT } from '../constants'
 
@@ -40,13 +46,6 @@ export type RenderedInjectableProps = {
   init?: string[]
 }
 
-export type Item = {
-  src: string
-  native: boolean
-  dependencies?: string[]
-  props?: InjectableProps
-}
-
 export type ItemRef = {
   src: string
   id: 'root' | number
@@ -55,7 +54,33 @@ export type ItemRef = {
   ref: string
 }
 
-export const items = {
+export type RootItem = {
+  filename: string
+  used: boolean
+  identifier: 'root'
+  script: string
+  dependencies: string[]
+}
+
+export type Item = {
+  filename: string
+  used: boolean
+  identifier: number
+  pos: Vertex3
+  angle: RotationVertex3
+  script: string
+  flags: number
+  dependencies: string[]
+}
+
+export type ItemDefinition = {
+  src: string
+  native: boolean
+  dependencies?: string[]
+  props?: InjectableProps
+}
+
+export const items: RecursiceKVPair<ItemDefinition> = {
   marker: {
     src: 'system/marker/marker.teo',
     native: true,
@@ -213,7 +238,7 @@ export const items = {
   },
 }
 
-let usedItems = {}
+let usedItems: { [key: string]: any } = {}
 
 const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   const init: string[] = []
@@ -255,7 +280,7 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
 }
 
 export const createItem = (
-  item: Item,
+  item: ItemDefinition,
   props: InjectableProps = {},
 ): ItemRef => {
   usedItems[item.src] = usedItems[item.src] || []
@@ -286,7 +311,7 @@ export const createItem = (
 }
 
 export const createRootItem = (
-  item: Item,
+  item: ItemDefinition,
   props: InjectableProps = {},
 ): ItemRef => {
   usedItems[item.src] = usedItems[item.src] || []
@@ -390,6 +415,8 @@ const arxifyFilename = (filename: string) => {
 
 export const exportUsedItems = (mapData) => {
   const { spawn } = mapData.state
+
+  const copyOfUsedItems = clone(usedItems)
 
   mapData.dlf.interactiveObjects = compose(
     map((item) => {
