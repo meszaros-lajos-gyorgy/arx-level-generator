@@ -63,4 +63,4 @@ export type FloatRgb = {
 
 export type KVPair<T> = { [key: string]: T }
 
-export type RecursiceKVPair<T> = { [key: string]: T | RecursiceKVPair<T> }
+export type RecursiveKVPair<T> = { [key: string]: T | RecursiveKVPair<T> }

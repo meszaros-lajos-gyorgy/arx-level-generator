@@ -11,7 +11,7 @@ import {
   isBetween,
 } from '../helpers'
 import { identity, clamp, pluck } from 'ramda'
-import { AbsoluteCoords, PosVertex3, Vector3 } from 'src/types'
+import { AbsoluteCoords, KVPair, PosVertex3, Vector3 } from 'src/types'
 
 type AdjustablePosVertex3 = PosVertex3 & { haveBeenAdjusted?: boolean }
 
@@ -187,7 +187,7 @@ export const connectToNearPolygons = (targetGroup, distanceThreshold = 100) => {
       return polygons
     }
 
-    const candidates: { [key: string]: Candidate[] } = {}
+    const candidates: KVPair<Candidate[]> = {}
 
     const vertices: AdjustablePosVertex3[] = []
 

@@ -1,13 +1,14 @@
 import { compose, clone, filter, propEq, reduce, uniq } from 'ramda'
+import { KVPair, RecursiveKVPair } from 'src/types'
 import { getRootPath } from '../../rootpath'
 
 export type Ambience = {
   name: string
-  tracks: string[]
+  tracks?: string[]
   native: boolean
 }
 
-export const ambiences = {
+export const ambiences: RecursiveKVPair<Ambience> = {
   none: {
     name: 'NONE',
     native: true,
@@ -36,7 +37,7 @@ export const exportAmbiences = (outputDir: string) => {
   )
   const ambiencesToBeExported = uniq(customAmbiences)
 
-  const filesToBeExported: { [key: string]: string } = {}
+  const filesToBeExported: KVPair<string> = {}
 
   return ambiencesToBeExported.reduce((files, { name, tracks }) => {
     const filename = `${outputDir}/sfx/ambiance/${name}.amb`

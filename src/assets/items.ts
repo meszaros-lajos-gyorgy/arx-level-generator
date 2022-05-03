@@ -23,7 +23,8 @@ import {
 import { padCharsStart } from 'ramda-adjunct'
 import { declare } from '../scripting'
 import {
-  RecursiceKVPair,
+  KVPair,
+  RecursiveKVPair,
   RelativeCoords,
   RotationVector3,
   RotationVertex3,
@@ -80,7 +81,7 @@ export type ItemDefinition = {
   props?: InjectableProps
 }
 
-export const items: RecursiceKVPair<ItemDefinition> = {
+export const items: RecursiveKVPair<ItemDefinition> = {
   marker: {
     src: 'system/marker/marker.teo',
     native: true,
@@ -238,7 +239,8 @@ export const items: RecursiceKVPair<ItemDefinition> = {
   },
 }
 
-let usedItems: { [key: string]: any } = {}
+// TODO: make this more specific
+let usedItems: KVPair<any> = {}
 
 const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   const init: string[] = []
@@ -406,7 +408,11 @@ export const markAsUsed = (itemRef: ItemRef) => {
 }
 
 // source: https://stackoverflow.com/a/40011873/1806628
-const capitalize = compose(join(''), juxt([compose(toUpper, head), tail]))
+const capitalize = (str: string) => {
+  const firstLetter = str[0].toUpperCase()
+  const restOfTheString = str.slice(1)
+  return firstLetter + restOfTheString
+}
 
 // asd/asd.teo -> Asd\\Asd.teo
 const arxifyFilename = (filename: string) => {
@@ -436,11 +442,12 @@ export const exportUsedItems = (mapData) => {
     unnest,
     map(values),
     values,
-    clone,
-  )(usedItems)
+  )(copyOfUsedItems)
 }
 
 export const exportScripts = (outputDir: string) => {
+  const copyOfUsedItems = clone(usedItems)
+
   return compose(
     reduce((files, item) => {
       const { dir, name } = path.parse(item.filename)
@@ -460,8 +467,7 @@ export const exportScripts = (outputDir: string) => {
     unnest,
     map(values),
     values,
-    clone,
-  )(usedItems)
+  )(copyOfUsedItems)
 }
 
 export const exportDependencies = (outputDir: string) => {

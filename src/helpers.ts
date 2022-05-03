@@ -21,12 +21,7 @@ import {
   adjust,
   split,
   unary,
-  values,
-  keys,
   curry,
-  apply,
-  zip,
-  divide,
   repeat,
   either,
   clone,
@@ -66,30 +61,33 @@ import {
   Vertex3,
 } from './types'
 
-export const normalize = (v: Vector3): Vector3 => {
-  return map(apply(divide), zip(v, repeat(magnitude(v), 3)))
+export const normalize = (vector: Vector3): Vector3 => {
+  const [x, y, z] = vector
+  const mag = magnitude(vector)
+  return [x / mag, y / mag, z / mag]
 }
 
 export const move = curry((x, y, z, vector) => {
-  return [vector[0] + x, vector[1] + y, vector[2] + z]
+  const [vx, vy, vz] = vector
+  return [vx + x, vy + y, vz + z]
 })
 
 export const addCoords = (
   a: RelativeCoords | AbsoluteCoords,
   b: RelativeCoords | AbsoluteCoords,
 ): RelativeCoords | AbsoluteCoords => {
-  if (a.type === b.type) {
-    return {
-      type: a.type,
-      coords: [
-        a.coords[0] + b.coords[0],
-        a.coords[1] + b.coords[1],
-        a.coords[2] + b.coords[2],
-      ],
-    }
+  if (a.type !== b.type) {
+    throw new Error('Incompatible coords')
   }
 
-  throw new Error('Incompatible coords')
+  return {
+    type: a.type,
+    coords: [
+      a.coords[0] + b.coords[0],
+      a.coords[1] + b.coords[1],
+      a.coords[2] + b.coords[2],
+    ],
+  }
 }
 
 // "#ff07a4" -> { r: [0..255], g: [0..255], b: [0..255], a: [0..255] }
@@ -129,21 +127,24 @@ const generateLights = (mapData) => {
   const colors: RgbaBytes[] = []
   const white = toRgba('white')
 
-  const p = mapData.fts.polygons.reduce((acc, { vertices }, idx) => {
-    const x = Math.min(...pluck('posX', vertices))
-    const z = Math.min(...pluck('posZ', vertices))
+  const p = mapData.fts.polygons.reduce(
+    (acc, { vertices }: { vertices: PosVertex3[] }, idx) => {
+      const x = Math.min(...vertices.map(({ posX }) => posX))
+      const z = Math.min(...pluck('posZ', vertices))
 
-    const cellX = Math.floor(x / 100)
-    const cellZ = Math.floor(z / 100) + 1
+      const cellX = Math.floor(x / 100)
+      const cellZ = Math.floor(z / 100) + 1
 
-    if (!acc[`${cellZ}-${cellX}`]) {
-      acc[`${cellZ}-${cellX}`] = [idx]
-    } else {
-      acc[`${cellZ}-${cellX}`].push(idx)
-    }
+      if (!acc[`${cellZ}-${cellX}`]) {
+        acc[`${cellZ}-${cellX}`] = [idx]
+      } else {
+        acc[`${cellZ}-${cellX}`].push(idx)
+      }
 
-    return acc
-  }, {})
+      return acc
+    },
+    {},
+  )
 
   for (let z = 0; z < MAP_MAX_HEIGHT; z++) {
     for (let x = 0; x < MAP_MAX_WIDTH; x++) {
@@ -213,7 +214,9 @@ const calculateNormals = (mapData) => {
 }
 
 export const finalize = (mapData) => {
-  mapData.fts.polygons = compose(unnest, values)(mapData.fts.polygons)
+  mapData.fts.polygons = Object.values(mapData.fts.polygons).flatMap(
+    (polygonGroup) => polygonGroup,
+  )
   const numberOfPolygons = mapData.fts.polygons.length
   mapData.dlf.header.numberOfBackgroundPolygons = numberOfPolygons
   mapData.llf.header.numberOfBackgroundPolygons = numberOfPolygons
@@ -356,21 +359,20 @@ export const saveToDisk = async (mapData) => {
     meta: mapData.meta,
     config: mapData.config,
     files: [
-      ...values(files),
-      ...keys(scripts),
-      ...keys(ambiences),
-      ...keys(dependencies),
-      ...keys(textures),
+      ...Object.values(files),
+      ...Object.keys(scripts),
+      ...Object.keys(ambiences),
+      ...Object.keys(dependencies),
+      ...Object.keys(textures),
       files.fts.replace('.fts.json', '.fts'),
       files.dlf.replace('.dlf.json', '.dlf'),
       files.llf.replace('.llf.json', '.llf'),
     ].sort(),
   }
 
-  const tasks = map(
-    (path) => fs.promises.mkdir(dirname(path), { recursive: true }),
-    manifest.files,
-  )
+  const tasks = manifest.files.map((path) => {
+    return fs.promises.mkdir(dirname(path), { recursive: true })
+  })
 
   for (let task of tasks) {
     await task
