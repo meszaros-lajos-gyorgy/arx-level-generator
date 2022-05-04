@@ -9,7 +9,6 @@ import {
   uniq,
 } from 'ramda'
 import { MapData } from 'src/helpers'
-import { KVPair } from 'src/types'
 import { getRootPath } from '../../rootpath'
 import { POLY_QUAD, POLY_TRANS, POLY_NO_SHADOW, POLY_WATER } from '../constants'
 
@@ -177,7 +176,7 @@ export const exportTextures = (outputDir: string) => {
   )
   const texturesToBeExported = uniq(customTextures)
 
-  const filesToBeExported: KVPair<string> = {}
+  const filesToBeExported: Record<string, string> = {}
 
   return texturesToBeExported.reduce((files, texture) => {
     const filename = `${outputDir}/graph/obj3d/textures/${texture.src}`

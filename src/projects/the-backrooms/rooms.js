@@ -1,4 +1,4 @@
-import { times, repeat, clamp, curry, flatten, uniq } from 'ramda'
+import { times, repeat, clamp, flatten, uniq } from 'ramda'
 import { textures } from '../../assets/textures'
 import { HFLIP, VFLIP } from '../../constants'
 import { setTexture, pickRandom, move } from '../../helpers'
@@ -107,7 +107,7 @@ export const generateGrid = (size) => {
   return times(() => repeat(0, size), size)
 }
 
-export const addRoom = curry((width, height, grid) => {
+export const addRoom = (width, height, grid) => {
   if (isEmpty(grid)) {
     return addFirstRoom(width, height, grid)
   }
@@ -145,7 +145,7 @@ export const addRoom = curry((width, height, grid) => {
   const startingPos = pickRandom(variants)
 
   return insertRoom(startingPos[0], startingPos[1], width, height, grid)
-})
+}
 
 const decalOffset = {
   right: [1, 0, 0],

@@ -62,7 +62,6 @@ import { dirname, resolve } from 'path'
 import {
   AbsoluteCoords,
   FloatRgb,
-  KVPair,
   PosVertex3,
   RelativeCoords,
   RgbaBytes,
@@ -306,7 +305,7 @@ export type MapData = {
     createdAt: string
     generatorVersion: string
   }
-  config: KVPair<any> // TODO
+  config: Record<string, any> // TODO
   state: {
     color: string | null
     texture: TextureDefinition | null

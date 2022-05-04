@@ -208,26 +208,34 @@ ON GOT_RUNE {
 }
       `
     }),
-    addDependency('graph/levels/level1/map.bmp'),
-    addDependencyAs(
-      'projects/the-backrooms/loading.bmp',
-      `graph/levels/level${config.levelIdx}/loading.bmp`,
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/sfx/no-sound.wav',
-      'sfx/magic_spell_ignite.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/sfx/no-sound.wav',
-      'sfx/magic_spell_douse.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/sfx/no-sound.wav',
-      'sfx/player_level_up.wav',
-    ),
-    declare('int', 'hasAam', 0),
-    declare('int', 'hasFolgora', 0),
-    declare('int', 'hasTaar', 0),
+    (item) => {
+      addDependency('graph/levels/level1/map.bmp', item)
+      addDependencyAs(
+        'projects/the-backrooms/loading.bmp',
+        `graph/levels/level${config.levelIdx}/loading.bmp`,
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/sfx/no-sound.wav',
+        'sfx/magic_spell_ignite.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/sfx/no-sound.wav',
+        'sfx/magic_spell_douse.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/sfx/no-sound.wav',
+        'sfx/player_level_up.wav',
+        item,
+      )
+      declare('int', 'hasAam', 0, item)
+      declare('int', 'hasFolgora', 0, item)
+      declare('int', 'hasTaar', 0, item)
+
+      return item
+    },
     createItem,
   )(items.marker)
 }
@@ -383,50 +391,68 @@ ON OPEN {
 }
       `
     }),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/english/do-you-smell-it.wav',
-      'speech/english/whisper--do-you-smell-it.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/german/do-you-smell-it.wav',
-      'speech/deutsch/whisper--do-you-smell-it.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/english/drink-it.wav',
-      'speech/english/whisper--drink-it.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/german/drink-it.wav',
-      'speech/deutsch/whisper--drink-it.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/english/drink-the-almond-water.wav',
-      'speech/english/whisper--drink-the-almond-water.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/german/drink-the-almond-water.wav',
-      'speech/deutsch/whisper--drink-the-almond-water.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/english/magic-wont-save-you.wav',
-      'speech/english/whisper--magic-wont-save-you.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/german/magic-wont-save-you.wav',
-      'speech/deutsch/whisper--magic-wont-save-you.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/english/no-exit.wav',
-      'speech/english/whisper--no-exit.wav',
-    ),
-    addDependencyAs(
-      'projects/the-backrooms/whispers/german/no-exit.wav',
-      'speech/deutsch/whisper--no-exit.wav',
-    ),
-    addDependencyAs('projects/the-backrooms/sfx/baby.wav', 'sfx/baby.wav'),
-    declare('int', 'magicCntr', 0),
-    declare('int', 'harmfulAlmondWaterCounter', 0),
-    declare('int', 'previousHarmfulAlmondWaterCounter', -1),
+    (item) => {
+      addDependencyAs(
+        'projects/the-backrooms/whispers/english/do-you-smell-it.wav',
+        'speech/english/whisper--do-you-smell-it.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/german/do-you-smell-it.wav',
+        'speech/deutsch/whisper--do-you-smell-it.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/english/drink-it.wav',
+        'speech/english/whisper--drink-it.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/german/drink-it.wav',
+        'speech/deutsch/whisper--drink-it.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/english/drink-the-almond-water.wav',
+        'speech/english/whisper--drink-the-almond-water.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/german/drink-the-almond-water.wav',
+        'speech/deutsch/whisper--drink-the-almond-water.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/english/magic-wont-save-you.wav',
+        'speech/english/whisper--magic-wont-save-you.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/german/magic-wont-save-you.wav',
+        'speech/deutsch/whisper--magic-wont-save-you.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/english/no-exit.wav',
+        'speech/english/whisper--no-exit.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/whispers/german/no-exit.wav',
+        'speech/deutsch/whisper--no-exit.wav',
+        item,
+      )
+      addDependencyAs(
+        'projects/the-backrooms/sfx/baby.wav',
+        'sfx/baby.wav',
+        item,
+      )
+      declare('int', 'magicCntr', 0, item)
+      declare('int', 'harmfulAlmondWaterCounter', 0, item)
+      declare('int', 'previousHarmfulAlmondWaterCounter', -1, item)
+
+      return item
+    },
     createItem,
   )(items.marker)
 }
@@ -494,15 +520,19 @@ ON ACTION {
 }
       `
     }),
-    declare('int', 'lockpickability', 100),
-    declare('string', 'type', 'Door_Ylsides'),
-    declare('string', 'key', key.ref),
-    declare('int', 'open', 0),
-    declare('int', 'unlock', 0),
-    addDependencyAs(
-      'projects/the-backrooms/sfx/backrooms-outro.wav',
-      'sfx/backrooms-outro.wav',
-    ),
+    (item) => {
+      declare('int', 'lockpickability', 100, item)
+      declare('string', 'type', 'Door_Ylsides', item)
+      declare('string', 'key', key.ref, item)
+      declare('int', 'open', 0, item)
+      declare('int', 'unlock', 0, item)
+      addDependencyAs(
+        'projects/the-backrooms/sfx/backrooms-outro.wav',
+        'sfx/backrooms-outro.wav',
+        item,
+      )
+      return item
+    },
     createItem,
     // )(items.doors.lightDoor, { name: "[door--exit]" });
   )(items.doors.lightDoor, { name: 'Unmarked fire exit' })
@@ -531,7 +561,7 @@ ON INVENTORYIN {
 }
       `
     }),
-    declare('int', 'pickedUp', 0),
+    (item) => declare('int', 'pickedUp', 0, item),
     createItem,
     // )(items.keys.oliverQuest, { name: "[key--exit]" });
   )(items.keys.oliverQuest, { name: 'Fire exit key' })
@@ -612,12 +642,16 @@ ON INVENTORYUSE {
 }
       `
     }),
-    addDependencyAs(
-      'projects/the-backrooms/almondwater.bmp',
-      'graph/obj3d/interactive/items/magic/potion_mana/potion_mana[icon].bmp',
-    ),
-    declare('string', 'variant', variant),
-    declare('int', 'pickedUp', 0),
+    (item) => {
+      addDependencyAs(
+        'projects/the-backrooms/almondwater.bmp',
+        'graph/obj3d/interactive/items/magic/potion_mana/potion_mana[icon].bmp',
+        item,
+      )
+      declare('string', 'variant', variant, item)
+      declare('int', 'pickedUp', 0, item)
+      return item
+    },
     createItem,
   )(items.magic.potion.mana, {
     // name: `[item--almond-water]`,
@@ -663,26 +697,22 @@ const generate = async (config) => {
 
   let roomCounter = 1
 
-  const grid = compose(
-    (grid) => {
-      let oldGrid = JSON.stringify(grid)
-      for (let i = 0; i < config.numberOfRooms; i++) {
-        grid = addRoom(
-          randomBetween(...config.roomDimensions.width),
-          randomBetween(...config.roomDimensions.depth),
-          grid,
-        )
-        let newGrid = JSON.stringify(grid)
-        if (newGrid !== oldGrid) {
-          oldGrid = newGrid
-          roomCounter++
-        }
-      }
-      return grid
-    },
-    addRoom(3, 3),
-    generateGrid,
-  )(50)
+  const grid = generateGrid(50)
+  addRoom(3, 3, grid)
+
+  let oldGrid = JSON.stringify(grid)
+  for (let i = 0; i < config.numberOfRooms; i++) {
+    grid = addRoom(
+      randomBetween(...config.roomDimensions.width),
+      randomBetween(...config.roomDimensions.depth),
+      grid,
+    )
+    let newGrid = JSON.stringify(grid)
+    if (newGrid !== oldGrid) {
+      oldGrid = newGrid
+      roomCounter++
+    }
+  }
 
   config.originalNumberOfRooms = config.numberOfRooms
   config.numberOfRooms = roomCounter

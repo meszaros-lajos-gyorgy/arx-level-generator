@@ -1,5 +1,5 @@
 import { MAP_MAX_WIDTH, MAP_MAX_HEIGHT } from './constants'
-import { KVPair, NullableVertex3, RotationVertex3, Vertex3 } from './types'
+import { NullableVertex3, RotationVertex3, Vertex3 } from './types'
 
 export type Meta = {
   type: string
@@ -97,7 +97,7 @@ export type FtsData = {
     playerPosition: Vertex3
     mScenePosition: Vertex3
   }
-  polygons: KVPair<any[]> & { global: any[] } // TODO
+  polygons: Record<string, any[]> & { global: any[] } // TODO
   textureContainers: any[] // TODO
   cells: { anchors: any[] }[] // TODO
   anchors: any[] // TODO

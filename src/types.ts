@@ -66,5 +66,3 @@ export type FloatRgb = {
   g: number
   b: number
 }
-
-export type KVPair<T> = { [key: string]: T }

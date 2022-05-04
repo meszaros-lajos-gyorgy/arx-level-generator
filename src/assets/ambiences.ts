@@ -1,5 +1,4 @@
 import { clone, uniq } from 'ramda'
-import { KVPair } from 'src/types'
 import { getRootPath } from '../../rootpath'
 
 export type AmbienceDefinition = {
@@ -39,7 +38,7 @@ export const exportAmbiences = (outputDir: string) => {
   )
   const ambiencesToBeExported = uniq(customAmbiences)
 
-  const filesToBeExported: KVPair<string> = {}
+  const filesToBeExported: Record<string, string> = {}
 
   return ambiencesToBeExported.reduce((files, { name, tracks }) => {
     const filename = `${outputDir}/sfx/ambiance/${name}.amb`

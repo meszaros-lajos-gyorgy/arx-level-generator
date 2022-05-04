@@ -196,14 +196,17 @@ ON COLLIDE_NPC {
 }
       `
     }),
-    addDependency('sfx/statue_idle1.wav'),
-    addDependency('sfx/statue_idle2.wav'),
-    addDependency('sfx/statue_idle3.wav'),
-    addDependency('sfx/statue_jumpscare1.wav'),
-    addDependency('sfx/statue_jumpscare2.wav'),
-    addDependency('sfx/statue_no.wav'),
-    declare('int', 'idle', 1),
-    declare('int', 'idleSoundIdx', 0),
+    (item) => {
+      addDependency('sfx/statue_idle1.wav', item)
+      addDependency('sfx/statue_idle2.wav', item)
+      addDependency('sfx/statue_idle3.wav', item)
+      addDependency('sfx/statue_jumpscare1.wav', item)
+      addDependency('sfx/statue_jumpscare2.wav', item)
+      addDependency('sfx/statue_no.wav', item)
+      declare('int', 'idle', 1, item)
+      declare('int', 'idleSoundIdx', 0, item)
+      return item
+    },
     createRootItem,
   )(items.npc.statue, {
     name: '...redacted...',

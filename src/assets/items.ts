@@ -17,7 +17,6 @@ import {
 import { padCharsStart } from 'ramda-adjunct'
 import { declare } from '../scripting'
 import {
-  KVPair,
   RelativeCoords,
   RotationVector3,
   RotationVertex3,
@@ -243,7 +242,7 @@ export const items = {
   },
 }
 
-let usedItems: KVPair<Item[] & { root?: RootItem }> = {}
+let usedItems: Record<string, Item[] & { root?: RootItem }> = {}
 
 const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   const init: string[] = []
@@ -348,26 +347,28 @@ export const createRootItem = (
   }
 }
 
-export const addDependency = curry((dependency, itemRef: ItemRef) => {
+export const addDependency = (dependency, itemRef: ItemRef) => {
   const { src, id } = itemRef
 
   usedItems[src][id].dependencies.push(dependency)
 
   return itemRef
-})
+}
 
-export const addDependencyAs = curry(
-  (source: string, target: string, itemRef: ItemRef) => {
-    const { src, id } = itemRef
+export const addDependencyAs = (
+  source: string,
+  target: string,
+  itemRef: ItemRef,
+) => {
+  const { src, id } = itemRef
 
-    usedItems[src][id].dependencies.push({
-      source,
-      target,
-    })
+  usedItems[src][id].dependencies.push({
+    source,
+    target,
+  })
 
-    return itemRef
-  },
-)
+  return itemRef
+}
 
 export const addScript = curry(
   (script: string | ((self: ItemRef) => string), itemRef: ItemRef) => {
@@ -469,7 +470,7 @@ export const exportScripts = (outputDir: string) => {
     copyOfUsedItems,
   ).flatMap((itemInstance) => Object.values(itemInstance))
 
-  const scriptsToBeExported: KVPair<string> = {}
+  const scriptsToBeExported: Record<string, string> = {}
 
   return itemInstances
     .filter(({ used }) => used === true)
@@ -502,7 +503,7 @@ export const exportDependencies = (outputDir: string) => {
 
   const uniqDependencies = uniq(dependencies)
 
-  const filesToBeExported: KVPair<string> = {}
+  const filesToBeExported: Record<string, string> = {}
 
   return uniqDependencies.reduce((files, dependency) => {
     if (typeof dependency === 'object') {

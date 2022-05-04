@@ -73,12 +73,16 @@ ON CONTROLLEDZONE_ENTER {
 }
       `
     }),
-    declare('int', 'hadIntro', 0),
-    addDependency('graph/levels/level1/map.bmp'),
-    addDependencyAs(
-      'projects/alias-nightmare/loading.bmp',
-      `graph/levels/level${config.levelIdx}/loading.bmp`,
-    ),
+    (item) => {
+      declare('int', 'hadIntro', 0, item)
+      addDependency('graph/levels/level1/map.bmp', item)
+      addDependencyAs(
+        'projects/alias-nightmare/loading.bmp',
+        `graph/levels/level${config.levelIdx}/loading.bmp`,
+        item,
+      )
+      return item
+    },
     createItem,
   )(items.marker)
 }
@@ -120,8 +124,15 @@ ON CONTROLLEDZONE_ENTER {
 }
       `
     }),
-    addDependencyAs('projects/alias-nightmare/UruLink.wav', `sfx/UruLink.wav`),
-    declare('int', 'isCatching', 0),
+    (item) => {
+      declare('int', 'isCatching', 0, item)
+      addDependencyAs(
+        'projects/alias-nightmare/UruLink.wav',
+        `sfx/UruLink.wav`,
+        item,
+      )
+      return item
+    },
     createItem,
   )(items.marker)
 }

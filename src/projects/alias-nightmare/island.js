@@ -101,7 +101,7 @@ const createPressurePlate = (id, eventBus) => {
       ACCEPT
     `
     }),
-    declare('int', 'onme', 0),
+    (item) => declare('int', 'onme', 0, item),
     createItem,
   )(items.mechanisms.pressurePlate)
 }
@@ -238,14 +238,14 @@ const createEventBus = (gates) => {
   }
     `
     }),
-    declare('int', 'northGateOpened', 0),
-    declare('int', 'southGateOpened', 0),
-    declare('int', 'westGateOpened', 0),
-    declare('int', 'eastGateOpened', 0),
-    declare('int', 'pp0pressed', 0),
-    declare('int', 'pp1pressed', 0),
-    declare('int', 'pp2pressed', 0),
-    declare('int', 'pp3pressed', 0),
+    (item) => declare('int', 'northGateOpened', 0, item),
+    (item) => declare('int', 'southGateOpened', 0, item),
+    (item) => declare('int', 'westGateOpened', 0, item),
+    (item) => declare('int', 'eastGateOpened', 0, item),
+    (item) => declare('int', 'pp0pressed', 0, item),
+    (item) => declare('int', 'pp1pressed', 0, item),
+    (item) => declare('int', 'pp2pressed', 0, item),
+    (item) => declare('int', 'pp3pressed', 0, item),
     createItem,
   )(items.marker)
 }
@@ -291,8 +291,8 @@ ON OPEN {
 }
   `
     }),
-    declare('int', 'isOpen', props.isOpen ?? false ? 1 : 0),
-    declare('int', 'isWide', props.isWide ?? false ? 1 : 0),
+    (item) => declare('int', 'isOpen', props.isOpen ?? false ? 1 : 0, item),
+    (item) => declare('int', 'isWide', props.isWide ?? false ? 1 : 0, item),
     createItem,
   )(items.doors.portcullis)
 }

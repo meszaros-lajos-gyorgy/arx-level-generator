@@ -1,5 +1,5 @@
 import rgba from 'color-rgba'
-import { compose, dropLast, join, curry, map } from 'ramda'
+import { compose, dropLast, join, map } from 'ramda'
 
 export const color = (colorDefinition) => {
   return compose(
@@ -15,7 +15,7 @@ const globalScope = {
   injections: {},
 }
 
-export const declare = curry((type, name, initialValue, scope) => {
+export const declare = (type, name, initialValue, scope) => {
   let value = initialValue
   if (scope === 'global') {
     switch (type) {
@@ -58,7 +58,7 @@ export const declare = curry((type, name, initialValue, scope) => {
   }
 
   return scope
-})
+}
 
 export const getInjections = (eventName, scope) => {
   return (
