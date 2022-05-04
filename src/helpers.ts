@@ -5,8 +5,16 @@ import {
   textures,
   exportTextures,
   resetTextures,
+  TextureDefinition,
 } from './assets/textures'
-import { createDlfData, createFtsData, createLlfData } from './blankMap'
+import {
+  createDlfData,
+  createFtsData,
+  createLlfData,
+  DlfData,
+  FtsData,
+  LlfData,
+} from './blankMap'
 import {
   pluck,
   compose,
@@ -48,11 +56,13 @@ import {
   exportAmbiences,
   useAmbience,
   resetAmbiences,
+  AmbienceDefinition,
 } from './assets/ambiences'
 import { dirname, resolve } from 'path'
 import {
   AbsoluteCoords,
   FloatRgb,
+  KVPair,
   PosVertex3,
   RelativeCoords,
   RgbaBytes,
@@ -67,10 +77,12 @@ export const normalize = (vector: Vector3): Vector3 => {
   return [x / mag, y / mag, z / mag]
 }
 
-export const move = curry((x, y, z, vector) => {
-  const [vx, vy, vz] = vector
-  return [vx + x, vy + y, vz + z]
-})
+export const move = curry(
+  (x: number, y: number, z: number, vector: Vector3) => {
+    const [vx, vy, vz] = vector
+    return [vx + x, vy + y, vz + z]
+  },
+)
 
 export const addCoords = (
   a: RelativeCoords | AbsoluteCoords,
@@ -214,10 +226,12 @@ const calculateNormals = (mapData) => {
 }
 
 export const finalize = (mapData) => {
-  mapData.fts.polygons = Object.values(mapData.fts.polygons).flatMap(
+  const ungroupedPolygons = Object.values(mapData.fts.polygons).flatMap(
     (polygonGroup) => polygonGroup,
   )
-  const numberOfPolygons = mapData.fts.polygons.length
+  const numberOfPolygons = ungroupedPolygons.length
+
+  mapData.fts.polygons = ungroupedPolygons
   mapData.dlf.header.numberOfBackgroundPolygons = numberOfPolygons
   mapData.llf.header.numberOfBackgroundPolygons = numberOfPolygons
 
@@ -281,17 +295,37 @@ const addOriginPolygon = (mapData) => {
   return mapData
 }
 
-const timestampToDate = (timestamp) => {
+const timestampToDate = (timestamp: number) => {
   const date = new Date()
   date.setTime(timestamp * 1000)
   return date.toUTCString()
 }
 
+export type MapData = {
+  meta: {
+    createdAt: string
+    generatorVersion: string
+  }
+  config: KVPair<any> // TODO
+  state: {
+    color: string | null
+    texture: TextureDefinition | null
+    spawn: Vector3
+    spawnAngle: number
+    vertexCounter: number
+    polygonGroup: string
+  }
+  items: any[] // TODO
+  dlf: DlfData
+  fts: FtsData
+  llf: LlfData
+}
+
 export const generateBlankMapData = (config) => {
   const now = Math.floor(Date.now() / 1000)
-  const generatorVersion = require('../package.json').version
+  const generatorVersion = require('../package.json').version as string
 
-  const mapData = {
+  const mapData: MapData = {
     meta: {
       createdAt: timestampToDate(now),
       generatorVersion,
@@ -380,19 +414,21 @@ export const saveToDisk = async (mapData) => {
 
   // ------------
 
-  scripts = toPairs(scripts)
-
-  for (let [filename, script] of scripts) {
+  for (let [filename, script] of Object.entries(scripts)) {
     await fs.promises.writeFile(filename, script, 'latin1')
   }
 
   // ------------
 
-  ambiences = toPairs(ambiences)
-  dependencies = toPairs(dependencies)
-  textures = toPairs(textures)
+  ambiences = Object.entries(ambiences)
+  dependencies = Object.entries(dependencies)
+  textures = Object.entries(textures)
 
-  for (let [target, source] of [...ambiences, ...dependencies, ...textures]) {
+  for (let [target, source] of [
+    ...Object.entries(ambiences),
+    ...Object.entries(dependencies),
+    ...Object.entries(textures),
+  ]) {
     await fs.promises.copyFile(source, target)
   }
 
@@ -588,7 +624,7 @@ export const addZone = (
   pos: RelativeCoords,
   size,
   name,
-  ambience = ambiences.none,
+  ambience: AmbienceDefinition = ambiences.none,
   drawDistance = 2000,
   flags = PATH_RGB | PATH_AMBIANCE | PATH_FARCLIP,
 ) => {

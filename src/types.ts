@@ -16,6 +16,12 @@ export type Vertex3 = {
   z: number
 }
 
+export type NullableVertex3 = {
+  x: number | null
+  y: number | null
+  z: number | null
+}
+
 export type RotationVertex3 = {
   a: number
   b: number
@@ -62,5 +68,3 @@ export type FloatRgb = {
 }
 
 export type KVPair<T> = { [key: string]: T }
-
-export type RecursiveKVPair<T> = { [key: string]: T | RecursiveKVPair<T> }

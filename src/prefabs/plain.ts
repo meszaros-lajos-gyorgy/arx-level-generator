@@ -13,9 +13,9 @@ import {
 import { identity, clamp, pluck } from 'ramda'
 import { AbsoluteCoords, KVPair, PosVertex3, Vector3 } from 'src/types'
 
-type AdjustablePosVertex3 = PosVertex3 & { haveBeenAdjusted?: boolean }
+export type AdjustablePosVertex3 = PosVertex3 & { haveBeenAdjusted?: boolean }
 
-type Candidate = {
+export type Candidate = {
   polygon: any // TODO
   vertex: AdjustablePosVertex3
   distance: number

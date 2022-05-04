@@ -5,18 +5,12 @@ import {
   compose,
   unnest,
   clone,
-  join,
-  juxt,
-  toUpper,
-  head,
-  tail,
   reduce,
   toString,
   propEq,
   filter,
   curry,
   isEmpty,
-  reject,
   pluck,
   uniq,
 } from 'ramda'
@@ -24,7 +18,6 @@ import { padCharsStart } from 'ramda-adjunct'
 import { declare } from '../scripting'
 import {
   KVPair,
-  RecursiveKVPair,
   RelativeCoords,
   RotationVector3,
   RotationVertex3,
@@ -55,12 +48,14 @@ export type ItemRef = {
   ref: string
 }
 
+export type Dependency = string | { source: string; target: string }
+
 export type RootItem = {
   filename: string
   used: boolean
   identifier: 'root'
   script: string
-  dependencies: string[]
+  dependencies: Dependency[]
 }
 
 export type Item = {
@@ -71,7 +66,7 @@ export type Item = {
   angle: RotationVertex3
   script: string
   flags: number
-  dependencies: string[]
+  dependencies: Dependency[]
 }
 
 export type ItemDefinition = {
@@ -81,7 +76,16 @@ export type ItemDefinition = {
   props?: InjectableProps
 }
 
-export const items: RecursiveKVPair<ItemDefinition> = {
+// TODO: this should come from arx-level-json-converter
+export type DlfInteractiveObject = {
+  name: string
+  pos: Vertex3
+  angle: RotationVertex3
+  identifier: number
+  flags: number
+}
+
+export const items = {
   marker: {
     src: 'system/marker/marker.teo',
     native: true,
@@ -239,8 +243,7 @@ export const items: RecursiveKVPair<ItemDefinition> = {
   },
 }
 
-// TODO: make this more specific
-let usedItems: KVPair<any> = {}
+let usedItems: KVPair<Item[] & { root?: RootItem }> = {}
 
 const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   const init: string[] = []
@@ -285,11 +288,13 @@ export const createItem = (
   item: ItemDefinition,
   props: InjectableProps = {},
 ): ItemRef => {
-  usedItems[item.src] = usedItems[item.src] || []
+  if (typeof usedItems[item.src] === 'undefined') {
+    usedItems[item.src] = []
+  }
 
   const id = usedItems[item.src].length
 
-  usedItems[item.src].push({
+  const itemInstance: Item = {
     filename: item.src,
     used: false,
     identifier: id + 1,
@@ -298,7 +303,9 @@ export const createItem = (
     script: '',
     flags: 0,
     dependencies: [...(item.dependencies ?? [])],
-  })
+  }
+
+  usedItems[item.src].push(itemInstance)
 
   const { name } = path.parse(item.src)
   const numericId = padCharsStart('0', 4, toString(id + 1))
@@ -316,15 +323,19 @@ export const createRootItem = (
   item: ItemDefinition,
   props: InjectableProps = {},
 ): ItemRef => {
-  usedItems[item.src] = usedItems[item.src] || []
+  if (typeof usedItems[item.src] === 'undefined') {
+    usedItems[item.src] = []
+  }
 
-  usedItems[item.src].root = {
+  const rootItem: RootItem = {
     filename: item.src,
     used: false,
     identifier: 'root',
     script: '',
     dependencies: [...(item.dependencies ?? [])],
   }
+
+  usedItems[item.src].root = rootItem
 
   const { name } = path.parse(item.src)
 
@@ -345,16 +356,18 @@ export const addDependency = curry((dependency, itemRef: ItemRef) => {
   return itemRef
 })
 
-export const addDependencyAs = curry((source, target, itemRef: ItemRef) => {
-  const { src, id } = itemRef
+export const addDependencyAs = curry(
+  (source: string, target: string, itemRef: ItemRef) => {
+    const { src, id } = itemRef
 
-  usedItems[src][id].dependencies.push({
-    source,
-    target,
-  })
+    usedItems[src][id].dependencies.push({
+      source,
+      target,
+    })
 
-  return itemRef
-})
+    return itemRef
+  },
+)
 
 export const addScript = curry(
   (script: string | ((self: ItemRef) => string), itemRef: ItemRef) => {
@@ -424,35 +437,46 @@ export const exportUsedItems = (mapData) => {
 
   const copyOfUsedItems = clone(usedItems)
 
-  mapData.dlf.interactiveObjects = compose(
-    map((item) => {
-      item.name =
-        'C:\\ARX\\Graph\\Obj3D\\Interactive\\' + arxifyFilename(item.filename)
-      delete item.filename
-      delete item.script
+  const itemInstances: (Item | RootItem)[] = Object.values(
+    copyOfUsedItems,
+  ).flatMap((itemInstance) => Object.values(itemInstance))
 
-      item.pos.x -= spawn[0]
-      item.pos.y -= spawn[1] + PLAYER_HEIGHT_ADJUSTMENT
-      item.pos.z -= spawn[2]
+  const itemsToBeExported = itemInstances.filter(({ identifier, used }) => {
+    return identifier !== 'root' && used === true
+  }) as Item[]
 
-      return item
-    }),
-    filter(propEq('used', true)),
-    reject(propEq('identifier', 'root')),
-    unnest,
-    map(values),
-    values,
-  )(copyOfUsedItems)
+  mapData.dlf.interactiveObjects = itemsToBeExported.map(
+    ({ filename, pos, angle, identifier, flags }): DlfInteractiveObject => {
+      return {
+        name: 'C:\\ARX\\Graph\\Obj3D\\Interactive\\' + arxifyFilename(filename),
+        pos: {
+          x: pos.x - spawn[0],
+          y: pos.y - spawn[1] + PLAYER_HEIGHT_ADJUSTMENT,
+          z: pos.z - spawn[2],
+        },
+        angle,
+        identifier,
+        flags,
+      }
+    },
+  )
 }
 
 export const exportScripts = (outputDir: string) => {
   const copyOfUsedItems = clone(usedItems)
 
-  return compose(
-    reduce((files, item) => {
+  const itemInstances: (Item | RootItem)[] = Object.values(
+    copyOfUsedItems,
+  ).flatMap((itemInstance) => Object.values(itemInstance))
+
+  const scriptsToBeExported: KVPair<string> = {}
+
+  return itemInstances
+    .filter(({ used }) => used === true)
+    .reduce((files, item) => {
       const { dir, name } = path.parse(item.filename)
 
-      let filename
+      let filename: string
       if (item.identifier === 'root') {
         filename = `${outputDir}/graph/obj3d/interactive/${dir}/${name}.asl`
       } else {
@@ -462,48 +486,40 @@ export const exportScripts = (outputDir: string) => {
       files[filename] = item.script
 
       return files
-    }, {}),
-    filter(propEq('used', true)),
-    unnest,
-    map(values),
-    values,
-  )(copyOfUsedItems)
+    }, scriptsToBeExported)
 }
 
 export const exportDependencies = (outputDir: string) => {
-  return compose(
-    reduce((files, filename) => {
-      if (typeof filename === 'object') {
-        const {
-          dir: dir1,
-          name: name1,
-          ext: ext1,
-        } = path.parse(filename.target as string)
-        const {
-          dir: dir2,
-          name: name2,
-          ext: ext2,
-        } = path.parse(filename.source as string)
-        files[
-          `${outputDir}/${dir1}/${name1}${ext1}`
-        ] = `${getRootPath()}/assets/${dir2}/${name2}${ext2}`
-      } else {
-        const { dir, name, ext } = path.parse(filename)
-        const target = `${outputDir}/${dir}/${name}${ext}`
-        files[target] = `${getRootPath()}/assets/${dir}/${name}${ext}`
-      }
+  const copyOfUsedItems = clone(usedItems)
 
-      return files
-    }, {}),
-    uniq,
-    unnest,
-    pluck('dependencies'),
-    filter(propEq('used', true)),
-    unnest,
-    map(values),
-    values,
-    clone,
-  )(usedItems)
+  const itemInstances: (Item | RootItem)[] = Object.values(
+    copyOfUsedItems,
+  ).flatMap((itemInstance) => Object.values(itemInstance))
+
+  const dependencies = itemInstances
+    .filter(({ used }) => used === true)
+    .flatMap(({ dependencies }) => dependencies)
+
+  const uniqDependencies = uniq(dependencies)
+
+  const filesToBeExported: KVPair<string> = {}
+
+  return uniqDependencies.reduce((files, dependency) => {
+    if (typeof dependency === 'object') {
+      const { target, source } = dependency
+      const { dir: dir1, name: name1, ext: ext1 } = path.parse(target)
+      const { dir: dir2, name: name2, ext: ext2 } = path.parse(source)
+      files[
+        `${outputDir}/${dir1}/${name1}${ext1}`
+      ] = `${getRootPath()}/assets/${dir2}/${name2}${ext2}`
+    } else {
+      const { dir, name, ext } = path.parse(dependency)
+      const target = `${outputDir}/${dir}/${name}${ext}`
+      files[target] = `${getRootPath()}/assets/${dir}/${name}${ext}`
+    }
+
+    return files
+  }, filesToBeExported)
 }
 
 export const resetItems = () => {

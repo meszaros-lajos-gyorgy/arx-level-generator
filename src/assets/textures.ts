@@ -8,8 +8,21 @@ import {
   reduce,
   uniq,
 } from 'ramda'
+import { MapData } from 'src/helpers'
+import { KVPair } from 'src/types'
 import { getRootPath } from '../../rootpath'
 import { POLY_QUAD, POLY_TRANS, POLY_NO_SHADOW, POLY_WATER } from '../constants'
+
+export type TextureDefinition = {
+  src: string
+  native: boolean
+  width?: number
+  height?: number
+  path?: string
+  flags?: number
+}
+
+export type Texture = TextureDefinition
 
 export const textures = {
   none: null,
@@ -133,21 +146,21 @@ export const textures = {
   },
 }
 
-let usedTextures = []
+let usedTextures: Texture[] = []
 
-export const useTexture = (texture) => {
+export const useTexture = (texture: TextureDefinition | null) => {
   if (texture === textures.none) {
     return 0
   }
 
-  if (!includes(texture, usedTextures)) {
+  if (!usedTextures.includes(texture)) {
     usedTextures.push(texture)
   }
 
-  return indexOf(texture, usedTextures) + 1
+  return usedTextures.indexOf(texture) + 1
 }
 
-export const createTextureContainers = (mapData) => {
+export const createTextureContainers = (mapData: MapData) => {
   mapData.fts.textureContainers = usedTextures.map((texture, idx) => {
     return {
       tc: idx + 1,
@@ -157,19 +170,23 @@ export const createTextureContainers = (mapData) => {
   })
 }
 
-export const exportTextures = (outputDir) => {
-  return compose(
-    reduce((files, texture) => {
-      const filename = `${outputDir}/graph/obj3d/textures/${texture.src}`
-      files[filename] = `${getRootPath()}/assets/${
-        texture.path ? texture.path : 'graph/obj3d/textures'
-      }/${texture.src}`
-      return files
-    }, {}),
-    uniq,
-    filter(propEq('native', false)),
-    clone,
-  )(usedTextures)
+export const exportTextures = (outputDir: string) => {
+  const copyOfUsedTextures = clone(usedTextures)
+  const customTextures = copyOfUsedTextures.filter(
+    ({ native }) => native === false,
+  )
+  const texturesToBeExported = uniq(customTextures)
+
+  const filesToBeExported: KVPair<string> = {}
+
+  return texturesToBeExported.reduce((files, texture) => {
+    const filename = `${outputDir}/graph/obj3d/textures/${texture.src}`
+    files[filename] = `${getRootPath()}/assets/${
+      texture.path ?? 'graph/obj3d/textures'
+    }/${texture.src}`
+
+    return files
+  }, filesToBeExported)
 }
 
 export const resetTextures = () => {

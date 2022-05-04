@@ -1,14 +1,16 @@
-import { compose, clone, filter, propEq, reduce, uniq } from 'ramda'
-import { KVPair, RecursiveKVPair } from 'src/types'
+import { clone, uniq } from 'ramda'
+import { KVPair } from 'src/types'
 import { getRootPath } from '../../rootpath'
 
-export type Ambience = {
+export type AmbienceDefinition = {
   name: string
   tracks?: string[]
   native: boolean
 }
 
-export const ambiences: RecursiveKVPair<Ambience> = {
+export type Ambience = AmbienceDefinition
+
+export const ambiences = {
   none: {
     name: 'NONE',
     native: true,
@@ -26,7 +28,7 @@ export const ambiences: RecursiveKVPair<Ambience> = {
 
 let usedAmbiences: Ambience[] = []
 
-export const useAmbience = (ambience: Ambience) => {
+export const useAmbience = (ambience: AmbienceDefinition) => {
   usedAmbiences.push(ambience)
 }
 
