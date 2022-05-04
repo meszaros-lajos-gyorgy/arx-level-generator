@@ -31,11 +31,10 @@ import { createCampfire } from './items/campfire'
 import { createGoblin } from './items/goblin'
 
 const createWelcomeMarker = (pos) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, [0, 0, 0]),
-    addScript((self) => {
-      return `
+  const ref = createItem(items.marker)
+
+  addScript((self) => {
+    return `
 // component: welcomeMarker
 ON INIT {
   ${getInjections('init', self)}
@@ -48,50 +47,51 @@ ON CONTROLLEDZONE_ENTER {
   ACCEPT
 }
       `
-    }),
-    createItem,
-  )(items.marker)
+  }, ref)
+
+  markAsUsed(ref)
+  moveTo({ type: 'relative', coords: pos }, [0, 0, 0], ref)
+
+  return ref
 }
 
 const createFishSpawn = (pos) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, [0, 0, 0]),
-    createItem,
-  )(items.fishSpawn)
+  const ref = createItem(items.fishSpawn)
+  moveTo({ type: 'relative', coords: pos }, [0, 0, 0], ref)
+  markAsUsed(ref)
+  return ref
 }
 
 const createBarrel = (pos, angle, contents = []) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, angle),
-    addScript((self) => {
-      return `
+  const ref = createItem(items.containers.barrel)
+  addScript((self) => {
+    return `
 // component: barrel
 ON INIT {
-  ${getInjections('init', self)}
+${getInjections('init', self)}
 
-  // setscale 75
+// setscale 75
 
-  ${contents
-    .map(({ ref }) => {
-      return `inventory addfromscene "${ref}"`
-    })
-    .join('  \n')}
+${contents
+  .map(({ ref }) => {
+    return `inventory addfromscene "${ref}"`
+  })
+  .join('  \n')}
 
-  ACCEPT
+ACCEPT
 }
-      `
-    }),
-    createItem,
-  )(items.containers.barrel)
+    `
+  }, ref)
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+  return ref
 }
 
 const createCards = (pos, angle = [0, 0, 0], props = {}) => {
-  const item = createItem(items.misc.deckOfCards, props)
-  moveTo({ type: 'relative', coords: pos }, angle, item)
-  markAsUsed(item)
-  return item
+  const ref = createItem(items.misc.deckOfCards, props)
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+  return ref
 }
 
 const generate = async (config) => {

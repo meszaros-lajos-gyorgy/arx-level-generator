@@ -37,42 +37,6 @@ const createWelcomeMarker = (pos) => (config) => {
   return compose(
     markAsUsed,
     moveTo({ type: 'relative', coords: pos }, [0, 0, 0]),
-    addScript((self) => {
-      return `
-// component: welcomeMarker
-ON INIT {
-  ${getInjections('init', self)}
-  SETCONTROLLEDZONE palette0
-  // CINEMASCOPE ON
-  // WORLDFADE OUT 0 ${color(colors.ambience[0])}
-
-  ACCEPT
-}
-ON CONTROLLEDZONE_ENTER {
-  if (${self.state.hadIntro} == 0) {
-    TELEPORT -p ${self.ref}
-    SET ${self.state.hadIntro} 1
-    SETPLAYERCONTROLS OFF
-    // TIMERfade 1 2 worldfade IN 2000
-    GOTO READY // TIMERmove -m 1 10 SPEAK -p [alia_nightmare2] GOTO READY
-
-    ACCEPT
-  }
-  ACCEPT
-}
->>READY {
-  CINEMASCOPE -s OFF
-  SETPLAYERCONTROLS ON
-
-  INVENTORY PLAYERADD special/wall_block/wall_block
-  INVENTORY PLAYERADD special/wall_block/wall_block
-  INVENTORY PLAYERADD special/wall_block/wall_block
-  INVENTORY PLAYERADD special/wall_block/wall_block
-
-  ACCEPT
-}
-      `
-    }),
     (item) => {
       declare('int', 'hadIntro', 0, item)
       addDependency('graph/levels/level1/map.bmp', item)
@@ -81,6 +45,43 @@ ON CONTROLLEDZONE_ENTER {
         `graph/levels/level${config.levelIdx}/loading.bmp`,
         item,
       )
+      addScript((self) => {
+        return `
+  // component: welcomeMarker
+  ON INIT {
+    ${getInjections('init', self)}
+    SETCONTROLLEDZONE palette0
+    // CINEMASCOPE ON
+    // WORLDFADE OUT 0 ${color(colors.ambience[0])}
+  
+    ACCEPT
+  }
+  ON CONTROLLEDZONE_ENTER {
+    if (${self.state.hadIntro} == 0) {
+      TELEPORT -p ${self.ref}
+      SET ${self.state.hadIntro} 1
+      SETPLAYERCONTROLS OFF
+      // TIMERfade 1 2 worldfade IN 2000
+      GOTO READY // TIMERmove -m 1 10 SPEAK -p [alia_nightmare2] GOTO READY
+  
+      ACCEPT
+    }
+    ACCEPT
+  }
+  >>READY {
+    CINEMASCOPE -s OFF
+    SETPLAYERCONTROLS ON
+  
+    INVENTORY PLAYERADD special/wall_block/wall_block
+    INVENTORY PLAYERADD special/wall_block/wall_block
+    INVENTORY PLAYERADD special/wall_block/wall_block
+    INVENTORY PLAYERADD special/wall_block/wall_block
+  
+    ACCEPT
+  }
+        `
+      }, item)
+
       return item
     },
     createItem,
@@ -91,8 +92,15 @@ const createFallSaver = (pos, target) => {
   return compose(
     markAsUsed,
     moveTo({ type: 'relative', coords: pos }, [0, 0, 0]),
-    addScript((self) => {
-      return `
+    (item) => {
+      declare('int', 'isCatching', 0, item)
+      addDependencyAs(
+        'projects/alias-nightmare/UruLink.wav',
+        `sfx/UruLink.wav`,
+        item,
+      )
+      addScript((self) => {
+        return `
 // component fallsaver
 ON INIT {
   ${getInjections('init', self)}
@@ -122,15 +130,9 @@ ON CONTROLLEDZONE_ENTER {
   TIMERfadein -m 1 2000 WORLDFADE IN 1000
   RETURN
 }
-      `
-    }),
-    (item) => {
-      declare('int', 'isCatching', 0, item)
-      addDependencyAs(
-        'projects/alias-nightmare/UruLink.wav',
-        `sfx/UruLink.wav`,
-        item,
-      )
+        `
+      }, item)
+
       return item
     },
     createItem,

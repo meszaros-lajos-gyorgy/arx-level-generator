@@ -69,41 +69,41 @@ const getPPIndices = (exits) => {
 }
 
 const createPressurePlate = (id, eventBus) => {
-  return compose(
-    addScript((self) => {
-      return `
-  // component: island.${id}
-    ON INIT {
-      SETSCALE 101
-      ${getInjections('init', self)}
-      ACCEPT
+  const ref = createItem(items.mechanisms.pressurePlate)
+  declare('int', 'onme', 0, ref)
+  addScript((self) => {
+    return `
+// component: island.${id}
+ON INIT {
+  SETSCALE 101
+  ${getInjections('init', self)}
+  ACCEPT
+}
+
+ON INITEND {
+  TIMERontop -im 0 500 GOTO TOP
+  ACCEPT
+}
+
+>>TOP
+  IF ( ^$OBJONTOP == "NONE" ) {
+    IF ( ${self.state.onme} == 1 ) {
+      SET ${self.state.onme} 0
+      PLAYANIM ACTION2
+      SENDEVENT CUSTOM ${eventBus.ref} "${id}.released"
     }
-  
-    ON INITEND {
-      TIMERontop -im 0 500 GOTO TOP
-      ACCEPT
-    }
-  
-    >>TOP
-      IF ( ^$OBJONTOP == "NONE" ) {
-        IF ( ${self.state.onme} == 1 ) {
-          SET ${self.state.onme} 0
-          PLAYANIM ACTION2
-          SENDEVENT CUSTOM ${eventBus.ref} "${id}.released"
-        }
-        ACCEPT
-      }
-      IF ( ${self.state.onme} == 0 ) {
-        SET ${self.state.onme} 1
-        PLAYANIM ACTION1
-        SENDEVENT CUSTOM ${eventBus.ref} "${id}.pressed"
-      }
-      ACCEPT
-    `
-    }),
-    (item) => declare('int', 'onme', 0, item),
-    createItem,
-  )(items.mechanisms.pressurePlate)
+    ACCEPT
+  }
+  IF ( ${self.state.onme} == 0 ) {
+    SET ${self.state.onme} 1
+    PLAYANIM ACTION1
+    SENDEVENT CUSTOM ${eventBus.ref} "${id}.pressed"
+  }
+  ACCEPT
+  `
+  }, ref)
+
+  return ref
 }
 
 const createPressurePlates = (eventBus) => {
@@ -116,9 +116,19 @@ const createPressurePlates = (eventBus) => {
 }
 
 const createEventBus = (gates) => {
-  return compose(
-    addScript((self) => {
-      return `
+  const ref = createItem(items.marker)
+
+  declare('int', 'northGateOpened', 0, ref)
+  declare('int', 'southGateOpened', 0, ref)
+  declare('int', 'westGateOpened', 0, ref)
+  declare('int', 'eastGateOpened', 0, ref)
+  declare('int', 'pp0pressed', 0, ref)
+  declare('int', 'pp1pressed', 0, ref)
+  declare('int', 'pp2pressed', 0, ref)
+  declare('int', 'pp3pressed', 0, ref)
+
+  addScript((self) => {
+    return `
   // component: island.eventBus
   ON INIT {
     ${getInjections('init', self)}
@@ -237,23 +247,18 @@ const createEventBus = (gates) => {
     ACCEPT
   }
     `
-    }),
-    (item) => declare('int', 'northGateOpened', 0, item),
-    (item) => declare('int', 'southGateOpened', 0, item),
-    (item) => declare('int', 'westGateOpened', 0, item),
-    (item) => declare('int', 'eastGateOpened', 0, item),
-    (item) => declare('int', 'pp0pressed', 0, item),
-    (item) => declare('int', 'pp1pressed', 0, item),
-    (item) => declare('int', 'pp2pressed', 0, item),
-    (item) => declare('int', 'pp3pressed', 0, item),
-    createItem,
-  )(items.marker)
+  }, ref)
+
+  return ref
 }
 
 const createGate = (orientation, props) => {
-  return compose(
-    addScript((self) => {
-      return `
+  const ref = createItem(items.doors.portcullis)
+  declare('int', 'isOpen', props.isOpen ?? false ? 1 : 0, ref)
+  declare('int', 'isWide', props.isWide ?? false ? 1 : 0, ref)
+
+  addScript((self) => {
+    return `
 // component island:gates.${orientation}
 ON INIT {
   ${getInjections('init', self)}
@@ -289,12 +294,10 @@ ON OPEN {
   ANCHOR_BLOCK OFF
   REFUSE
 }
-  `
-    }),
-    (item) => declare('int', 'isOpen', props.isOpen ?? false ? 1 : 0, item),
-    (item) => declare('int', 'isWide', props.isWide ?? false ? 1 : 0, item),
-    createItem,
-  )(items.doors.portcullis)
+`
+  }, ref)
+
+  return ref
 }
 
 const createGates = () => {

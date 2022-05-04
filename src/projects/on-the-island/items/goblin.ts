@@ -1,4 +1,3 @@
-import { compose } from 'ramda'
 import {
   addScript,
   items,
@@ -14,18 +13,20 @@ export const createGoblin = (
   angle: RotationVector3 = [0, 0, 0],
   props = {},
 ) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, angle),
-    addScript((self) => {
-      return `
+  const ref = createItem(items.npc.goblin, props)
+
+  addScript((self) => {
+    return `
 // component: goblin
 ON INIT {
-  ${getInjections('init', self)}
-  ACCEPT
+${getInjections('init', self)}
+ACCEPT
 }
-      `
-    }),
-    createItem,
-  )(items.npc.goblin, props)
+    `
+  }, ref)
+
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+
+  return ref
 }

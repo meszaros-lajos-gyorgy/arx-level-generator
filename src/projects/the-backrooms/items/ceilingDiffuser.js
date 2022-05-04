@@ -1,4 +1,3 @@
-import { compose } from 'ramda'
 import {
   createItem,
   addScript,
@@ -17,43 +16,46 @@ const itemDesc = {
 export const defineCeilingDiffuser = () => {
   useTexture(textures.backrooms.ceilingDiffuser)
 
-  return compose(
-    addScript((self) => {
-      return `
-// component: ceilingDiffuser
-ON INIT {
-  ${getInjections('init', self)}
-  USEMESH "polytrans/polytrans.teo"
-  ACCEPT
-}
-
-ON INITEND {
-  TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-ceiling-air-diffuser"
-  ACCEPT
-}
-      `
-    }),
-    createRootItem,
-  )(itemDesc, {
+  const ref = createRootItem(itemDesc, {
     name: 'Ceiling Diffuser',
     interactive: false,
     scale: 0.6,
   })
+
+  addScript((self) => {
+    return `
+// component: ceilingDiffuser
+ON INIT {
+${getInjections('init', self)}
+USEMESH "polytrans/polytrans.teo"
+ACCEPT
+}
+
+ON INITEND {
+TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-ceiling-air-diffuser"
+ACCEPT
+}
+    `
+  }, ref)
+
+  return ref
 }
 
 export const createCeilingDiffuser = (pos, angle = [0, 0, 0], config = {}) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, angle),
-    addScript((self) => {
-      return `
+  const ref = createItem(itemDesc, {})
+
+  addScript((self) => {
+    return `
 // component: ceilingDiffuser
 ON INIT {
-  ${getInjections('init', self)}
-  ACCEPT
+${getInjections('init', self)}
+ACCEPT
 }
-      `
-    }),
-    createItem,
-  )(itemDesc, {})
+    `
+  }, ref)
+
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+
+  return ref
 }

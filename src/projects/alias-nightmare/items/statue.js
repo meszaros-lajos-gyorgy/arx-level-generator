@@ -1,4 +1,3 @@
-import { compose } from 'ramda'
 import {
   addScript,
   createItem,
@@ -11,9 +10,14 @@ import {
 import { getInjections, declare } from '../../../scripting'
 
 export const defineStatue = () => {
-  return compose(
-    addScript((self) => {
-      return `
+  const ref = createRootItem(items.npc.statue, {
+    name: '...redacted...',
+    speed: 3,
+    hp: 1000,
+  })
+
+  addScript((self) => {
+    return `
 // component: statue
 ON INIT {
   ${getInjections('init', self)}
@@ -195,39 +199,34 @@ ON COLLIDE_NPC {
   ACCEPT
 }
       `
-    }),
-    (item) => {
-      addDependency('sfx/statue_idle1.wav', item)
-      addDependency('sfx/statue_idle2.wav', item)
-      addDependency('sfx/statue_idle3.wav', item)
-      addDependency('sfx/statue_jumpscare1.wav', item)
-      addDependency('sfx/statue_jumpscare2.wav', item)
-      addDependency('sfx/statue_no.wav', item)
-      declare('int', 'idle', 1, item)
-      declare('int', 'idleSoundIdx', 0, item)
-      return item
-    },
-    createRootItem,
-  )(items.npc.statue, {
-    name: '...redacted...',
-    speed: 3,
-    hp: 1000,
-  })
+  }, ref)
+  addDependency('sfx/statue_idle1.wav', ref)
+  addDependency('sfx/statue_idle2.wav', ref)
+  addDependency('sfx/statue_idle3.wav', ref)
+  addDependency('sfx/statue_jumpscare1.wav', ref)
+  addDependency('sfx/statue_jumpscare2.wav', ref)
+  addDependency('sfx/statue_no.wav', ref)
+  declare('int', 'idle', 1, ref)
+  declare('int', 'idleSoundIdx', 0, ref)
+
+  return ref
 }
 
 export const createStatue = (pos, angle = [0, 0, 0], props = {}) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, angle),
-    addScript((self) => {
-      return `
+  const ref = createItem(items.npc.statue, props)
+
+  addScript((self) => {
+    return `
 // component: statue
 ON INIT {
   ${getInjections('init', self)}
   ACCEPT
 }
-      `
-    }),
-    createItem,
-  )(items.npc.statue, props)
+    `
+  }, ref)
+
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+
+  return ref
 }

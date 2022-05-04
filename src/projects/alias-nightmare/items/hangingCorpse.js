@@ -1,4 +1,3 @@
-import { compose } from 'ramda'
 import {
   addScript,
   createItem,
@@ -9,11 +8,13 @@ import {
 import { getInjections } from '../../../scripting'
 
 export const createHangingCorpse = (pos, angle = [0, 0, 0], props = {}) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, angle),
-    addScript((self) => {
-      return `
+  const ref = createItem(items.corpse.hanging, {
+    hp: 0,
+    ...props,
+  })
+
+  addScript((self) => {
+    return `
 // component: hangingCorpse
 ON INIT {
   ${getInjections('init', self)}
@@ -26,11 +27,11 @@ ON INIT {
 ON DIE {
   REFUSE
 }
-      `
-    }),
-    createItem,
-  )(items.corpse.hanging, {
-    hp: 0,
-    ...props,
-  })
+    `
+  }, ref)
+
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+
+  return ref
 }

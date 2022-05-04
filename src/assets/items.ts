@@ -1,19 +1,5 @@
 import path from 'path'
-import {
-  map,
-  values,
-  compose,
-  unnest,
-  clone,
-  reduce,
-  toString,
-  propEq,
-  filter,
-  curry,
-  isEmpty,
-  pluck,
-  uniq,
-} from 'ramda'
+import { clone, toString, curry, isEmpty, uniq } from 'ramda'
 import { padCharsStart } from 'ramda-adjunct'
 import { declare } from '../scripting'
 import {
@@ -370,24 +356,25 @@ export const addDependencyAs = (
   return itemRef
 }
 
-export const addScript = curry(
-  (script: string | ((self: ItemRef) => string), itemRef: ItemRef) => {
-    const { src, id } = itemRef
+export const addScript = (
+  script: string | ((self: ItemRef) => string),
+  itemRef: ItemRef,
+) => {
+  const { src, id } = itemRef
 
-    usedItems[src][id].script =
-      (usedItems &&
-      usedItems[src] &&
-      usedItems[src][id] &&
-      usedItems[src][id].script
-        ? usedItems[src][id].script
-        : '') +
-      '\r\n' +
-      '\r\n' +
-      (typeof script === 'function' ? script(itemRef) : script).trim()
+  usedItems[src][id].script =
+    (usedItems &&
+    usedItems[src] &&
+    usedItems[src][id] &&
+    usedItems[src][id].script
+      ? usedItems[src][id].script
+      : '') +
+    '\r\n' +
+    '\r\n' +
+    (typeof script === 'function' ? script(itemRef) : script).trim()
 
-    return itemRef
-  },
-)
+  return itemRef
+}
 
 export const moveTo = curry(
   (
