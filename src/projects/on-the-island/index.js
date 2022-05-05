@@ -195,7 +195,7 @@ const generate = async (config) => {
     setTexture(textures.water.cave),
     setColor('lightblue'),
 
-    unsetPolygonGroup,
+    (mapData) => unsetPolygonGroup(mapData),
     plain(
       [-islandCenter.x, 210, islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -211,7 +211,7 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    setPolygonGroup('island-4'),
+    (mapData) => setPolygonGroup('island-4', mapData),
     plain(
       [-islandCenter.x, 140, -islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -222,7 +222,7 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    setPolygonGroup('island-3'),
+    (mapData) => setPolygonGroup('island-3', mapData),
     plain(
       [islandCenter.x, 70, -islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -233,7 +233,7 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    setPolygonGroup('island-2'),
+    (mapData) => setPolygonGroup('island-2', mapData),
     plain(
       [islandCenter.x, 0, islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -244,7 +244,7 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    setPolygonGroup('island-1'),
+    (mapData) => setPolygonGroup('island-1', mapData),
     setTexture(textures.gravel.ground1),
     setColor('hsv(150, 37%, 70%)'),
 

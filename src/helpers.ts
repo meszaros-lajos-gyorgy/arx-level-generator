@@ -453,10 +453,10 @@ export const setTexture = curry((texture, mapData) => {
   return mapData
 })
 
-export const setPolygonGroup = curry((group, mapData) => {
+export const setPolygonGroup = (group, mapData) => {
   mapData.state.polygonGroup = group
   return mapData
-})
+}
 
 export const unsetPolygonGroup = (mapData) => {
   mapData.state.polygonGroup = 'global'
@@ -580,7 +580,7 @@ const isPointInTriangle = (p: Vector3, a, b, c) => {
   )
 }
 
-export const isPointInPolygon = curry((point: Vector3, polygon) => {
+export const isPointInPolygon = (point: Vector3, polygon) => {
   const [a, b, c, d] = polygon.vertices.map(posVertexToVector)
 
   if (polygon.config.isQuad) {
@@ -590,7 +590,7 @@ export const isPointInPolygon = curry((point: Vector3, polygon) => {
   } else {
     return isPointInTriangle(point, a, b, c)
   }
-})
+}
 
 export const addLight = (pos: Vector3, props = {}) => {
   return (mapData) => {

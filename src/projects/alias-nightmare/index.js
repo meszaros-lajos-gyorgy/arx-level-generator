@@ -33,20 +33,17 @@ import { textures } from '../../assets/textures'
 import { MAP_MAX_WIDTH, MAP_MAX_HEIGHT, PATH_RGB } from '../../constants'
 import { disableBumping } from '../../prefabs/plain'
 
-const createWelcomeMarker = (pos) => (config) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, [0, 0, 0]),
-    (item) => {
-      declare('int', 'hadIntro', 0, item)
-      addDependency('graph/levels/level1/map.bmp', item)
-      addDependencyAs(
-        'projects/alias-nightmare/loading.bmp',
-        `graph/levels/level${config.levelIdx}/loading.bmp`,
-        item,
-      )
-      addScript((self) => {
-        return `
+const createWelcomeMarker = (pos, config) => {
+  const ref = createItem(items.marker)
+  declare('int', 'hadIntro', 0, ref)
+  addDependency('graph/levels/level1/map.bmp', ref)
+  addDependencyAs(
+    'projects/alias-nightmare/loading.bmp',
+    `graph/levels/level${config.levelIdx}/loading.bmp`,
+    ref,
+  )
+  addScript((self) => {
+    return `
   // component: welcomeMarker
   ON INIT {
     ${getInjections('init', self)}
@@ -80,27 +77,26 @@ const createWelcomeMarker = (pos) => (config) => {
     ACCEPT
   }
         `
-      }, item)
+  }, ref)
 
-      return item
-    },
-    createItem,
-  )(items.marker)
+  moveTo({ type: 'relative', coords: pos }, [0, 0, 0], ref)
+
+  markAsUsed(ref)
+
+  return ref
 }
 
 const createFallSaver = (pos, target) => {
-  return compose(
-    markAsUsed,
-    moveTo({ type: 'relative', coords: pos }, [0, 0, 0]),
-    (item) => {
-      declare('int', 'isCatching', 0, item)
-      addDependencyAs(
-        'projects/alias-nightmare/UruLink.wav',
-        `sfx/UruLink.wav`,
-        item,
-      )
-      addScript((self) => {
-        return `
+  const ref = createItem(items.marker)
+
+  declare('int', 'isCatching', 0, ref)
+  addDependencyAs(
+    'projects/alias-nightmare/UruLink.wav',
+    `sfx/UruLink.wav`,
+    ref,
+  )
+  addScript((self) => {
+    return `
 // component fallsaver
 ON INIT {
   ${getInjections('init', self)}
@@ -131,12 +127,11 @@ ON CONTROLLEDZONE_ENTER {
   RETURN
 }
         `
-      }, item)
+  }, ref)
+  moveTo({ type: 'relative', coords: pos }, [0, 0, 0], ref)
+  markAsUsed(ref)
 
-      return item
-    },
-    createItem,
-  )(items.marker)
+  return ref
 }
 
 const generateAtLeastOneExit = () => {
@@ -145,36 +140,34 @@ const generateAtLeastOneExit = () => {
   )
 }
 
-const createFallInducer = (origin) => (mapData) => {
+// creates a large flat plane for the player to fall onto
+const createGravityInducer = (origin, mapData) => {
   const divider = 4
 
-  return compose(
-    (mapData) => {
-      for (let x = 0; x < divider; x++) {
-        for (let y = 0; y < divider; y++) {
-          setPolygonGroup(`gravity-${x}-${y}`)(mapData)
-          plain(
-            [
-              -origin.coords[0] +
-                (MAP_MAX_WIDTH / divider) * 50 +
-                (MAP_MAX_WIDTH / divider) * 100 * x,
-              origin.coords[1] + 10000,
-              -origin.coords[2] +
-                (MAP_MAX_HEIGHT / divider) * 50 +
-                (MAP_MAX_HEIGHT / divider) * 100 * y,
-            ],
-            [MAP_MAX_WIDTH / divider, MAP_MAX_HEIGHT / divider],
-            'floor',
-            disableBumping,
-          )(mapData)
-          unsetPolygonGroup(mapData)
-        }
-      }
-      return mapData
-    },
-    setTexture(textures.none),
-    setColor('white'),
-  )(mapData)
+  setColor('white', mapData)
+  setTexture(textures.none, mapData)
+
+  for (let x = 0; x < divider; x++) {
+    for (let y = 0; y < divider; y++) {
+      setPolygonGroup(`gravity-${x}-${y}`, mapData)
+      plain(
+        [
+          -origin.coords[0] +
+            (MAP_MAX_WIDTH / divider) * 50 +
+            (MAP_MAX_WIDTH / divider) * 100 * x,
+          origin.coords[1] + 10000,
+          -origin.coords[2] +
+            (MAP_MAX_HEIGHT / divider) * 50 +
+            (MAP_MAX_HEIGHT / divider) * 100 * y,
+        ],
+        [MAP_MAX_WIDTH / divider, MAP_MAX_HEIGHT / divider],
+        'floor',
+        disableBumping,
+      )(mapData)
+      unsetPolygonGroup(mapData)
+    }
+  }
+  return mapData
 }
 
 const generate = async (config) => {
@@ -211,7 +204,7 @@ const generate = async (config) => {
     },
   ]
 
-  const welcomeMarker = createWelcomeMarker(islands[0].pos)(config)
+  const welcomeMarker = createWelcomeMarker(islands[0].pos, config)
   /*
   createHangingCorpse([-300, -150, -200], [0, 145, 0], {
     name: "[public_falan_tomb]",
@@ -238,7 +231,7 @@ const generate = async (config) => {
       islands,
     ),
 
-    createFallInducer(origin),
+    (mapData) => createGravityInducer(origin, mapData),
 
     addZone(
       { type: 'relative', coords: [0, 5000, 0] },

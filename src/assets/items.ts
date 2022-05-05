@@ -1,5 +1,5 @@
 import path from 'path'
-import { clone, toString, curry, isEmpty, uniq } from 'ramda'
+import { clone, toString, isEmpty, uniq } from 'ramda'
 import { padCharsStart } from 'ramda-adjunct'
 import { declare } from '../scripting'
 import {
@@ -376,20 +376,18 @@ export const addScript = (
   return itemRef
 }
 
-export const moveTo = curry(
-  (
-    { coords: [x, y, z] }: RelativeCoords,
-    [a, b, g]: RotationVector3,
-    itemRef: ItemRef,
-  ) => {
-    const { src, id } = itemRef
+export const moveTo = (
+  { coords: [x, y, z] }: RelativeCoords,
+  [a, b, g]: RotationVector3,
+  itemRef: ItemRef,
+) => {
+  const { src, id } = itemRef
 
-    usedItems[src][id].pos = { x, y, z }
-    usedItems[src][id].angle = { a, b, g }
+  usedItems[src][id].pos = { x, y, z }
+  usedItems[src][id].angle = { a, b, g }
 
-    return itemRef
-  },
-)
+  return itemRef
+}
 
 export const whereIs = (itemRef: ItemRef): ItemRef => {
   const { src, id } = itemRef

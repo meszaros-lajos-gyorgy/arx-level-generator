@@ -129,7 +129,7 @@ const stairs = (pos) => (mapData) => {
   const absPos = move(...pos, origin.coords)
 
   return compose(
-    unsetPolygonGroup,
+    (mapData) => unsetPolygonGroup(mapData),
 
     reduce(
       (mapData, idx) => {
@@ -145,7 +145,7 @@ const stairs = (pos) => (mapData) => {
     ),
 
     setTexture(textures.stone.stairs),
-    setPolygonGroup(`${id}-stairs`),
+    (mapData) => setPolygonGroup(`${id}-stairs`, mapData),
   )(mapData)
 }
 

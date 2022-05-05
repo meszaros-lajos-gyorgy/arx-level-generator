@@ -441,14 +441,15 @@ const island = (config) => (mapData) => {
             textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
           }),
         ),
-        setPolygonGroup(`${id}-north-island-joint-bottom`),
+        (mapData) =>
+          setPolygonGroup(`${id}-north-island-joint-bottom`, mapData),
         setTexture(textures.gravel.ground1),
         plain(
           move(0, 0, (height * 100) / 2 + jointOffset, pos),
           [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
           'floor',
         ),
-        setPolygonGroup(`${id}-north-island-joint-top`),
+        (mapData) => setPolygonGroup(`${id}-north-island-joint-top`, mapData),
         setTexture(textures.stone.humanWall1),
       ),
     ),
@@ -470,14 +471,15 @@ const island = (config) => (mapData) => {
             textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
           }),
         ),
-        setPolygonGroup(`${id}-south-island-joint-bottom`),
+        (mapData) =>
+          setPolygonGroup(`${id}-south-island-joint-bottom`, mapData),
         setTexture(textures.gravel.ground1),
         plain(
           move(0, 0, -((height * 100) / 2 + jointOffset), pos),
           [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
           'floor',
         ),
-        setPolygonGroup(`${id}-south-island-joint-top`),
+        (mapData) => setPolygonGroup(`${id}-south-island-joint-top`, mapData),
         setTexture(textures.stone.humanWall1),
       ),
     ),
@@ -499,14 +501,14 @@ const island = (config) => (mapData) => {
             textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
           }),
         ),
-        setPolygonGroup(`${id}-east-island-joint-bottom`),
+        (mapData) => setPolygonGroup(`${id}-east-island-joint-bottom`, mapData),
         setTexture(textures.gravel.ground1),
         plain(
           move((width * 100) / 2 + jointOffset, 0, 0, pos),
           [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
           'floor',
         ),
-        setPolygonGroup(`${id}-east-island-joint-top`),
+        (mapData) => setPolygonGroup(`${id}-east-island-joint-top`, mapData),
         setTexture(textures.stone.humanWall1),
       ),
     ),
@@ -528,14 +530,14 @@ const island = (config) => (mapData) => {
             textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
           }),
         ),
-        setPolygonGroup(`${id}-west-island-joint-bottom`),
+        (mapData) => setPolygonGroup(`${id}-west-island-joint-bottom`, mapData),
         setTexture(textures.gravel.ground1),
         plain(
           move(-((width * 100) / 2 + jointOffset), 0, 0, pos),
           [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
           'floor',
         ),
-        setPolygonGroup(`${id}-west-island-joint-top`),
+        (mapData) => setPolygonGroup(`${id}-west-island-joint-top`, mapData),
         setTexture(textures.stone.humanWall1),
       ),
     ),
@@ -550,7 +552,7 @@ const island = (config) => (mapData) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    setPolygonGroup(`${id}-island-bottom`),
+    (mapData) => setPolygonGroup(`${id}-island-bottom`, mapData),
     setTexture(textures.gravel.ground1),
 
     plain(pos, [width, height], 'floor', (polygons) => {
@@ -575,8 +577,8 @@ const island = (config) => (mapData) => {
 
         if (
           any(
-            isPointInPolygon(__, polygon),
-            map(move(0, 6, 0), ppAbsoluteCoords),
+            (point) => isPointInPolygon(point, polygon),
+            ppAbsoluteCoords.map(move(0, 6, 0)),
           )
         ) {
           polygon.tex = 0
@@ -586,7 +588,7 @@ const island = (config) => (mapData) => {
         return polygon
       }, polygons)
     }),
-    setPolygonGroup(`${id}-island-top`),
+    (mapData) => setPolygonGroup(`${id}-island-top`, mapData),
     setTexture(textures.stone.humanWall1),
 
     setColor(colors.terrain),

@@ -11,9 +11,9 @@ import {
   unsetPolygonGroup,
 } from '../helpers'
 
-const skybox = (x, y, z, size) => {
+const skybox = (x, y, z, size) => (mapData) => {
   return compose(
-    unsetPolygonGroup,
+    (mapData) => unsetPolygonGroup(mapData),
     floor(
       { type: 'absolute', coords: [x, y - size / 2, z] },
       'ceiling',
@@ -37,10 +37,10 @@ const skybox = (x, y, z, size) => {
     wallZ([x, y, z], 'front', null, 0, size, HFLIP),
     setTexture(textures.skybox.front),
     wallZ([x, y, z + size], 'back', null, 0, size),
-    setPolygonGroup('skybox'),
+    (mapData) => setPolygonGroup('skybox', mapData),
     setTexture(textures.skybox.back),
     setColor('white'),
-  )
+  )(mapData)
 }
 
 export default skybox

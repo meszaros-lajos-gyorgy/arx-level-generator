@@ -15,9 +15,9 @@ export const createRune = (
   angle: RotationVector3 = [0, 0, 0],
   onEquipTarget?: ItemRef,
 ) => {
-  const item = createItem(items.magic.rune)
+  const ref = createItem(items.magic.rune)
 
-  declare('string', 'rune_name', runeName, item)
+  declare('string', 'rune_name', runeName, ref)
 
   addScript((self) => {
     return `
@@ -37,13 +37,13 @@ ON INVENTORYUSE {
 `
 }
     `
-  }, item)
+  }, ref)
 
   if (pos !== null) {
-    moveTo({ type: 'relative', coords: pos }, angle, item)
+    moveTo({ type: 'relative', coords: pos }, angle, ref)
   }
 
-  markAsUsed(item)
+  markAsUsed(ref)
 
-  return item
+  return ref
 }
