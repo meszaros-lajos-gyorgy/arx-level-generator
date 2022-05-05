@@ -1,4 +1,3 @@
-import { compose } from 'ramda'
 import {
   markAsUsed,
   addScript,
@@ -10,10 +9,10 @@ import { getInjections, declare } from '../../scripting'
 export const overridePlayerScript = () => {
   declare('int', 'TUTORIAL_MAGIC', 100, 'global') // disable magic related tutorial messages in rune_aam.asl
 
-  return compose(
-    markAsUsed,
-    addScript((self) => {
-      return `
+  const ref = createRootItem(items.npc.player)
+
+  addScript((self) => {
+    return `
 // component: player
 ON INIT {
   ${getInjections('init', self)}
@@ -192,8 +191,10 @@ ON SETSPEED {
   SETSPEED ^&PARAM1
   ACCEPT
 }
-      `
-    }),
-    createRootItem,
-  )(items.npc.player)
+    `
+  }, ref)
+
+  markAsUsed(ref)
+
+  return ref
 }
