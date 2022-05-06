@@ -195,11 +195,7 @@ const generateLights = (mapData) => {
   mapData.llf.colors = colors
 }
 
-export const posVertexToVector = ({
-  posX,
-  posY,
-  posZ,
-}: PosVertex3): Vector3 => {
+export const posVertexToVector = ({ posX, posY, posZ }): Vector3 => {
   return [posX, posY, posZ]
 }
 
@@ -468,10 +464,15 @@ export const categorizeVertices = (polygons) => {
     vertices,
   )
 
-  const [corner, [edge, middle]] = compose(
-    adjust(1, partition(compose(equals(2), nth(1)))),
-    partition(compose(either(equals(1), equals(3)), nth(1))),
-  )(Object.entries(summary))
+  const [corner, tmp] = partition(
+    ([hash, amount]: [string, number]) => amount === 1 || amount === 3,
+    Object.entries(summary),
+  )
+
+  const [edge, middle] = partition(
+    ([hash, amount]: [string, number]) => amount === 2,
+    tmp,
+  )
 
   return {
     corners: unpackCoords(corner),

@@ -9,6 +9,7 @@ import {
   posVertexToVector,
   distance,
   isBetween,
+  MapData,
 } from '../helpers'
 import { identity, clamp, pluck } from 'ramda'
 import { AbsoluteCoords, PosVertex3, Vector3 } from 'src/types'
@@ -27,7 +28,7 @@ export const plain = (
   pos: Vector3,
   size,
   facing: 'floor' | 'ceiling' = 'floor',
-  onBeforeBumping = identity,
+  onBeforeBumping: (polygons: any[], mapData: MapData) => any[] = identity,
   getConfig: () => {
     textureRotation?: number
     textureFlags?: number
@@ -46,7 +47,7 @@ export const plain = (
       sizeZ = size[1]
     }
 
-    let tmp = {
+    const dummyMapData = {
       config: mapData.config,
       state: mapData.state,
       fts: {
@@ -67,6 +68,7 @@ export const plain = (
             z + 100 * j - (sizeZ * 100) / 2 + 100 / 2,
           ],
         }
+
         floor(
           position,
           facing,
@@ -74,12 +76,12 @@ export const plain = (
           config.textureRotation ?? 90,
           100,
           config.textureFlags ?? 0,
-        )(tmp)
+        )(dummyMapData)
       }
     }
 
     let polygons = onBeforeBumping(
-      tmp.fts.polygons[mapData.state.polygonGroup],
+      dummyMapData.fts.polygons[mapData.state.polygonGroup],
       mapData,
     )
 
@@ -176,7 +178,10 @@ export const disableBumping = (polygons) => {
   return polygons
 }
 
-export const connectToNearPolygons = (targetGroup, distanceThreshold = 100) => {
+export const connectToNearPolygons = (
+  targetGroup: string,
+  distanceThreshold: number = 100,
+) => {
   return (polygons, mapData) => {
     const target = categorizeVertices(mapData.fts.polygons[targetGroup] || [])
     const targetVertices: Vector3[] = [...target.corners, ...target.edges].map(
