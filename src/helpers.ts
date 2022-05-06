@@ -15,19 +15,7 @@ import {
   FtsData,
   LlfData,
 } from './blankMap'
-import {
-  pluck,
-  compose,
-  countBy,
-  partition,
-  nth,
-  equals,
-  adjust,
-  repeat,
-  either,
-  clone,
-  flatten,
-} from 'ramda'
+import { pluck, countBy, partition, repeat, clone, flatten } from 'ramda'
 import {
   POLY_QUAD,
   MAP_MAX_HEIGHT,

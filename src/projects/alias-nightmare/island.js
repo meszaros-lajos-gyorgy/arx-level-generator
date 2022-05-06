@@ -1,4 +1,4 @@
-import { compose, props, any, __, when, isEmpty } from 'ramda'
+import { props, any, isEmpty } from 'ramda'
 import {
   setColor,
   move,
@@ -411,220 +411,170 @@ const island = (config) => (mapData) => {
     )
   }
 
-  return compose(
-    unsetPolygonGroup,
+  setColor(colors.terrain, mapData)
+  setTexture(textures.stone.humanWall1, mapData)
+  setPolygonGroup(`${id}-island-top`, mapData)
 
-    (mapData) => {
-      props(ppIndices, ppCoords).forEach((ppCoord) => {
-        mapData = addLight(move(0, -10, 0, ppCoord), mapData)
-      })
-      return mapData
-    },
-    (mapData) => {
-      setColor(colors.lights, mapData)
-      return mapData
-    },
+  plain(pos, [width, height], 'floor', (polygons) => {
+    const ppAbsoluteCoords = props(ppIndices, ppCoords).map((pos) =>
+      move(...mapData.config.origin.coords, pos),
+    )
 
-    when(
-      () => (exits | entrances) & NORTH,
-      compose(
-        plain(
-          move(0, 100, (height * 100) / 2 + jointOffset, pos),
-          [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
-          'ceiling',
-          (polygon, mapData) => {
-            return connectToNearPolygons(`${id}-north-island-joint-top`)(
-              disableBumping(polygon),
-              mapData,
-            )
-          },
-          () => ({
-            textureRotation: pickRandom([0, 90, 180, 270]),
-            textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-          }),
-        ),
-        (mapData) => {
-          setTexture(textures.gravel.ground1, mapData)
-          setPolygonGroup(`${id}-north-island-joint-bottom`, mapData)
-          return mapData
-        },
-        plain(
-          move(0, 0, (height * 100) / 2 + jointOffset, pos),
-          [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
-          'floor',
-        ),
-        (mapData) => {
-          setTexture(textures.stone.humanWall1, mapData)
-          setPolygonGroup(`${id}-north-island-joint-top`, mapData)
-          return mapData
-        },
-      ),
-    ),
-    when(
-      () => (exits | entrances) & SOUTH,
-      compose(
-        plain(
-          move(0, 100, -((height * 100) / 2 + jointOffset), pos),
-          [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
-          'ceiling',
-          (polygon, mapData) => {
-            return connectToNearPolygons(`${id}-south-island-joint-top`)(
-              disableBumping(polygon),
-              mapData,
-            )
-          },
-          () => ({
-            textureRotation: pickRandom([0, 90, 180, 270]),
-            textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-          }),
-        ),
-        (mapData) => {
-          setTexture(textures.gravel.ground1, mapData)
-          setPolygonGroup(`${id}-south-island-joint-bottom`, mapData)
-          return mapData
-        },
-        plain(
-          move(0, 0, -((height * 100) / 2 + jointOffset), pos),
-          [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
-          'floor',
-        ),
-        (mapData) => {
-          setTexture(textures.stone.humanWall1, mapData)
-          setPolygonGroup(`${id}-south-island-joint-top`, mapData)
-          return mapData
-        },
-      ),
-    ),
-    when(
-      () => (exits | entrances) & EAST,
-      compose(
-        plain(
-          move((width * 100) / 2 + jointOffset, 100, 0, pos),
-          [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
-          'ceiling',
-          (polygon, mapData) => {
-            return connectToNearPolygons(`${id}-east-island-joint-top`)(
-              disableBumping(polygon),
-              mapData,
-            )
-          },
-          () => ({
-            textureRotation: pickRandom([0, 90, 180, 270]),
-            textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-          }),
-        ),
-        (mapData) => {
-          setTexture(textures.gravel.ground1, mapData)
-          setPolygonGroup(`${id}-east-island-joint-bottom`, mapData)
-          return mapData
-        },
-        plain(
-          move((width * 100) / 2 + jointOffset, 0, 0, pos),
-          [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
-          'floor',
-        ),
-        (mapData) => {
-          setTexture(textures.stone.humanWall1, mapData)
-          setPolygonGroup(`${id}-east-island-joint-top`, mapData)
-          return mapData
-        },
-      ),
-    ),
-    when(
-      () => (exits | entrances) & WEST,
-      compose(
-        plain(
-          move(-((width * 100) / 2 + jointOffset), 100, 0, pos),
-          [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
-          'ceiling',
-          (polygon, mapData) => {
-            return connectToNearPolygons(`${id}-west-island-joint-top`)(
-              disableBumping(polygon),
-              mapData,
-            )
-          },
-          () => ({
-            textureRotation: pickRandom([0, 90, 180, 270]),
-            textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-          }),
-        ),
-        (mapData) => {
-          setTexture(textures.gravel.ground1, mapData)
-          setPolygonGroup(`${id}-west-island-joint-bottom`, mapData)
-          return mapData
-        },
-        plain(
-          move(-((width * 100) / 2 + jointOffset), 0, 0, pos),
-          [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
-          'floor',
-        ),
-        (mapData) => {
-          setTexture(textures.stone.humanWall1, mapData)
-          setPolygonGroup(`${id}-west-island-joint-top`, mapData)
-          return mapData
-        },
-      ),
-    ),
+    return polygons.map((polygon) => {
+      if (isPointInPolygon(pos, polygon)) {
+        polygon.config.bumpable = false
+      }
 
+      if (
+        isPointInPolygon(move(...mapData.config.origin.coords, spawn), polygon)
+      ) {
+        polygon.config.bumpable = false
+      }
+
+      if (
+        any(
+          (point) => isPointInPolygon(point, polygon),
+          ppAbsoluteCoords.map((pos) => move(0, 6, 0, pos)),
+        )
+      ) {
+        polygon.tex = 0
+        polygon.config.bumpable = false
+      }
+
+      return polygon
+    })
+  })(mapData)
+
+  setTexture(textures.gravel.ground1, mapData)
+  setPolygonGroup(`${id}-island-bottom`, mapData)
+
+  plain(
+    move(0, 100, 0, pos),
+    [width, height],
+    'ceiling',
+    connectToNearPolygons(`${id}-island-top`),
+    () => ({
+      textureRotation: pickRandom([0, 90, 180, 270]),
+      textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+    }),
+  )(mapData)
+
+  if ((exits | entrances) & NORTH) {
+    setTexture(textures.stone.humanWall1, mapData)
+    setPolygonGroup(`${id}-north-island-joint-top`, mapData)
     plain(
-      move(0, 100, 0, pos),
-      [width, height],
+      move(0, 0, (height * 100) / 2 + jointOffset, pos),
+      [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
+      'floor',
+    )(mapData)
+
+    setTexture(textures.gravel.ground1, mapData)
+    setPolygonGroup(`${id}-north-island-joint-bottom`, mapData)
+    plain(
+      move(0, 100, (height * 100) / 2 + jointOffset, pos),
+      [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
       'ceiling',
-      connectToNearPolygons(`${id}-island-top`),
+      (polygon, mapData) => {
+        return connectToNearPolygons(`${id}-north-island-joint-top`)(
+          disableBumping(polygon),
+          mapData,
+        )
+      },
       () => ({
         textureRotation: pickRandom([0, 90, 180, 270]),
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
-    ),
-    (mapData) => {
-      setTexture(textures.gravel.ground1, mapData)
-      setPolygonGroup(`${id}-island-bottom`, mapData)
-      return mapData
-    },
+    )(mapData)
+  }
 
-    plain(pos, [width, height], 'floor', (polygons) => {
-      const ppAbsoluteCoords = props(ppIndices, ppCoords).map((pos) =>
-        move(...mapData.config.origin.coords, pos),
-      )
+  if ((exits | entrances) & SOUTH) {
+    setTexture(textures.stone.humanWall1, mapData)
+    setPolygonGroup(`${id}-south-island-joint-top`, mapData)
+    plain(
+      move(0, 0, -((height * 100) / 2 + jointOffset), pos),
+      [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
+      'floor',
+    )(mapData)
+    setTexture(textures.gravel.ground1, mapData)
+    setPolygonGroup(`${id}-south-island-joint-bottom`, mapData)
+    plain(
+      move(0, 100, -((height * 100) / 2 + jointOffset), pos),
+      [ISLAND_JOINT_WIDTH, ISLAND_JOINT_LENGTH],
+      'ceiling',
+      (polygon, mapData) => {
+        return connectToNearPolygons(`${id}-south-island-joint-top`)(
+          disableBumping(polygon),
+          mapData,
+        )
+      },
+      () => ({
+        textureRotation: pickRandom([0, 90, 180, 270]),
+        textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+      }),
+    )(mapData)
+  }
 
-      return polygons.map((polygon) => {
-        if (isPointInPolygon(pos, polygon)) {
-          polygon.config.bumpable = false
-        }
+  if ((exits | entrances) & EAST) {
+    setTexture(textures.stone.humanWall1, mapData)
+    setPolygonGroup(`${id}-east-island-joint-top`, mapData)
+    plain(
+      move((width * 100) / 2 + jointOffset, 0, 0, pos),
+      [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
+      'floor',
+    )(mapData)
+    setTexture(textures.gravel.ground1, mapData)
+    setPolygonGroup(`${id}-east-island-joint-bottom`, mapData)
+    plain(
+      move((width * 100) / 2 + jointOffset, 100, 0, pos),
+      [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
+      'ceiling',
+      (polygon, mapData) => {
+        return connectToNearPolygons(`${id}-east-island-joint-top`)(
+          disableBumping(polygon),
+          mapData,
+        )
+      },
+      () => ({
+        textureRotation: pickRandom([0, 90, 180, 270]),
+        textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+      }),
+    )(mapData)
+  }
 
-        if (
-          isPointInPolygon(
-            move(...mapData.config.origin.coords, spawn),
-            polygon,
-          )
-        ) {
-          polygon.config.bumpable = false
-        }
+  if ((exits | entrances) & WEST) {
+    setTexture(textures.stone.humanWall1, mapData)
+    setPolygonGroup(`${id}-west-island-joint-top`, mapData)
+    plain(
+      move(-((width * 100) / 2 + jointOffset), 0, 0, pos),
+      [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
+      'floor',
+    )(mapData)
+    setTexture(textures.gravel.ground1, mapData)
+    setPolygonGroup(`${id}-west-island-joint-bottom`, mapData)
+    plain(
+      move(-((width * 100) / 2 + jointOffset), 100, 0, pos),
+      [ISLAND_JOINT_LENGTH, ISLAND_JOINT_WIDTH],
+      'ceiling',
+      (polygon, mapData) => {
+        return connectToNearPolygons(`${id}-west-island-joint-top`)(
+          disableBumping(polygon),
+          mapData,
+        )
+      },
+      () => ({
+        textureRotation: pickRandom([0, 90, 180, 270]),
+        textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+      }),
+    )(mapData)
+  }
 
-        if (
-          any(
-            (point) => isPointInPolygon(point, polygon),
-            ppAbsoluteCoords.map((pos) => move(0, 6, 0, pos)),
-          )
-        ) {
-          polygon.tex = 0
-          polygon.config.bumpable = false
-        }
+  setColor(colors.lights, mapData)
+  props(ppIndices, ppCoords).forEach((ppCoord) => {
+    addLight(move(0, -10, 0, ppCoord), mapData)
+  })
+  unsetPolygonGroup(mapData)
 
-        return polygon
-      })
-    }),
-    (mapData) => {
-      setTexture(textures.stone.humanWall1, mapData)
-      setPolygonGroup(`${id}-island-top`, mapData)
-      return mapData
-    },
-
-    (mapData) => {
-      setColor(colors.terrain, mapData)
-      return mapData
-    },
-  )(mapData)
+  return mapData
 }
 
 export default island

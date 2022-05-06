@@ -1,17 +1,12 @@
 import rgba from 'color-rgba'
-import { compose, dropLast, join } from 'ramda'
+
+const toFloat = (colorChannel) => {
+  return Math.round((colorChannel / 256) * 10 ** 6) / 10 ** 6
+}
 
 export const color = (colorDefinition) => {
-  return compose(
-    join(' '),
-    (tmp) => {
-      return tmp.map((channel) => {
-        return Math.round((channel / 256) * 10 ** 6) / 10 ** 6
-      })
-    },
-    dropLast(1),
-    rgba,
-  )(colorDefinition)
+  const [r, g, b] = rgba(colorDefinition)
+  return `${toFloat(r)} ${toFloat(g)} ${toFloat(b)}`
 }
 
 const globalScope = {

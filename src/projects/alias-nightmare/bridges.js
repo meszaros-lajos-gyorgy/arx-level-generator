@@ -1,4 +1,4 @@
-import { compose, reduce, __, addIndex, without } from 'ramda'
+import { reduce, addIndex, without } from 'ramda'
 import { NORTH, SOUTH, EAST, WEST } from './constants'
 import {
   move,
@@ -152,18 +152,16 @@ const bridges = (islands) => (mapData) => {
       return acc
     }, [])
 
-  return compose(
-    addIndex(reduce)(
-      (mapData, [a, b], idx) => {
-        // TODO: render polygons between the 2 points
-        console.log('TODO: render bridge between', a, 'and', b)
+  return addIndex(reduce)(
+    (mapData, [a, b], idx) => {
+      // TODO: render polygons between the 2 points
+      console.log('TODO: render bridge between', a, 'and', b)
 
-        return mapData
-      },
-      __,
-      pairs,
-    ),
-  )(mapData)
+      return mapData
+    },
+    mapData,
+    pairs,
+  )
 }
 
 export default bridges
