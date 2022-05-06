@@ -29,7 +29,6 @@ import {
   adjust,
   split,
   unary,
-  curry,
   repeat,
   either,
   clone,
@@ -62,6 +61,7 @@ import { dirname, resolve } from 'path'
 import {
   AbsoluteCoords,
   FloatRgb,
+  MapConfig,
   PosVertex3,
   RelativeCoords,
   RgbaBytes,
@@ -70,18 +70,41 @@ import {
   Vertex3,
 } from './types'
 
+export type MapData = {
+  meta: {
+    createdAt: string
+    generatorVersion: string
+  }
+  config: MapConfig
+  state: {
+    color: RgbaBytes
+    texture: TextureDefinition | null
+    spawn: Vector3
+    spawnAngle: number
+    vertexCounter: number
+    polygonGroup: string
+  }
+  items: any[] // TODO
+  dlf: DlfData
+  fts: FtsData
+  llf: LlfData
+}
+
 export const normalize = (vector: Vector3): Vector3 => {
   const [x, y, z] = vector
   const mag = magnitude(vector)
   return [x / mag, y / mag, z / mag]
 }
 
-export const move = curry(
-  (x: number, y: number, z: number, vector: Vector3) => {
-    const [vx, vy, vz] = vector
-    return [vx + x, vy + y, vz + z]
-  },
-)
+export const move = (
+  x: number,
+  y: number,
+  z: number,
+  vector: Vector3,
+): Vector3 => {
+  const [vx, vy, vz] = vector
+  return [vx + x, vy + y, vz + z]
+}
 
 export const addCoords = (
   a: RelativeCoords | AbsoluteCoords,
@@ -119,10 +142,10 @@ export const toFloatRgb = (color: RgbaBytes): FloatRgb => {
   return { r: r / 256, g: g / 256, b: b / 256 }
 }
 
-export const movePlayerTo = curry((pos: RelativeCoords, mapData) => {
+export const movePlayerTo = (pos: RelativeCoords, mapData: MapData) => {
   mapData.state.spawn = pos.coords
   return mapData
-})
+}
 
 export const isBetween = (min: number, max: number, value: number) => {
   return value >= min && value < max
@@ -136,7 +159,6 @@ const generateLights = (mapData) => {
   let colorIdx = 0
 
   const colors: RgbaBytes[] = []
-  const white = toRgba('white')
 
   const p = mapData.fts.polygons.reduce(
     (acc, { vertices }: { vertices: PosVertex3[] }, idx) => {
@@ -162,10 +184,6 @@ const generateLights = (mapData) => {
       ;(p[`${z}-${x}`] || []).forEach((idx) => {
         const { config, vertices } = mapData.fts.polygons[idx]
         let { color, isQuad } = config
-
-        if (color === null) {
-          color = white
-        }
 
         colors.push(color, color, color)
         vertices[0].llfColorIdx = colorIdx++
@@ -224,7 +242,7 @@ const calculateNormals = (mapData) => {
   })
 }
 
-export const finalize = (mapData) => {
+export const finalize = (mapData: MapData) => {
   const ungroupedPolygons = Object.values(mapData.fts.polygons).flatMap(
     (polygonGroup) => polygonGroup,
   )
@@ -270,7 +288,7 @@ export const finalize = (mapData) => {
   return mapData
 }
 
-const addOriginPolygon = (mapData) => {
+const addOriginPolygon = (mapData: MapData) => {
   mapData.fts.polygons.global.push({
     config: {
       color: toRgba('black'),
@@ -290,34 +308,12 @@ const addOriginPolygon = (mapData) => {
     room: 1,
     paddy: 0,
   })
-
-  return mapData
 }
 
 const timestampToDate = (timestamp: number) => {
   const date = new Date()
   date.setTime(timestamp * 1000)
   return date.toUTCString()
-}
-
-export type MapData = {
-  meta: {
-    createdAt: string
-    generatorVersion: string
-  }
-  config: Record<string, any> // TODO
-  state: {
-    color: string | null
-    texture: TextureDefinition | null
-    spawn: Vector3
-    spawnAngle: number
-    vertexCounter: number
-    polygonGroup: string
-  }
-  items: any[] // TODO
-  dlf: DlfData
-  fts: FtsData
-  llf: LlfData
 }
 
 export const generateBlankMapData = (config) => {
@@ -333,7 +329,7 @@ export const generateBlankMapData = (config) => {
       ...config,
     },
     state: {
-      color: null,
+      color: toRgba('white'),
       texture: textures.none,
       spawn: [0, 0, 0],
       spawnAngle: 0,
@@ -346,7 +342,9 @@ export const generateBlankMapData = (config) => {
     llf: createLlfData(now),
   }
 
-  return addOriginPolygon(mapData)
+  addOriginPolygon(mapData)
+
+  return mapData
 }
 
 export const uninstall = async (dir) => {
@@ -419,14 +417,14 @@ export const saveToDisk = async (mapData) => {
 
   // ------------
 
-  ambiences = Object.entries(ambiences)
-  dependencies = Object.entries(dependencies)
-  textures = Object.entries(textures)
+  const ambiencesPairs = Object.entries(ambiences)
+  const dependenciesPairs = Object.entries(dependencies)
+  const texturesPairs = Object.entries(textures)
 
   for (let [target, source] of [
-    ...Object.entries(ambiences),
-    ...Object.entries(dependencies),
-    ...Object.entries(textures),
+    ...ambiencesPairs,
+    ...dependenciesPairs,
+    ...texturesPairs,
   ]) {
     await fs.promises.copyFile(source, target)
   }
@@ -443,50 +441,49 @@ export const saveToDisk = async (mapData) => {
   )
 }
 
-export const setColor = curry((color, mapData) => {
+export const setColor = (color: string, mapData: MapData) => {
   mapData.state.color = toRgba(color)
-  return mapData
-})
+}
 
-export const setTexture = curry((texture, mapData) => {
+export const setTexture = (texture, mapData: MapData) => {
   mapData.state.texture = clone(texture)
-  return mapData
-})
+}
 
-export const setPolygonGroup = (group, mapData) => {
+export const setPolygonGroup = (group, mapData: MapData) => {
   mapData.state.polygonGroup = group
-  return mapData
 }
 
-export const unsetPolygonGroup = (mapData) => {
+export const unsetPolygonGroup = (mapData: MapData) => {
   mapData.state.polygonGroup = 'global'
-  return mapData
 }
 
-const unpackCoords = map(
-  compose(
-    ([posX, posY, posZ]) => ({ posX, posY, posZ }),
-    map(unary(parseInt)),
-    split('|'),
-    nth(0),
-  ),
-)
+const unpackCoords = (coords: any[]) => {
+  return coords.map((coord) => {
+    const [posX, posY, posZ] = coord[0].split('|').map((x) => parseInt(x))
+    return { posX, posY, posZ }
+  })
+}
 
 export const categorizeVertices = (polygons) => {
-  return compose(
-    ([corner, [edge, middle]]) => ({
-      corners: unpackCoords(corner),
-      edges: unpackCoords(edge),
-      middles: unpackCoords(middle),
-    }),
+  const vertices = polygons.flatMap(({ vertices: { posX, posY, posZ } }) => {
+    return { posX, posY, posZ }
+  })
+
+  const summary: Record<string, number> = countBy(
+    ({ posX, posY, posZ }: PosVertex3) => `${posX}|${posY}|${posZ}`,
+    vertices,
+  )
+
+  const [corner, [edge, middle]] = compose(
     adjust(1, partition(compose(equals(2), nth(1)))),
     partition(compose(either(equals(1), equals(3)), nth(1))),
-    toPairs,
-    countBy(({ posX, posY, posZ }) => `${posX}|${posY}|${posZ}`),
-    map(pick(['posX', 'posY', 'posZ'])),
-    unnest,
-    pluck('vertices'),
-  )(polygons)
+  )(Object.entries(summary))
+
+  return {
+    corners: unpackCoords(corner),
+    edges: unpackCoords(edge),
+    middles: unpackCoords(middle),
+  }
 }
 
 export const bumpByMagnitude = (magnitude) => (vertex) => {
@@ -592,31 +589,29 @@ export const isPointInPolygon = (point: Vector3, polygon) => {
   }
 }
 
-export const addLight = (pos: Vector3, props = {}) => {
-  return (mapData) => {
-    let [x, y, z] = pos
+export const addLight = (pos: Vector3, props = {}, mapData: MapData) => {
+  let [x, y, z] = pos
 
-    mapData.llf.lights.push({
-      ...{
-        pos: { x, y, z },
-        rgb: toFloatRgb(mapData.state.color),
-        fallstart: 100,
-        fallend: 180,
-        intensity: 1.3,
-        i: 0,
-        exFlicker: toFloatRgb(toRgba('black')), // this gets subtracted from light.rgb when flickering
-        exRadius: 0,
-        exFrequency: 0.01,
-        exSize: 0,
-        exSpeed: 0,
-        exFlareSize: 0,
-        extras: 0,
-      },
-      ...props,
-    })
+  mapData.llf.lights.push({
+    ...{
+      pos: { x, y, z },
+      rgb: toFloatRgb(mapData.state.color),
+      fallstart: 100,
+      fallend: 180,
+      intensity: 1.3,
+      i: 0,
+      exFlicker: toFloatRgb(toRgba('black')), // this gets subtracted from light.rgb when flickering
+      exRadius: 0,
+      exFrequency: 0.01,
+      exSize: 0,
+      exSpeed: 0,
+      exFlareSize: 0,
+      extras: 0,
+    },
+    ...props,
+  })
 
-    return mapData
-  }
+  return mapData
 }
 
 export const addZone = (

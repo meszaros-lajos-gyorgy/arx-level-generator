@@ -71,18 +71,26 @@ const addLamp = (pos, angle, config = {}) => {
     const roomHeight = mapData.config.roomDimensions.height
 
     compose(
-      addLight(move(0, 20, 0, pos), {
-        fallstart: 100,
-        fallend: 500 * roomHeight,
-        intensity: 1.3 - roomHeight * 0.1,
-        exFlicker: toFloatRgb(toRgba('#1f1f07')),
-        extras:
-          EXTRAS_SEMIDYNAMIC |
-          EXTRAS_EXTINGUISHABLE |
-          (isOn ? 0 : EXTRAS_STARTEXTINGUISHED) |
-          EXTRAS_NO_IGNIT,
-      }),
-      setColor('white'),
+      (mapData) =>
+        addLight(
+          move(0, 20, 0, pos),
+          {
+            fallstart: 100,
+            fallend: 500 * roomHeight,
+            intensity: 1.3 - roomHeight * 0.1,
+            exFlicker: toFloatRgb(toRgba('#1f1f07')),
+            extras:
+              EXTRAS_SEMIDYNAMIC |
+              EXTRAS_EXTINGUISHABLE |
+              (isOn ? 0 : EXTRAS_STARTEXTINGUISHED) |
+              EXTRAS_NO_IGNIT,
+          },
+          mapData,
+        ),
+      (mapData) => {
+        setColor('white', mapData)
+        return mapData
+      },
     )(mapData)
 
     return lampEntity
@@ -134,13 +142,17 @@ const addAmbientLight = (pos, config = {}) => {
     }
 
     compose(
-      addLight(move(0, -radius + 20, 0, pos), lightConfig),
-      addLight(move(0, radius + 20, 0, pos), lightConfig),
-      addLight(move(-radius, 20, 0, pos), lightConfig),
-      addLight(move(radius, 20, 0, pos), lightConfig),
-      addLight(move(0, 20, -radius, pos), lightConfig),
-      addLight(move(0, 20, radius, pos), lightConfig),
-      setColor(lightColor),
+      (mapData) =>
+        addLight(move(0, -radius + 20, 0, pos), lightConfig, mapData),
+      (mapData) => addLight(move(0, radius + 20, 0, pos), lightConfig, mapData),
+      (mapData) => addLight(move(-radius, 20, 0, pos), lightConfig, mapData),
+      (mapData) => addLight(move(radius, 20, 0, pos), lightConfig, mapData),
+      (mapData) => addLight(move(0, 20, -radius, pos), lightConfig, mapData),
+      (mapData) => addLight(move(0, 20, radius, pos), lightConfig, mapData),
+      (mapData) => {
+        setColor(lightColor, mapData)
+        return mapData
+      },
     )(mapData)
 
     return lampEntities
@@ -863,7 +875,10 @@ const generate = async (config) => {
     },
 
     renderGrid(grid),
-    setColor('#0b0c10'),
+    (mapData) => {
+      setColor('#0b0c10', mapData)
+      return mapData
+    },
 
     addZone(
       {
@@ -875,14 +890,19 @@ const generate = async (config) => {
       ambiences.none,
       5000,
     ),
-    setColor('black'),
 
-    movePlayerTo({
-      type: 'relative',
-      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-    }),
     (mapData) => {
       mapData.meta.mapName = 'The Backrooms'
+
+      movePlayerTo(
+        {
+          type: 'relative',
+          coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
+        },
+        mapData,
+      )
+      setColor('black', mapData)
+
       return mapData
     },
     generateBlankMapData,

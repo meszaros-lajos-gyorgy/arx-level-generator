@@ -24,7 +24,7 @@ export type Candidate = {
 
 // pos is relative to origin
 export const plain = (
-  pos,
+  pos: Vector3,
   size,
   facing: 'floor' | 'ceiling' = 'floor',
   onBeforeBumping = identity,

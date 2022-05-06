@@ -178,24 +178,29 @@ const generate = async (config) => {
         [0, 0, 0],
         mapData,
       )
-
       setColor('white', mapData)
       circleOfVectors([0, -1000, 0], 1000, 3).forEach((pos) => {
-        addLight(pos, {
-          fallstart: 1,
-          fallend: 3000,
-          intensity: 3,
-        })(mapData)
+        addLight(
+          pos,
+          {
+            fallstart: 1,
+            fallend: 3000,
+            intensity: 3,
+          },
+          mapData,
+        )
       })
 
       return mapData
     },
 
     plain([0, 10, 0], [50, 50], 'floor', disableBumping),
-    setTexture(textures.water.cave),
-    setColor('lightblue'),
-
-    (mapData) => unsetPolygonGroup(mapData),
+    (mapData) => {
+      setColor('lightblue', mapData)
+      setTexture(textures.water.cave, mapData)
+      unsetPolygonGroup(mapData)
+      return mapData
+    },
     plain(
       [-islandCenter.x, 210, islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -211,7 +216,10 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    (mapData) => setPolygonGroup('island-4', mapData),
+    (mapData) => {
+      setPolygonGroup('island-4', mapData)
+      return mapData
+    },
     plain(
       [-islandCenter.x, 140, -islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -222,7 +230,10 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    (mapData) => setPolygonGroup('island-3', mapData),
+    (mapData) => {
+      setPolygonGroup('island-3', mapData)
+      return mapData
+    },
     plain(
       [islandCenter.x, 70, -islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -233,7 +244,10 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    (mapData) => setPolygonGroup('island-2', mapData),
+    (mapData) => {
+      setPolygonGroup('island-2', mapData)
+      return mapData
+    },
     plain(
       [islandCenter.x, 0, islandCenter.z],
       [islandSizeInTiles, islandSizeInTiles],
@@ -244,9 +258,12 @@ const generate = async (config) => {
         textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
       }),
     ),
-    (mapData) => setPolygonGroup('island-1', mapData),
-    setTexture(textures.gravel.ground1),
-    setColor('hsv(150, 37%, 70%)'),
+    (mapData) => {
+      setColor('hsv(150, 37%, 70%)', mapData)
+      setTexture(textures.gravel.ground1, mapData)
+      setPolygonGroup('island-1', mapData)
+      return mapData
+    },
 
     addZone(
       {
@@ -258,15 +275,18 @@ const generate = async (config) => {
       ambiences.none,
       2000,
     ),
-    setColor('#DBF4FF'),
-
-    movePlayerTo({
-      type: 'relative',
-      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-    }),
     (mapData) => {
       mapData.meta.mapName = 'On the island'
       mapData.state.spawnAngle = 180
+      movePlayerTo(
+        {
+          type: 'relative',
+          coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
+        },
+        mapData,
+      )
+      setColor('#DBF4FF', mapData)
+
       return mapData
     },
 

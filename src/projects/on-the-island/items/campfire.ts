@@ -20,28 +20,32 @@ import {
 
 const createCampfireFlames = (pos: RelativeCoords, mapData) => {
   setColor('white', mapData)
-  addLight(pos.coords, {
-    fallstart: 63,
-    fallend: 241,
-    intensity: 2.18,
-    i: 0,
-    exFlicker: {
-      r: 0.25,
-      g: 0.25,
-      b: 0.25,
+  addLight(
+    pos.coords,
+    {
+      fallstart: 63,
+      fallend: 241,
+      intensity: 2.18,
+      i: 0,
+      exFlicker: {
+        r: 0.25,
+        g: 0.25,
+        b: 0.25,
+      },
+      exRadius: 20, // how large the flame particles spread out as a whole
+      exFrequency: 0.8,
+      exSize: 0.5, // how large the individual flame particles are
+      exSpeed: 0.65, // how fast the flame particles travel upwards
+      exFlareSize: 80,
+      extras:
+        EXTRAS_SEMIDYNAMIC |
+        EXTRAS_EXTINGUISHABLE |
+        EXTRAS_STARTEXTINGUISHED |
+        EXTRAS_SPAWNFIRE |
+        EXTRAS_SPAWNSMOKE,
     },
-    exRadius: 20, // how large the flame particles spread out as a whole
-    exFrequency: 0.8,
-    exSize: 0.5, // how large the individual flame particles are
-    exSpeed: 0.65, // how fast the flame particles travel upwards
-    exFlareSize: 80,
-    extras:
-      EXTRAS_SEMIDYNAMIC |
-      EXTRAS_EXTINGUISHABLE |
-      EXTRAS_STARTEXTINGUISHED |
-      EXTRAS_SPAWNFIRE |
-      EXTRAS_SPAWNSMOKE,
-  })(mapData)
+    mapData,
+  )
 }
 
 const createCampfireCookZone = (

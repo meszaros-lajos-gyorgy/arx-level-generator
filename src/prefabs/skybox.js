@@ -13,7 +13,10 @@ import {
 
 const skybox = (x, y, z, size) => (mapData) => {
   return compose(
-    (mapData) => unsetPolygonGroup(mapData),
+    (mapData) => {
+      unsetPolygonGroup(mapData)
+      return mapData
+    },
     floor(
       { type: 'absolute', coords: [x, y - size / 2, z] },
       'ceiling',
@@ -21,7 +24,10 @@ const skybox = (x, y, z, size) => (mapData) => {
       0,
       size,
     ),
-    setTexture(textures.skybox.top),
+    (mapData) => {
+      setTexture(textures.skybox.top, mapData)
+      return mapData
+    },
     floor(
       { type: 'absolute', coords: [x, y + size / 2, z] },
       'floor',
@@ -29,17 +35,32 @@ const skybox = (x, y, z, size) => (mapData) => {
       2,
       size,
     ),
-    setTexture(textures.skybox.bottom),
+    (mapData) => {
+      setTexture(textures.skybox.bottom, mapData)
+      return mapData
+    },
     wallX([x + size, y, z], 'left', null, 0, size, HFLIP),
-    setTexture(textures.skybox.left),
+    (mapData) => {
+      setTexture(textures.skybox.left, mapData)
+      return mapData
+    },
     wallX([x, y, z], 'right', null, 0, size),
-    setTexture(textures.skybox.right),
+    (mapData) => {
+      setTexture(textures.skybox.right, mapData)
+      return mapData
+    },
     wallZ([x, y, z], 'front', null, 0, size, HFLIP),
-    setTexture(textures.skybox.front),
+    (mapData) => {
+      setTexture(textures.skybox.front, mapData)
+      return mapData
+    },
     wallZ([x, y, z + size], 'back', null, 0, size),
-    (mapData) => setPolygonGroup('skybox', mapData),
-    setTexture(textures.skybox.back),
-    setColor('white'),
+    (mapData) => {
+      setColor('white', mapData)
+      setTexture(textures.skybox.back, mapData)
+      setPolygonGroup('skybox', mapData)
+      return mapData
+    },
   )(mapData)
 }
 

@@ -241,7 +241,10 @@ const generate = async (config) => {
       0,
       PATH_RGB,
     ),
-    setColor(colors.ambience[0]),
+    (mapData) => {
+      setColor(colors.ambience[0], mapData)
+      return mapData
+    },
 
     addZone(
       {
@@ -253,14 +256,16 @@ const generate = async (config) => {
       ambiences.sirs,
       5000,
     ),
-    setColor(colors.ambience[0]),
-
-    movePlayerTo({
-      type: 'relative',
-      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-    }),
     (mapData) => {
       mapData.meta.mapName = "Alia's Nightmare"
+      movePlayerTo(
+        {
+          type: 'relative',
+          coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
+        },
+        mapData,
+      )
+      setColor(colors.ambience[0], mapData)
       return mapData
     },
     generateBlankMapData,
