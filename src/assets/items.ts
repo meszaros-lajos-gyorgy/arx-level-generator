@@ -1,5 +1,5 @@
 import path from 'path'
-import { clone, toString, isEmpty, uniq } from 'ramda'
+import { clone, isEmpty, uniq } from 'ramda'
 import { declare } from '../scripting'
 import {
   RelativeCoords,
@@ -465,7 +465,7 @@ export const exportScripts = (outputDir: string) => {
       if (item.identifier === 'root') {
         filename = `${outputDir}/graph/obj3d/interactive/${dir}/${name}.asl`
       } else {
-        const id = padCharsStart('0', 4, toString(item.identifier))
+        const id = item.identifier.toString().padStart(4, '0')
         filename = `${outputDir}/graph/obj3d/interactive/${dir}/${name}_${id}/${name}.asl`
       }
       files[filename] = item.script
