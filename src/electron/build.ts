@@ -30,7 +30,6 @@ const buildJsAndCss = async () => {
       'nanoid',
       'node-pkware',
       'ramda',
-      'ramda-adjunct',
       'seedrandom',
       '*.png',
     ],

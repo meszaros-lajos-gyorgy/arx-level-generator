@@ -1,6 +1,5 @@
 import path from 'path'
 import { clone, toString, isEmpty, uniq } from 'ramda'
-import { padCharsStart } from 'ramda-adjunct'
 import { declare } from '../scripting'
 import {
   RelativeCoords,
@@ -293,7 +292,7 @@ export const createItem = (
   usedItems[item.src].push(itemInstance)
 
   const { name } = path.parse(item.src)
-  const numericId = padCharsStart('0', 4, toString(id + 1))
+  const numericId = (id + 1).toString().padStart(4, '0')
 
   return {
     src: item.src,

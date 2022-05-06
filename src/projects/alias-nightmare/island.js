@@ -1,4 +1,4 @@
-import { compose, map, props, any, __, when } from 'ramda'
+import { compose, map, props, any, __, when, isEmpty } from 'ramda'
 import {
   setColor,
   move,
@@ -23,7 +23,6 @@ import {
   addScript,
   markAsUsed,
 } from '../../assets/items'
-import { isNotEmpty } from 'ramda-adjunct'
 import { textures } from '../../assets/textures'
 import { nanoid } from 'nanoid'
 import {
@@ -342,7 +341,7 @@ const island = (config) => (mapData) => {
     markAsUsed(pp)
   })
 
-  if (isNotEmpty(ppIndices)) {
+  if (!isEmpty(ppIndices)) {
     markAsUsed(eventBus)
   }
 
