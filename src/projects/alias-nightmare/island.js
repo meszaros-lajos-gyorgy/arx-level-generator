@@ -1,4 +1,4 @@
-import { compose, map, props, any, __, when, isEmpty } from 'ramda'
+import { compose, props, any, __, when, isEmpty } from 'ramda'
 import {
   setColor,
   move,
@@ -587,7 +587,7 @@ const island = (config) => (mapData) => {
         move(...mapData.config.origin.coords, pos),
       )
 
-      return map((polygon) => {
+      return polygons.map((polygon) => {
         if (isPointInPolygon(pos, polygon)) {
           polygon.config.bumpable = false
         }
@@ -612,7 +612,7 @@ const island = (config) => (mapData) => {
         }
 
         return polygon
-      }, polygons)
+      })
     }),
     (mapData) => {
       setTexture(textures.stone.humanWall1, mapData)

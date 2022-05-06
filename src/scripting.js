@@ -1,10 +1,14 @@
 import rgba from 'color-rgba'
-import { compose, dropLast, join, map } from 'ramda'
+import { compose, dropLast, join } from 'ramda'
 
 export const color = (colorDefinition) => {
   return compose(
     join(' '),
-    map((channel) => Math.round((channel / 256) * 10 ** 6) / 10 ** 6),
+    (tmp) => {
+      return tmp.map((channel) => {
+        return Math.round((channel / 256) * 10 ** 6) / 10 ** 6
+      })
+    },
     dropLast(1),
     rgba,
   )(colorDefinition)
