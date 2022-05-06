@@ -275,10 +275,8 @@ const generate = async (config) => {
     )
   })
 
-  finalize(mapData)
-  saveToDisk(mapData)
-
-  return mapData
+  const finalizedMapData = finalize(mapData)
+  return saveToDisk(finalizedMapData)
 }
 
 export default generate

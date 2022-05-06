@@ -876,8 +876,6 @@ const generate = async (config) => {
 
   finalize(mapData)
   saveToDisk(mapData)
-
-  return mapData
 }
 
 export default generate

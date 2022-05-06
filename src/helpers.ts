@@ -227,16 +227,16 @@ const calculateNormals = (mapData: any) => {
 }
 
 export const finalize = (mapData: MapData) => {
-  const compiledMapData: any = clone(mapData)
+  const finalizedMapData: any = clone(mapData)
 
   const ungroupedPolygons = Object.values(mapData.fts.polygons).flatMap(
     (polygonGroup) => polygonGroup,
   )
   const numberOfPolygons = ungroupedPolygons.length
 
-  compiledMapData.fts.polygons = ungroupedPolygons
-  compiledMapData.dlf.header.numberOfBackgroundPolygons = numberOfPolygons
-  compiledMapData.llf.header.numberOfBackgroundPolygons = numberOfPolygons
+  finalizedMapData.fts.polygons = ungroupedPolygons
+  finalizedMapData.dlf.header.numberOfBackgroundPolygons = numberOfPolygons
+  finalizedMapData.llf.header.numberOfBackgroundPolygons = numberOfPolygons
 
   const { spawn, spawnAngle } = mapData.state
 
@@ -246,15 +246,15 @@ export const finalize = (mapData: MapData) => {
     0,
     move(...mapData.config.origin.coords, spawn),
   )
-  compiledMapData.fts.sceneHeader.mScenePosition = { x, y, z }
+  finalizedMapData.fts.sceneHeader.mScenePosition = { x, y, z }
 
-  compiledMapData.llf.lights.forEach((light) => {
+  finalizedMapData.llf.lights.forEach((light) => {
     light.pos.x -= spawn[0]
     light.pos.y -= spawn[1] + PLAYER_HEIGHT_ADJUSTMENT
     light.pos.z -= spawn[2]
   })
 
-  compiledMapData.dlf.paths.forEach((zone) => {
+  finalizedMapData.dlf.paths.forEach((zone) => {
     zone.header.initPos.x -= spawn[0]
     zone.header.initPos.y -= spawn[1] + PLAYER_HEIGHT_ADJUSTMENT
     zone.header.initPos.z -= spawn[2]
@@ -264,14 +264,14 @@ export const finalize = (mapData: MapData) => {
     zone.header.pos.z -= spawn[2]
   })
 
-  compiledMapData.dlf.header.angleEdit.b = spawnAngle
+  finalizedMapData.dlf.header.angleEdit.b = spawnAngle
 
-  createTextureContainers(compiledMapData)
-  exportUsedItems(compiledMapData)
-  calculateNormals(compiledMapData)
-  generateLights(compiledMapData)
+  createTextureContainers(finalizedMapData)
+  exportUsedItems(finalizedMapData)
+  calculateNormals(finalizedMapData)
+  generateLights(finalizedMapData)
 
-  return compiledMapData
+  return finalizedMapData
 }
 
 const addOriginPolygon = (mapData: MapData) => {
@@ -345,13 +345,14 @@ export const uninstall = async (dir) => {
   } catch (e) {}
 }
 
-export const saveToDisk = async (mapData) => {
-  const { levelIdx } = mapData.config
-
+export const saveToDisk = async (finalizedMapData) => {
+  const { levelIdx } = finalizedMapData.config
   const defaultOutputDir = resolve('./dist')
 
   const outputDir =
-    process.env.OUTPUTDIR ?? mapData.config.outputDir ?? defaultOutputDir
+    process.env.OUTPUTDIR ??
+    finalizedMapData.config.outputDir ??
+    defaultOutputDir
 
   if (outputDir === defaultOutputDir) {
     try {
@@ -373,8 +374,8 @@ export const saveToDisk = async (mapData) => {
   }
 
   const manifest = {
-    meta: mapData.meta,
-    config: mapData.config,
+    meta: finalizedMapData.meta,
+    config: finalizedMapData.config,
     files: [
       ...Object.values(files),
       ...Object.keys(scripts),
@@ -417,9 +418,9 @@ export const saveToDisk = async (mapData) => {
 
   // ------------
 
-  await fs.promises.writeFile(files.dlf, JSON.stringify(mapData.dlf))
-  await fs.promises.writeFile(files.fts, JSON.stringify(mapData.fts))
-  await fs.promises.writeFile(files.llf, JSON.stringify(mapData.llf))
+  await fs.promises.writeFile(files.dlf, JSON.stringify(finalizedMapData.dlf))
+  await fs.promises.writeFile(files.fts, JSON.stringify(finalizedMapData.fts))
+  await fs.promises.writeFile(files.llf, JSON.stringify(finalizedMapData.llf))
 
   await fs.promises.writeFile(
     `${outputDir}/manifest.json`,

@@ -52,7 +52,7 @@ export type MapConfig = {
   seed: string
   lootTable: LootTable
   bumpFactor: number
-  outputDir: string
+  outputDir?: string
 }
 
 export type RgbaBytes = {
