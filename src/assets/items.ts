@@ -227,7 +227,7 @@ export const items = {
   },
 }
 
-let usedItems: Record<string, Item[] & { root?: RootItem }> = {}
+const usedItems: Record<string, Item[] & { root?: RootItem }> = {}
 
 const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   const init: string[] = []
@@ -335,6 +335,7 @@ export const createRootItem = (
 export const addDependency = (dependency, itemRef: ItemRef) => {
   const { src, id } = itemRef
 
+  // @ts-ignore
   usedItems[src][id].dependencies.push(dependency)
 
   return itemRef
@@ -347,6 +348,7 @@ export const addDependencyAs = (
 ) => {
   const { src, id } = itemRef
 
+  // @ts-ignore
   usedItems[src][id].dependencies.push({
     source,
     target,
@@ -361,12 +363,14 @@ export const addScript = (
 ) => {
   const { src, id } = itemRef
 
+  // @ts-ignore
   usedItems[src][id].script =
-    (usedItems &&
-    usedItems[src] &&
+    (usedItems[src] &&
     usedItems[src][id] &&
+    // @ts-ignore
     usedItems[src][id].script
-      ? usedItems[src][id].script
+      ? // @ts-ignore
+        usedItems[src][id].script
       : '') +
     '\r\n' +
     '\r\n' +
@@ -382,7 +386,9 @@ export const moveTo = (
 ) => {
   const { src, id } = itemRef
 
+  // @ts-ignore
   usedItems[src][id].pos = { x, y, z }
+  // @ts-ignore
   usedItems[src][id].angle = { a, b, g }
 
   return itemRef
@@ -391,14 +397,17 @@ export const moveTo = (
 export const whereIs = (itemRef: ItemRef): ItemRef => {
   const { src, id } = itemRef
 
+  // @ts-ignore
   return clone(usedItems[src][id].pos)
 }
 
 export const markAsUsed = (itemRef: ItemRef) => {
   const { src, id } = itemRef
 
+  // @ts-ignore
   usedItems[src][id].used = true
   if (usedItems[src].root) {
+    // @ts-ignore
     usedItems[src].root.used = true
   }
 
@@ -417,7 +426,7 @@ const arxifyFilename = (filename: string) => {
   return filename.split('/').map(capitalize).join('\\')
 }
 
-export const exportUsedItems = (mapData) => {
+export const exportUsedItems = (mapData: any) => {
   const { spawn } = mapData.state
 
   const copyOfUsedItems = clone(usedItems)
@@ -508,5 +517,8 @@ export const exportDependencies = (outputDir: string) => {
 }
 
 export const resetItems = () => {
-  usedItems = {}
+  // https://bobbyhadz.com/blog/javascript-clear-object-delete-all-properties#clear-an-object-in-javascript
+  for (const key in usedItems) {
+    delete usedItems[key]
+  }
 }

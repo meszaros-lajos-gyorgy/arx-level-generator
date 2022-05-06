@@ -150,7 +150,7 @@ export const useTexture = (texture: TextureDefinition | null) => {
   return usedTextures.indexOf(texture) + 1
 }
 
-export const createTextureContainers = (mapData: MapData) => {
+export const createTextureContainers = (mapData: any) => {
   mapData.fts.textureContainers = usedTextures.map((texture, idx) => {
     return {
       tc: idx + 1,

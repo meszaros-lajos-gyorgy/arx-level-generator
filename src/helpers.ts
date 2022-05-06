@@ -108,7 +108,13 @@ export const addCoords = (
 
 // "#ff07a4" -> { r: [0..255], g: [0..255], b: [0..255], a: [0..255] }
 export const toRgba = (cssColor: string): RgbaBytes => {
-  const [r, g, b, a] = rgba(cssColor)
+  const color = rgba(cssColor)
+
+  if (color === undefined) {
+    return { r: 255, g: 255, b: 255, a: 255 }
+  }
+
+  const [r, g, b, a] = color
 
   return {
     r,
@@ -137,7 +143,7 @@ export const isBetweenInclusive = (min: number, max: number, value: number) => {
   return value >= min && value <= max
 }
 
-const generateLights = (mapData) => {
+const generateLights = (mapData: any) => {
   let colorIdx = 0
 
   const colors: RgbaBytes[] = []
@@ -145,7 +151,7 @@ const generateLights = (mapData) => {
   const p = mapData.fts.polygons.reduce(
     (acc, { vertices }: { vertices: PosVertex3[] }, idx) => {
       const x = Math.min(...vertices.map(({ posX }) => posX))
-      const z = Math.min(...pluck('posZ', vertices))
+      const z = Math.min(...vertices.map(({ posZ }) => posZ))
 
       const cellX = Math.floor(x / 100)
       const cellZ = Math.floor(z / 100) + 1
@@ -191,7 +197,7 @@ const vectorToXYZ = ([x, y, z]: Vector3): Vertex3 => {
   return { x, y, z }
 }
 
-const calculateNormals = (mapData) => {
+const calculateNormals = (mapData: any) => {
   // https://computergraphics.stackexchange.com/questions/4031/programmatically-generating-vertex-normals
 
   mapData.fts.polygons.forEach((polygon) => {
@@ -221,14 +227,16 @@ const calculateNormals = (mapData) => {
 }
 
 export const finalize = (mapData: MapData) => {
+  const compiledMapData: any = clone(mapData)
+
   const ungroupedPolygons = Object.values(mapData.fts.polygons).flatMap(
     (polygonGroup) => polygonGroup,
   )
   const numberOfPolygons = ungroupedPolygons.length
 
-  mapData.fts.polygons = ungroupedPolygons
-  mapData.dlf.header.numberOfBackgroundPolygons = numberOfPolygons
-  mapData.llf.header.numberOfBackgroundPolygons = numberOfPolygons
+  compiledMapData.fts.polygons = ungroupedPolygons
+  compiledMapData.dlf.header.numberOfBackgroundPolygons = numberOfPolygons
+  compiledMapData.llf.header.numberOfBackgroundPolygons = numberOfPolygons
 
   const { spawn, spawnAngle } = mapData.state
 
@@ -238,15 +246,15 @@ export const finalize = (mapData: MapData) => {
     0,
     move(...mapData.config.origin.coords, spawn),
   )
-  mapData.fts.sceneHeader.mScenePosition = { x, y, z }
+  compiledMapData.fts.sceneHeader.mScenePosition = { x, y, z }
 
-  mapData.llf.lights.forEach((light) => {
+  compiledMapData.llf.lights.forEach((light) => {
     light.pos.x -= spawn[0]
     light.pos.y -= spawn[1] + PLAYER_HEIGHT_ADJUSTMENT
     light.pos.z -= spawn[2]
   })
 
-  mapData.dlf.paths.forEach((zone) => {
+  compiledMapData.dlf.paths.forEach((zone) => {
     zone.header.initPos.x -= spawn[0]
     zone.header.initPos.y -= spawn[1] + PLAYER_HEIGHT_ADJUSTMENT
     zone.header.initPos.z -= spawn[2]
@@ -256,14 +264,14 @@ export const finalize = (mapData: MapData) => {
     zone.header.pos.z -= spawn[2]
   })
 
-  mapData.dlf.header.angleEdit.b = spawnAngle
+  compiledMapData.dlf.header.angleEdit.b = spawnAngle
 
-  createTextureContainers(mapData)
-  exportUsedItems(mapData)
-  calculateNormals(mapData)
-  generateLights(mapData)
+  createTextureContainers(compiledMapData)
+  exportUsedItems(compiledMapData)
+  calculateNormals(compiledMapData)
+  generateLights(compiledMapData)
 
-  return mapData
+  return compiledMapData
 }
 
 const addOriginPolygon = (mapData: MapData) => {
