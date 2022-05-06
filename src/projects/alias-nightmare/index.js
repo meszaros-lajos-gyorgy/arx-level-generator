@@ -1,4 +1,4 @@
-import { compose, reduce, __, addIndex } from 'ramda'
+import { reduce, addIndex } from 'ramda'
 import {
   generateBlankMapData,
   movePlayerTo,
@@ -76,7 +76,7 @@ const createWelcomeMarker = (pos, config) => {
   
     ACCEPT
   }
-        `
+  `
   }, ref)
 
   moveTo({ type: 'relative', coords: pos }, [0, 0, 0], ref)
@@ -220,56 +220,54 @@ const generate = async (config) => {
 
   createFallSaver(islands[0].pos, welcomeMarker)
 
-  return compose(
-    saveToDisk,
-    finalize,
+  const mapData = generateBlankMapData(config)
 
-    bridges(islands),
-    addIndex(reduce)(
-      (mapData, config, idx) => island({ ...config, idx })(mapData),
-      __,
-      islands,
-    ),
-
-    (mapData) => createGravityInducer(origin, mapData),
-
-    addZone(
-      { type: 'relative', coords: [0, 5000, 0] },
-      [MAP_MAX_WIDTH * 100, 1000, MAP_MAX_HEIGHT * 100],
-      `fall-detector`,
-      ambiences.none,
-      0,
-      PATH_RGB,
-    ),
-    (mapData) => {
-      setColor(colors.ambience[0], mapData)
-      return mapData
+  mapData.meta.mapName = "Alia's Nightmare"
+  movePlayerTo(
+    {
+      type: 'relative',
+      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
     },
+    mapData,
+  )
+  setColor(colors.ambience[0], mapData)
 
-    addZone(
-      {
-        type: 'relative',
-        coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-      },
-      [100, 0, 100],
-      'palette0',
-      ambiences.sirs,
-      5000,
-    ),
-    (mapData) => {
-      mapData.meta.mapName = "Alia's Nightmare"
-      movePlayerTo(
-        {
-          type: 'relative',
-          coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-        },
-        mapData,
-      )
-      setColor(colors.ambience[0], mapData)
-      return mapData
+  addZone(
+    {
+      type: 'relative',
+      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
     },
-    generateBlankMapData,
-  )(config)
+    [100, 0, 100],
+    'palette0',
+    ambiences.sirs,
+    5000,
+  )(mapData)
+
+  setColor(colors.ambience[0], mapData)
+
+  addZone(
+    { type: 'relative', coords: [0, 5000, 0] },
+    [MAP_MAX_WIDTH * 100, 1000, MAP_MAX_HEIGHT * 100],
+    `fall-detector`,
+    ambiences.none,
+    0,
+    PATH_RGB,
+  )(mapData)
+
+  createGravityInducer(origin, mapData)
+
+  addIndex(reduce)(
+    (mapData, config, idx) => island({ ...config, idx })(mapData),
+    mapData,
+    islands,
+  )
+
+  bridges(islands)(mapData)
+
+  finalize(mapData)
+  saveToDisk(mapData)
+
+  return mapData
 }
 
 export default generate

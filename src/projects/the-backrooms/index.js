@@ -10,7 +10,6 @@
  * Glass popping sound effects: https://www.youtube.com/watch?v=6nKbpLUpqiQ (SOUND EFFECT EN & FR)
  */
 
-import { compose } from 'ramda'
 import {
   generateBlankMapData,
   finalize,
@@ -70,28 +69,22 @@ const addLamp = (pos, angle, config = {}) => {
 
     const roomHeight = mapData.config.roomDimensions.height
 
-    compose(
-      (mapData) =>
-        addLight(
-          move(0, 20, 0, pos),
-          {
-            fallstart: 100,
-            fallend: 500 * roomHeight,
-            intensity: 1.3 - roomHeight * 0.1,
-            exFlicker: toFloatRgb(toRgba('#1f1f07')),
-            extras:
-              EXTRAS_SEMIDYNAMIC |
-              EXTRAS_EXTINGUISHABLE |
-              (isOn ? 0 : EXTRAS_STARTEXTINGUISHED) |
-              EXTRAS_NO_IGNIT,
-          },
-          mapData,
-        ),
-      (mapData) => {
-        setColor('white', mapData)
-        return mapData
+    setColor('white', mapData)
+    addLight(
+      move(0, 20, 0, pos),
+      {
+        fallstart: 100,
+        fallend: 500 * roomHeight,
+        intensity: 1.3 - roomHeight * 0.1,
+        exFlicker: toFloatRgb(toRgba('#1f1f07')),
+        extras:
+          EXTRAS_SEMIDYNAMIC |
+          EXTRAS_EXTINGUISHABLE |
+          (isOn ? 0 : EXTRAS_STARTEXTINGUISHED) |
+          EXTRAS_NO_IGNIT,
       },
-    )(mapData)
+      mapData,
+    )
 
     return lampEntity
   }
@@ -141,19 +134,13 @@ const addAmbientLight = (pos, config = {}) => {
       }),
     }
 
-    compose(
-      (mapData) =>
-        addLight(move(0, -radius + 20, 0, pos), lightConfig, mapData),
-      (mapData) => addLight(move(0, radius + 20, 0, pos), lightConfig, mapData),
-      (mapData) => addLight(move(-radius, 20, 0, pos), lightConfig, mapData),
-      (mapData) => addLight(move(radius, 20, 0, pos), lightConfig, mapData),
-      (mapData) => addLight(move(0, 20, -radius, pos), lightConfig, mapData),
-      (mapData) => addLight(move(0, 20, radius, pos), lightConfig, mapData),
-      (mapData) => {
-        setColor(lightColor, mapData)
-        return mapData
-      },
-    )(mapData)
+    setColor(lightColor, mapData)
+    addLight(move(0, 20, radius, pos), lightConfig, mapData)
+    addLight(move(0, 20, -radius, pos), lightConfig, mapData)
+    addLight(move(radius, 20, 0, pos), lightConfig, mapData)
+    addLight(move(-radius, 20, 0, pos), lightConfig, mapData)
+    addLight(move(0, radius + 20, 0, pos), lightConfig, mapData)
+    addLight(move(0, -radius + 20, 0, pos), lightConfig, mapData)
 
     return lampEntities
   }
@@ -721,192 +708,176 @@ const generate = async (config) => {
   config.originalNumberOfRooms = config.numberOfRooms
   config.numberOfRooms = roomCounter
 
-  return compose(
-    saveToDisk,
-    finalize,
+  const mapData = generateBlankMapData(config)
 
-    (mapData) => {
-      const radius = getRadius(grid)
-      const top = -radius * UNIT + UNIT / 2
-      const left = -radius * UNIT + UNIT / 2
+  mapData.meta.mapName = 'The Backrooms'
 
-      const wallSegments = []
-      const floors = []
+  movePlayerTo(
+    {
+      type: 'relative',
+      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
+    },
+    mapData,
+  )
+  setColor('black', mapData)
 
-      const ambientLights = addAmbientLight([0, 0, 0], {
-        color: COLORS.BLOOD,
-        on: false,
-      })(mapData)
+  addZone(
+    {
+      type: 'relative',
+      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
+    },
+    [100, 0, 100],
+    'palette0',
+    ambiences.none,
+    5000,
+  )(mapData)
+  setColor('#0b0c10', mapData)
+  renderGrid(grid)(mapData)
 
-      const lampsToBeCreated = []
+  const radius = getRadius(grid)
+  const top = -radius * UNIT + UNIT / 2
+  const left = -radius * UNIT + UNIT / 2
 
-      for (let y = 0; y < grid.length; y++) {
-        for (let x = 0; x < grid[y].length; x++) {
-          if (isOccupied(x, y, grid)) {
-            floors.push([x, y])
+  const wallSegments = []
+  const floors = []
 
-            const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
-            const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
+  const ambientLights = addAmbientLight([0, 0, 0], {
+    color: COLORS.BLOOD,
+    on: false,
+  })(mapData)
 
-            if (x % 3 === 0 && y % 3 === 0) {
-              lampsToBeCreated.push({
-                pos: [
-                  left + x * UNIT - 50 + offsetX,
-                  -(config.roomDimensions.height * UNIT - 10),
-                  -(top + y * UNIT) - 50 + offsetZ,
-                ],
-                config: {
-                  on: randomBetween(0, 100) < config.percentOfLightsOn,
-                },
-              })
-            } else {
-              if (Math.random() < 0.05) {
-                createCeilingDiffuser([
-                  left + x * UNIT - 50 + offsetX,
-                  -(config.roomDimensions.height * UNIT - 5),
-                  -(top + y * UNIT) - 50 + offsetZ,
-                ])
-              }
-            }
+  const lampsToBeCreated = []
 
-            if (isOccupied(x - 1, y, grid) !== true) {
-              wallSegments.push([x - 1, y, 'right'])
-            }
-            if (isOccupied(x + 1, y, grid) !== true) {
-              wallSegments.push([x + 1, y, 'left'])
-            }
-            if (isOccupied(x, y + 1, grid) !== true) {
-              wallSegments.push([x, y + 1, 'front'])
-            }
-            if (isOccupied(x, y - 1, grid) !== true) {
-              wallSegments.push([x, y - 1, 'back'])
-            }
-          }
-        }
-      }
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      if (isOccupied(x, y, grid)) {
+        floors.push([x, y])
 
-      const spawnContainerPos = [0, 0, UNIT]
-
-      const aam = createRune('aam', spawnContainerPos, [0, 0, 0], welcomeMarker)
-      const folgora = createRune(
-        'folgora',
-        spawnContainerPos,
-        [0, 0, 0],
-        welcomeMarker,
-      )
-      const taar = createRune(
-        'taar',
-        spawnContainerPos,
-        [0, 0, 0],
-        welcomeMarker,
-      )
-
-      const spawnContainer = createSpawnContainer(
-        spawnContainerPos,
-        [0, 0, 0],
-        [aam, folgora, taar],
-      )
-
-      const importantLocations = [spawnContainerPos]
-
-      importantLocations.forEach((pos) => {
-        const sortedLamps = lampsToBeCreated.sort((a, b) => {
-          return sortByDistance(pos)(a.pos, b.pos)
-        })
-
-        sortedLamps[0].config.on = true
-      })
-
-      const lamps = lampsToBeCreated.reduce((lamps, { pos, config }) => {
-        lamps.push(addLamp(pos, [0, 0, 0], config)(mapData))
-        return lamps
-      }, [])
-
-      const lampCtrl = createLampController([10, 0, 10], lamps, config)
-
-      const jumpscareCtrl = createJumpscareController(
-        [-10, 0, -10],
-        lampCtrl,
-        ambientLights,
-        config,
-      )
-
-      const lootSlots = pickRandoms(
-        Math.floor(mapData.config.numberOfRooms / 3) + 5,
-        floors,
-      )
-
-      // TODO: filter 5 of the farthest lootSlots compared to spawn and select a random from that
-      const keySlot = pickRandomIdx(lootSlots)
-      const [keyX, keyZ] = lootSlots[keySlot]
-      lootSlots.splice(keySlot, 1)
-
-      const key = createKey(
-        [left + keyX * UNIT - 50, 0, -(top + keyZ * UNIT) - 50],
-        [0, 0, 0],
-        jumpscareCtrl,
-      )
-
-      createExit(top, left, pickRandom(wallSegments), key, jumpscareCtrl)
-
-      lootSlots.forEach(([x, z]) => {
         const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
         const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
-        const pos = [
-          left + x * UNIT - 50 + offsetX,
-          0,
-          -(top + z * UNIT) - 50 + offsetZ,
-        ]
 
-        const loot = pickRandomLoot(config.lootTable)
-
-        switch (loot.name) {
-          case 'almondWater':
-            {
-              createAlmondWater(pos, [0, 0, 0], loot.variant, jumpscareCtrl)
-            }
-            break
-          default:
-            console.error('unknown item', loot)
+        if (x % 3 === 0 && y % 3 === 0) {
+          lampsToBeCreated.push({
+            pos: [
+              left + x * UNIT - 50 + offsetX,
+              -(config.roomDimensions.height * UNIT - 10),
+              -(top + y * UNIT) - 50 + offsetZ,
+            ],
+            config: {
+              on: randomBetween(0, 100) < config.percentOfLightsOn,
+            },
+          })
+        } else {
+          if (Math.random() < 0.05) {
+            createCeilingDiffuser([
+              left + x * UNIT - 50 + offsetX,
+              -(config.roomDimensions.height * UNIT - 5),
+              -(top + y * UNIT) - 50 + offsetZ,
+            ])
+          }
         }
-      })
 
-      return mapData
-    },
+        if (isOccupied(x - 1, y, grid) !== true) {
+          wallSegments.push([x - 1, y, 'right'])
+        }
+        if (isOccupied(x + 1, y, grid) !== true) {
+          wallSegments.push([x + 1, y, 'left'])
+        }
+        if (isOccupied(x, y + 1, grid) !== true) {
+          wallSegments.push([x, y + 1, 'front'])
+        }
+        if (isOccupied(x, y - 1, grid) !== true) {
+          wallSegments.push([x, y - 1, 'back'])
+        }
+      }
+    }
+  }
 
-    renderGrid(grid),
-    (mapData) => {
-      setColor('#0b0c10', mapData)
-      return mapData
-    },
+  const spawnContainerPos = [0, 0, UNIT]
 
-    addZone(
-      {
-        type: 'relative',
-        coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-      },
-      [100, 0, 100],
-      'palette0',
-      ambiences.none,
-      5000,
-    ),
+  const aam = createRune('aam', spawnContainerPos, [0, 0, 0], welcomeMarker)
+  const folgora = createRune(
+    'folgora',
+    spawnContainerPos,
+    [0, 0, 0],
+    welcomeMarker,
+  )
+  const taar = createRune('taar', spawnContainerPos, [0, 0, 0], welcomeMarker)
 
-    (mapData) => {
-      mapData.meta.mapName = 'The Backrooms'
+  const spawnContainer = createSpawnContainer(
+    spawnContainerPos,
+    [0, 0, 0],
+    [aam, folgora, taar],
+  )
 
-      movePlayerTo(
+  const importantLocations = [spawnContainerPos]
+
+  importantLocations.forEach((pos) => {
+    const sortedLamps = lampsToBeCreated.sort((a, b) => {
+      return sortByDistance(pos)(a.pos, b.pos)
+    })
+
+    sortedLamps[0].config.on = true
+  })
+
+  const lamps = lampsToBeCreated.reduce((lamps, { pos, config }) => {
+    lamps.push(addLamp(pos, [0, 0, 0], config)(mapData))
+    return lamps
+  }, [])
+
+  const lampCtrl = createLampController([10, 0, 10], lamps, config)
+
+  const jumpscareCtrl = createJumpscareController(
+    [-10, 0, -10],
+    lampCtrl,
+    ambientLights,
+    config,
+  )
+
+  const lootSlots = pickRandoms(
+    Math.floor(mapData.config.numberOfRooms / 3) + 5,
+    floors,
+  )
+
+  // TODO: filter 5 of the farthest lootSlots compared to spawn and select a random from that
+  const keySlot = pickRandomIdx(lootSlots)
+  const [keyX, keyZ] = lootSlots[keySlot]
+  lootSlots.splice(keySlot, 1)
+
+  const key = createKey(
+    [left + keyX * UNIT - 50, 0, -(top + keyZ * UNIT) - 50],
+    [0, 0, 0],
+    jumpscareCtrl,
+  )
+
+  createExit(top, left, pickRandom(wallSegments), key, jumpscareCtrl)
+
+  lootSlots.forEach(([x, z]) => {
+    const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
+    const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
+    const pos = [
+      left + x * UNIT - 50 + offsetX,
+      0,
+      -(top + z * UNIT) - 50 + offsetZ,
+    ]
+
+    const loot = pickRandomLoot(config.lootTable)
+
+    switch (loot.name) {
+      case 'almondWater':
         {
-          type: 'relative',
-          coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-        },
-        mapData,
-      )
-      setColor('black', mapData)
+          createAlmondWater(pos, [0, 0, 0], loot.variant, jumpscareCtrl)
+        }
+        break
+      default:
+        console.error('unknown item', loot)
+    }
+  })
 
-      return mapData
-    },
-    generateBlankMapData,
-  )(config)
+  finalize(mapData)
+  saveToDisk(mapData)
+
+  return mapData
 }
 
 export default generate

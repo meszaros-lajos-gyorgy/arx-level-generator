@@ -1,5 +1,5 @@
 import { createRune } from '@items/createRune'
-import { compose, identity, uniq } from 'ramda'
+import { identity, uniq } from 'ramda'
 import { ambiences } from '../../assets/ambiences'
 import {
   items,
@@ -148,8 +148,8 @@ const generate = async (config) => {
   })
 
   const startingLoot = [
-    compose(markAsUsed, createItem)(items.misc.pole),
-    compose(markAsUsed, createItem)(items.misc.rope),
+    markAsUsed(createItem(items.misc.pole)),
+    markAsUsed(createItem(items.misc.rope)),
     createRune('aam'),
     createRune('yok'),
   ]
@@ -165,133 +165,120 @@ const generate = async (config) => {
     islandCenter.z + 30,
   ])
 
-  return compose(
-    saveToDisk,
-    finalize,
+  const mapData = generateBlankMapData(config)
 
-    (mapData) => {
-      createCampfire(
-        {
-          type: 'relative',
-          coords: [islandCenter.x, -20, islandCenter.z],
-        },
-        [0, 0, 0],
-        mapData,
-      )
-      setColor('white', mapData)
-      circleOfVectors([0, -1000, 0], 1000, 3).forEach((pos) => {
-        addLight(
-          pos,
-          {
-            fallstart: 1,
-            fallend: 3000,
-            intensity: 3,
-          },
-          mapData,
-        )
-      })
+  mapData.meta.mapName = 'On the island'
+  mapData.state.spawnAngle = 180
+  movePlayerTo(
+    {
+      type: 'relative',
+      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
+    },
+    mapData,
+  )
+  setColor('#DBF4FF', mapData)
 
-      return mapData
+  addZone(
+    {
+      type: 'relative',
+      coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
     },
+    [100, 0, 100],
+    'palette0',
+    ambiences.none,
+    2000,
+  )(mapData)
 
-    plain([0, 10, 0], [50, 50], 'floor', disableBumping),
-    (mapData) => {
-      setColor('lightblue', mapData)
-      setTexture(textures.water.cave, mapData)
-      unsetPolygonGroup(mapData)
-      return mapData
-    },
-    plain(
-      [-islandCenter.x, 210, islandCenter.z],
-      [islandSizeInTiles, islandSizeInTiles],
-      'floor',
-      (polygons, mapData) => {
-        // TODO: don't know why this only works in this particular order and not the other way around
-        polygons = connectToNearPolygons('island-1', 200)(polygons, mapData)
-        polygons = connectToNearPolygons('island-3', 100)(polygons, mapData)
-        return polygons
-      },
-      () => ({
-        textureRotation: pickRandom([0, 90, 180, 270]),
-        textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-      }),
-    ),
-    (mapData) => {
-      setPolygonGroup('island-4', mapData)
-      return mapData
-    },
-    plain(
-      [-islandCenter.x, 140, -islandCenter.z],
-      [islandSizeInTiles, islandSizeInTiles],
-      'floor',
-      connectToNearPolygons('island-2'),
-      () => ({
-        textureRotation: pickRandom([0, 90, 180, 270]),
-        textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-      }),
-    ),
-    (mapData) => {
-      setPolygonGroup('island-3', mapData)
-      return mapData
-    },
-    plain(
-      [islandCenter.x, 70, -islandCenter.z],
-      [islandSizeInTiles, islandSizeInTiles],
-      'floor',
-      connectToNearPolygons('island-1'),
-      () => ({
-        textureRotation: pickRandom([0, 90, 180, 270]),
-        textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-      }),
-    ),
-    (mapData) => {
-      setPolygonGroup('island-2', mapData)
-      return mapData
-    },
-    plain(
-      [islandCenter.x, 0, islandCenter.z],
-      [islandSizeInTiles, islandSizeInTiles],
-      'floor',
-      identity,
-      () => ({
-        textureRotation: pickRandom([0, 90, 180, 270]),
-        textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-      }),
-    ),
-    (mapData) => {
-      setColor('hsv(150, 37%, 70%)', mapData)
-      setTexture(textures.gravel.ground1, mapData)
-      setPolygonGroup('island-1', mapData)
-      return mapData
-    },
+  setColor('hsv(150, 37%, 70%)', mapData)
+  setTexture(textures.gravel.ground1, mapData)
+  setPolygonGroup('island-1', mapData)
 
-    addZone(
+  plain(
+    [islandCenter.x, 0, islandCenter.z],
+    [islandSizeInTiles, islandSizeInTiles],
+    'floor',
+    identity,
+    () => ({
+      textureRotation: pickRandom([0, 90, 180, 270]),
+      textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+    }),
+  )(mapData)
+
+  setPolygonGroup('island-2', mapData)
+
+  plain(
+    [islandCenter.x, 70, -islandCenter.z],
+    [islandSizeInTiles, islandSizeInTiles],
+    'floor',
+    connectToNearPolygons('island-1'),
+    () => ({
+      textureRotation: pickRandom([0, 90, 180, 270]),
+      textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+    }),
+  )(mapData)
+
+  setPolygonGroup('island-3', mapData)
+
+  plain(
+    [-islandCenter.x, 140, -islandCenter.z],
+    [islandSizeInTiles, islandSizeInTiles],
+    'floor',
+    connectToNearPolygons('island-2'),
+    () => ({
+      textureRotation: pickRandom([0, 90, 180, 270]),
+      textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+    }),
+  )(mapData)
+
+  setPolygonGroup('island-4', mapData)
+
+  plain(
+    [-islandCenter.x, 210, islandCenter.z],
+    [islandSizeInTiles, islandSizeInTiles],
+    'floor',
+    (polygons, mapData) => {
+      // TODO: don't know why this only works in this particular order and not the other way around
+      polygons = connectToNearPolygons('island-1', 200)(polygons, mapData)
+      polygons = connectToNearPolygons('island-3', 100)(polygons, mapData)
+      return polygons
+    },
+    () => ({
+      textureRotation: pickRandom([0, 90, 180, 270]),
+      textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+    }),
+  )(mapData)
+
+  setColor('lightblue', mapData)
+  setTexture(textures.water.cave, mapData)
+  unsetPolygonGroup(mapData)
+
+  plain([0, 10, 0], [50, 50], 'floor', disableBumping)(mapData)
+
+  createCampfire(
+    {
+      type: 'relative',
+      coords: [islandCenter.x, -20, islandCenter.z],
+    },
+    [0, 0, 0],
+    mapData,
+  )
+  setColor('white', mapData)
+  circleOfVectors([0, -1000, 0], 1000, 3).forEach((pos) => {
+    addLight(
+      pos,
       {
-        type: 'relative',
-        coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
+        fallstart: 1,
+        fallend: 3000,
+        intensity: 3,
       },
-      [100, 0, 100],
-      'palette0',
-      ambiences.none,
-      2000,
-    ),
-    (mapData) => {
-      mapData.meta.mapName = 'On the island'
-      mapData.state.spawnAngle = 180
-      movePlayerTo(
-        {
-          type: 'relative',
-          coords: [-origin.coords[0], -origin.coords[1], -origin.coords[2]],
-        },
-        mapData,
-      )
-      setColor('#DBF4FF', mapData)
+      mapData,
+    )
+  })
 
-      return mapData
-    },
+  finalize(mapData)
+  saveToDisk(mapData)
 
-    generateBlankMapData,
-  )(config)
+  return mapData
 }
 
 export default generate
