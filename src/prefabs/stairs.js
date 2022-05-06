@@ -1,6 +1,5 @@
 import { nanoid } from 'nanoid'
 import floor from './base/floor'
-import { compose, times, identity, reduce, __ } from 'ramda'
 import wallZ from './base/wallZ'
 import { textures } from '../assets/textures'
 import {
@@ -19,7 +18,7 @@ const STEP = {
 
 const PIXEL = 1 / textures.stone.stairs.height
 
-const stairTopLeft = (pos, isLeftFlipped, areSidesFlipped) => {
+const stairTopLeft = (pos, isLeftFlipped, areSidesFlipped, mapData) => {
   return floor(
     {
       type: 'absolute',
@@ -41,10 +40,10 @@ const stairTopLeft = (pos, isLeftFlipped, areSidesFlipped) => {
       c: { u: 0, v: PIXEL * 160 },
       d: { u: 0, v: PIXEL * 222 },
     },
-  )
+  )(mapData)
 }
 
-const stairTopRight = (pos, isRightFlipped, areSidesFlipped) => {
+const stairTopRight = (pos, isRightFlipped, areSidesFlipped, mapData) => {
   return floor(
     {
       type: 'absolute',
@@ -66,10 +65,10 @@ const stairTopRight = (pos, isRightFlipped, areSidesFlipped) => {
       c: { u: 0.5, v: PIXEL * 160 },
       d: { u: 0.5, v: PIXEL * 222 },
     },
-  )
+  )(mapData)
 }
 
-const stairFrontRight = (pos, isRightFlipped, areSidesFlipped) => {
+const stairFrontRight = (pos, isRightFlipped, areSidesFlipped, mapData) => {
   return wallZ(
     move(
       areSidesFlipped ? -STEP.WIDTH / 4 : STEP.WIDTH / 4,
@@ -88,10 +87,10 @@ const stairFrontRight = (pos, isRightFlipped, areSidesFlipped) => {
       c: { u: 0.5, v: PIXEL * 222 },
       d: { u: 0.5, v: PIXEL * 255 },
     },
-  )
+  )(mapData)
 }
 
-const stairFrontLeft = (pos, isLeftFlipped, areSidesFlipped) => {
+const stairFrontLeft = (pos, isLeftFlipped, areSidesFlipped, mapData) => {
   return wallZ(
     move(
       areSidesFlipped ? STEP.WIDTH / 4 : -STEP.WIDTH / 4,
@@ -110,16 +109,22 @@ const stairFrontLeft = (pos, isLeftFlipped, areSidesFlipped) => {
       c: { u: 0, v: PIXEL * 222 },
       d: { u: 0, v: PIXEL * 255 },
     },
-  )
+  )(mapData)
 }
 
-const stairStep = (pos, isLeftFlipped, isRightFlipped, areSidesFlipped) => {
-  return compose(
-    stairTopRight(pos, isRightFlipped, areSidesFlipped),
-    stairTopLeft(pos, isLeftFlipped, areSidesFlipped),
-    stairFrontRight(pos, isRightFlipped, areSidesFlipped),
-    stairFrontLeft(pos, isLeftFlipped, areSidesFlipped),
-  )
+const stairStep = (
+  pos,
+  isLeftFlipped,
+  isRightFlipped,
+  areSidesFlipped,
+  mapData,
+) => {
+  stairFrontLeft(pos, isLeftFlipped, areSidesFlipped, mapData)
+  stairFrontRight(pos, isRightFlipped, areSidesFlipped, mapData)
+  stairTopLeft(pos, isLeftFlipped, areSidesFlipped, mapData)
+  stairTopRight(pos, isRightFlipped, areSidesFlipped, mapData)
+
+  return mapData
 }
 
 const stairs = (pos) => (mapData) => {
@@ -128,31 +133,21 @@ const stairs = (pos) => (mapData) => {
 
   const absPos = move(...pos, origin.coords)
 
-  return compose(
-    (mapData) => {
-      unsetPolygonGroup(mapData)
-      return mapData
-    },
+  setPolygonGroup(`${id}-stairs`, mapData)
+  setTexture(textures.stone.stairs, mapData)
+  ;[...Array(15).keys()].forEach((idx) => {
+    stairStep(
+      move(0, -STEP.HEIGHT * idx, STEP.DEPTH * idx, absPos),
+      Math.random() > 0.5,
+      Math.random() > 0.5,
+      Math.random() > 0.5,
+      mapData,
+    )
+  })
 
-    reduce(
-      (mapData, idx) => {
-        return stairStep(
-          move(0, -STEP.HEIGHT * idx, STEP.DEPTH * idx, absPos),
-          Math.random() > 0.5,
-          Math.random() > 0.5,
-          Math.random() > 0.5,
-        )(mapData)
-      },
-      __,
-      times(identity, 15),
-    ),
+  unsetPolygonGroup(mapData)
 
-    (mapData) => {
-      setPolygonGroup(`${id}-stairs`, mapData)
-      setTexture(textures.stone.stairs, mapData)
-      return mapData
-    },
-  )(mapData)
+  return mapData
 }
 
 export default stairs
