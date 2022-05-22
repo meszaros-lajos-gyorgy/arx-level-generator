@@ -370,36 +370,31 @@ ACCEPT
 
 >>WHISPER_NOEXIT {
 SPEAK -p [whisper--no-exit]
-// HEROSAY [whisper--no-exit]
-HEROSAY "It is no use trying to find an exit, Am Sheagar! You will never leave this place!"
+HEROSAY [whisper--no-exit]
 RETURN
 }
 
 >>WHISPER_DRINK1 {
 SPEAK -p [whisper--drink-the-almond-water]
-// HEROSAY [whisper--drink-the-almond-water]
-HEROSAY "Drink the almond water! It will be over faster with that!"
+HEROSAY [whisper--drink-the-almond-water]
 RETURN
 }
 
 >>WHISPER_DRINK2 {
 SPEAK -p [whisper--drink-it]
-// HEROSAY [whisper--drink-it]
-HEROSAY "Drink it! Drink it! Drink it! Drink it! Drink it!"
+HEROSAY [whisper--drink-it]
 RETURN
 }
 
 >>WHISPER_SMELL {
 SPEAK -p [whisper--do-you-smell-it]
-// HEROSAY [whisper--do-you-smell-it]
-HEROSAY "Do you smell it? It is the smell of how you will rot here next to your precious Alia!"
+HEROSAY [whisper--do-you-smell-it]
 RETURN
 }
 
 >>WHISPER_MAGIC {
 SPEAK -p [whisper--magic-wont-save-you]
-// HEROSAY [whisper--magic-wont-save-you]
-HEROSAY "Do you really think magic will save you this time?"
+HEROSAY [whisper--magic-wont-save-you]
 RETURN
 }
 
