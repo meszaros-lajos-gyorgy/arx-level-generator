@@ -14,8 +14,6 @@ const insertRoom = (left, top, width, height, grid) => {
       grid[top + y][left + x] = 1
     }
   }
-
-  return grid
 }
 
 const addFirstRoom = (width, height, grid) => {
@@ -27,7 +25,7 @@ const addFirstRoom = (width, height, grid) => {
   const left = radius - Math.floor(width / 2)
   const top = radius - Math.floor(height / 2)
 
-  return insertRoom(left, top, width, height, grid)
+  insertRoom(left, top, width, height, grid)
 }
 
 // is every cell of the grid === 0 ?
@@ -144,7 +142,7 @@ export const addRoom = (width, height, grid) => {
 
   const startingPos = pickRandom(variants)
 
-  return insertRoom(startingPos[0], startingPos[1], width, height, grid)
+  insertRoom(startingPos[0], startingPos[1], width, height, grid)
 }
 
 const decalOffset = {
@@ -258,295 +256,286 @@ const getBackWalls = (wallSegments) => {
     }, [])
 }
 
-export const renderGrid = (grid) => {
-  return (mapData) => {
-    const { roomDimensions } = mapData.config
-    const radius = getRadius(grid)
-    const top = -radius * UNIT + UNIT / 2
-    const left = -radius * UNIT + UNIT / 2
+export const renderGrid = (grid, mapData) => {
+  const { roomDimensions } = mapData.config
+  const radius = getRadius(grid)
+  const top = -radius * UNIT + UNIT / 2
+  const left = -radius * UNIT + UNIT / 2
 
-    const wallSegments = []
+  const wallSegments = []
 
-    for (let y = 0; y < grid.length; y++) {
-      for (let x = 0; x < grid[y].length; x++) {
-        if (grid[y][x] === 1) {
-          if (isOccupied(x - 1, y, grid) !== true) {
-            wallSegments.push([x, y, 'right'])
-          }
-          if (isOccupied(x + 1, y, grid) !== true) {
-            wallSegments.push([x, y, 'left'])
-          }
-          if (isOccupied(x, y + 1, grid) !== true) {
-            wallSegments.push([x, y, 'front'])
-          }
-          if (isOccupied(x, y - 1, grid) !== true) {
-            wallSegments.push([x, y, 'back'])
-          }
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      if (grid[y][x] === 1) {
+        if (isOccupied(x - 1, y, grid) !== true) {
+          wallSegments.push([x, y, 'right'])
+        }
+        if (isOccupied(x + 1, y, grid) !== true) {
+          wallSegments.push([x, y, 'left'])
+        }
+        if (isOccupied(x, y + 1, grid) !== true) {
+          wallSegments.push([x, y, 'front'])
+        }
+        if (isOccupied(x, y - 1, grid) !== true) {
+          wallSegments.push([x, y, 'back'])
         }
       }
     }
-
-    const rightWalls = getRightWalls(wallSegments)
-    const leftWalls = getLeftWalls(wallSegments)
-    const frontWalls = getFrontWalls(wallSegments)
-    const backWalls = getBackWalls(wallSegments)
-
-    rightWalls.forEach((wall) => {
-      const { x, y, width } = wall
-
-      const leftAdjacentWallIdx = frontWalls.findIndex((frontWall) => {
-        return frontWall.x === x && frontWall.y === y + width - 1
-      })
-      const rightAdjacentWallIdx = backWalls.findIndex((backWall) => {
-        return backWall.x === x && backWall.y === y
-      })
-
-      if (leftAdjacentWallIdx !== -1) {
-        wall.isLeftCornerConcave = true
-        frontWalls[leftAdjacentWallIdx].isRightCornerConcave = true
-      }
-      if (rightAdjacentWallIdx !== -1) {
-        wall.isRightCornerConcave = true
-        backWalls[rightAdjacentWallIdx].isLeftCornerConcave = true
-      }
-    })
-
-    leftWalls.forEach((wall) => {
-      const { x, y, width } = wall
-
-      const leftAdjacentWallIdx = backWalls.findIndex((backWall) => {
-        return backWall.x + backWall.width - 1 === x && backWall.y === y
-      })
-      const rightAdjacentWallIdx = frontWalls.findIndex((frontWall) => {
-        return (
-          frontWall.x + frontWall.width - 1 === x &&
-          frontWall.y === y + width - 1
-        )
-      })
-
-      if (leftAdjacentWallIdx !== -1) {
-        wall.isLeftCornerConcave = true
-        backWalls[leftAdjacentWallIdx].isRightCornerConcave = true
-      }
-      if (rightAdjacentWallIdx !== -1) {
-        wall.isRightCornerConcave = true
-        frontWalls[rightAdjacentWallIdx].isLeftCornerConcave = true
-      }
-    })
-
-    for (let y = 0; y < grid.length; y++) {
-      for (let x = 0; x < grid[y].length; x++) {
-        if (grid[y][x] === 1) {
-          setTexture(textures.backrooms.carpetDirty, mapData)
-          plain(
-            [left + x * UNIT, 0, -(top + y * UNIT)],
-            [UNIT / 100, UNIT / 100],
-            'floor',
-            disableBumping,
-            () => ({
-              textureRotation: pickRandom([0, 90, 180, 270]),
-              textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-            }),
-          )(mapData)
-
-          setTexture(textures.backrooms.ceiling, mapData)
-          plain(
-            [
-              left + x * UNIT,
-              -(UNIT * roomDimensions.height),
-              -(top + y * UNIT),
-            ],
-            [UNIT / 100, UNIT / 100],
-            'ceiling',
-            disableBumping,
-          )(mapData)
-        }
-      }
-    }
-
-    rightWalls.forEach(
-      ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
-        const coords = [
-          left + x * UNIT - UNIT / 2,
-          0,
-          -(top + (y + width) * UNIT) - UNIT / 2,
-        ]
-
-        setTexture(
-          textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
-          mapData,
-        )
-        wall(coords, 'right', { width, unit: UNIT })(mapData)
-
-        setTexture(textures.backrooms.moldEdge, mapData)
-        wall(move(...decalOffset.right, coords), 'right', {
-          height: 1,
-          width,
-          unit: UNIT,
-        })(mapData)
-
-        if (isLeftCornerConcave) {
-          wall(move(...decalOffset.right, coords), 'right', {
-            width: 1 / (UNIT / 100),
-            textureRotation: 270,
-            unit: UNIT,
-          })(mapData)
-        }
-
-        if (isRightCornerConcave) {
-          wall(
-            move(
-              ...decalOffset.right,
-              move(0, 0, UNIT * width - UNIT / 2, coords),
-            ),
-            'right',
-            {
-              width: 1 / (UNIT / 100),
-              textureRotation: 90,
-              unit: UNIT,
-            },
-          )(mapData)
-        }
-      },
-    )
-
-    leftWalls.forEach(
-      ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
-        const coords = [
-          left + x * UNIT + UNIT / 2,
-          0,
-          -(top + (y + width) * UNIT) - UNIT / 2,
-        ]
-
-        setTexture(
-          textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
-          mapData,
-        )
-        wall(coords, 'left', { width, unit: UNIT })(mapData)
-
-        setTexture(textures.backrooms.moldEdge, mapData)
-        wall(move(...decalOffset.left, coords), 'left', {
-          height: 1,
-          width,
-          unit: UNIT,
-        })(mapData)
-
-        if (isLeftCornerConcave) {
-          wall(
-            move(
-              ...decalOffset.left,
-              move(0, 0, UNIT * width - UNIT / 2, coords),
-            ),
-            'left',
-            {
-              width: 1 / (UNIT / 100),
-              textureRotation: 90,
-              unit: UNIT,
-            },
-          )(mapData)
-        }
-
-        if (isRightCornerConcave) {
-          wall(move(...decalOffset.left, coords), 'left', {
-            width: 1 / (UNIT / 100),
-            textureRotation: 270,
-            unit: UNIT,
-          })(mapData)
-        }
-      },
-    )
-
-    frontWalls.forEach(
-      ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
-        const coords = [
-          left + (x - 1) * UNIT - UNIT / 2,
-          0,
-          -(top + y * UNIT) - UNIT / 2,
-        ]
-
-        setTexture(
-          textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
-          mapData,
-        )
-        wall(coords, 'front', { width, unit: UNIT })(mapData)
-
-        setTexture(textures.backrooms.moldEdge, mapData)
-        wall(move(...decalOffset.front, coords), 'front', {
-          height: 1,
-          width,
-          unit: UNIT,
-        })(mapData)
-
-        if (isLeftCornerConcave) {
-          wall(
-            move(
-              ...decalOffset.front,
-              move(UNIT * width - UNIT / 2, 0, 0, coords),
-            ),
-            'front',
-            {
-              width: 1 / (UNIT / 100),
-              textureRotation: 90,
-              unit: UNIT,
-            },
-          )(mapData)
-        }
-
-        if (isRightCornerConcave) {
-          wall(move(...decalOffset.front, coords), 'front', {
-            width: 1 / (UNIT / 100),
-            textureRotation: 270,
-            unit: UNIT,
-          })(mapData)
-        }
-      },
-    )
-
-    backWalls.forEach(
-      ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
-        const coords = [
-          left + (x - 1) * UNIT - UNIT / 2,
-          0,
-          -(top + y * UNIT) + UNIT / 2,
-        ]
-        setTexture(
-          textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
-          mapData,
-        )
-        wall(coords, 'back', { width, unit: UNIT })(mapData)
-
-        setTexture(textures.backrooms.moldEdge, mapData)
-        wall(move(...decalOffset.back, coords), 'back', {
-          height: 1,
-          width,
-          unit: UNIT,
-        })(mapData)
-
-        if (isLeftCornerConcave) {
-          wall(move(...decalOffset.back, coords), 'back', {
-            width: 1 / (UNIT / 100),
-            textureRotation: 270,
-            unit: UNIT,
-          })(mapData)
-        }
-
-        if (isRightCornerConcave) {
-          wall(
-            move(
-              ...decalOffset.back,
-              move(UNIT * width - UNIT / 2, 0, 0, coords),
-            ),
-            'back',
-            {
-              width: 1 / (UNIT / 100),
-              textureRotation: 90,
-              unit: UNIT,
-            },
-          )(mapData)
-        }
-      },
-    )
-
-    return mapData
   }
+
+  const rightWalls = getRightWalls(wallSegments)
+  const leftWalls = getLeftWalls(wallSegments)
+  const frontWalls = getFrontWalls(wallSegments)
+  const backWalls = getBackWalls(wallSegments)
+
+  rightWalls.forEach((wall) => {
+    const { x, y, width } = wall
+
+    const leftAdjacentWallIdx = frontWalls.findIndex((frontWall) => {
+      return frontWall.x === x && frontWall.y === y + width - 1
+    })
+    const rightAdjacentWallIdx = backWalls.findIndex((backWall) => {
+      return backWall.x === x && backWall.y === y
+    })
+
+    if (leftAdjacentWallIdx !== -1) {
+      wall.isLeftCornerConcave = true
+      frontWalls[leftAdjacentWallIdx].isRightCornerConcave = true
+    }
+    if (rightAdjacentWallIdx !== -1) {
+      wall.isRightCornerConcave = true
+      backWalls[rightAdjacentWallIdx].isLeftCornerConcave = true
+    }
+  })
+
+  leftWalls.forEach((wall) => {
+    const { x, y, width } = wall
+
+    const leftAdjacentWallIdx = backWalls.findIndex((backWall) => {
+      return backWall.x + backWall.width - 1 === x && backWall.y === y
+    })
+    const rightAdjacentWallIdx = frontWalls.findIndex((frontWall) => {
+      return (
+        frontWall.x + frontWall.width - 1 === x && frontWall.y === y + width - 1
+      )
+    })
+
+    if (leftAdjacentWallIdx !== -1) {
+      wall.isLeftCornerConcave = true
+      backWalls[leftAdjacentWallIdx].isRightCornerConcave = true
+    }
+    if (rightAdjacentWallIdx !== -1) {
+      wall.isRightCornerConcave = true
+      frontWalls[rightAdjacentWallIdx].isLeftCornerConcave = true
+    }
+  })
+
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      if (grid[y][x] === 1) {
+        setTexture(textures.backrooms.carpetDirty, mapData)
+        plain(
+          [left + x * UNIT, 0, -(top + y * UNIT)],
+          [UNIT / 100, UNIT / 100],
+          'floor',
+          disableBumping,
+          () => ({
+            textureRotation: pickRandom([0, 90, 180, 270]),
+            textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+          }),
+        )(mapData)
+
+        setTexture(textures.backrooms.ceiling, mapData)
+        plain(
+          [left + x * UNIT, -(UNIT * roomDimensions.height), -(top + y * UNIT)],
+          [UNIT / 100, UNIT / 100],
+          'ceiling',
+          disableBumping,
+        )(mapData)
+      }
+    }
+  }
+
+  rightWalls.forEach(
+    ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
+      const coords = [
+        left + x * UNIT - UNIT / 2,
+        0,
+        -(top + (y + width) * UNIT) - UNIT / 2,
+      ]
+
+      setTexture(
+        textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
+        mapData,
+      )
+      wall(coords, 'right', { width, unit: UNIT })(mapData)
+
+      setTexture(textures.backrooms.moldEdge, mapData)
+      wall(move(...decalOffset.right, coords), 'right', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
+
+      if (isLeftCornerConcave) {
+        wall(move(...decalOffset.right, coords), 'right', {
+          width: 1 / (UNIT / 100),
+          textureRotation: 270,
+          unit: UNIT,
+        })(mapData)
+      }
+
+      if (isRightCornerConcave) {
+        wall(
+          move(
+            ...decalOffset.right,
+            move(0, 0, UNIT * width - UNIT / 2, coords),
+          ),
+          'right',
+          {
+            width: 1 / (UNIT / 100),
+            textureRotation: 90,
+            unit: UNIT,
+          },
+        )(mapData)
+      }
+    },
+  )
+
+  leftWalls.forEach(
+    ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
+      const coords = [
+        left + x * UNIT + UNIT / 2,
+        0,
+        -(top + (y + width) * UNIT) - UNIT / 2,
+      ]
+
+      setTexture(
+        textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
+        mapData,
+      )
+      wall(coords, 'left', { width, unit: UNIT })(mapData)
+
+      setTexture(textures.backrooms.moldEdge, mapData)
+      wall(move(...decalOffset.left, coords), 'left', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
+
+      if (isLeftCornerConcave) {
+        wall(
+          move(
+            ...decalOffset.left,
+            move(0, 0, UNIT * width - UNIT / 2, coords),
+          ),
+          'left',
+          {
+            width: 1 / (UNIT / 100),
+            textureRotation: 90,
+            unit: UNIT,
+          },
+        )(mapData)
+      }
+
+      if (isRightCornerConcave) {
+        wall(move(...decalOffset.left, coords), 'left', {
+          width: 1 / (UNIT / 100),
+          textureRotation: 270,
+          unit: UNIT,
+        })(mapData)
+      }
+    },
+  )
+
+  frontWalls.forEach(
+    ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
+      const coords = [
+        left + (x - 1) * UNIT - UNIT / 2,
+        0,
+        -(top + y * UNIT) - UNIT / 2,
+      ]
+
+      setTexture(
+        textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
+        mapData,
+      )
+      wall(coords, 'front', { width, unit: UNIT })(mapData)
+
+      setTexture(textures.backrooms.moldEdge, mapData)
+      wall(move(...decalOffset.front, coords), 'front', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
+
+      if (isLeftCornerConcave) {
+        wall(
+          move(
+            ...decalOffset.front,
+            move(UNIT * width - UNIT / 2, 0, 0, coords),
+          ),
+          'front',
+          {
+            width: 1 / (UNIT / 100),
+            textureRotation: 90,
+            unit: UNIT,
+          },
+        )(mapData)
+      }
+
+      if (isRightCornerConcave) {
+        wall(move(...decalOffset.front, coords), 'front', {
+          width: 1 / (UNIT / 100),
+          textureRotation: 270,
+          unit: UNIT,
+        })(mapData)
+      }
+    },
+  )
+
+  backWalls.forEach(
+    ({ x, y, width, isLeftCornerConcave, isRightCornerConcave }) => {
+      const coords = [
+        left + (x - 1) * UNIT - UNIT / 2,
+        0,
+        -(top + y * UNIT) + UNIT / 2,
+      ]
+      setTexture(
+        textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
+        mapData,
+      )
+      wall(coords, 'back', { width, unit: UNIT })(mapData)
+
+      setTexture(textures.backrooms.moldEdge, mapData)
+      wall(move(...decalOffset.back, coords), 'back', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
+
+      if (isLeftCornerConcave) {
+        wall(move(...decalOffset.back, coords), 'back', {
+          width: 1 / (UNIT / 100),
+          textureRotation: 270,
+          unit: UNIT,
+        })(mapData)
+      }
+
+      if (isRightCornerConcave) {
+        wall(
+          move(
+            ...decalOffset.back,
+            move(UNIT * width - UNIT / 2, 0, 0, coords),
+          ),
+          'back',
+          {
+            width: 1 / (UNIT / 100),
+            textureRotation: 90,
+            unit: UNIT,
+          },
+        )(mapData)
+      }
+    },
+  )
 }

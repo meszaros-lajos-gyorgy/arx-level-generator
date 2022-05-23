@@ -62,7 +62,7 @@ const findClosestJoint = (a, bx) => {
   return bx[distances.indexOf(Math.min(...distances))]
 }
 
-const bridges = (islands) => (mapData) => {
+const bridges = (islands, mapData) => {
   const { origin } = mapData.config
 
   const pairs = islands

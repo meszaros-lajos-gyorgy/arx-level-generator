@@ -570,7 +570,7 @@ const island = (config) => (mapData) => {
 
   setColor(colors.lights, mapData)
   props(ppIndices, ppCoords).forEach((ppCoord) => {
-    addLight(move(0, -10, 0, ppCoord), mapData)
+    addLight(move(0, -10, 0, ppCoord), {}, mapData)
   })
   unsetPolygonGroup(mapData)
 

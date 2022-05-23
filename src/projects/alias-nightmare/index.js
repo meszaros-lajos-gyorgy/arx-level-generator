@@ -262,10 +262,10 @@ const generate = async (config) => {
     islands,
   )
 
-  bridges(islands)(mapData)
+  bridges(islands, mapData)
 
-  finalize(mapData)
-  saveToDisk(mapData)
+  const finalizedMapData = finalize(mapData)
+  return saveToDisk(finalizedMapData)
 }
 
 export default generate

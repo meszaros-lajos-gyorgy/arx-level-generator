@@ -688,7 +688,7 @@ const generate = async (config) => {
 
   let oldGrid = JSON.stringify(grid)
   for (let i = 0; i < config.numberOfRooms; i++) {
-    grid = addRoom(
+    addRoom(
       randomBetween(...config.roomDimensions.width),
       randomBetween(...config.roomDimensions.depth),
       grid,
@@ -727,7 +727,7 @@ const generate = async (config) => {
     5000,
   )(mapData)
   setColor('#0b0c10', mapData)
-  renderGrid(grid)(mapData)
+  renderGrid(grid, mapData)
 
   const radius = getRadius(grid)
   const top = -radius * UNIT + UNIT / 2
@@ -869,8 +869,8 @@ const generate = async (config) => {
     }
   })
 
-  finalize(mapData)
-  saveToDisk(mapData)
+  const finalizedMapData = finalize(mapData)
+  return saveToDisk(finalizedMapData)
 }
 
 export default generate

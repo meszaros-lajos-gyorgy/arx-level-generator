@@ -18,7 +18,7 @@ import { MapConfig } from './types'
     bumpFactor: 3,
   }
 
-  const project: string = 'on-the-island'
+  const project: string = 'the-backrooms'
 
   switch (project) {
     case 'the-backrooms':
