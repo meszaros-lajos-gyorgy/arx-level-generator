@@ -80,7 +80,7 @@ export const plain = (
       }
     }
 
-    let polygons = onBeforeBumping(
+    const polygons = onBeforeBumping(
       dummyMapData.fts.polygons[mapData.state.polygonGroup],
       mapData,
     )

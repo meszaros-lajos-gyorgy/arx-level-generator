@@ -15,7 +15,7 @@ import {
   FtsData,
   LlfData,
 } from './blankMap'
-import { pluck, countBy, partition, repeat, clone, flatten } from 'ramda'
+import { countBy, partition, repeat, clone, flatten } from 'ramda'
 import {
   POLY_QUAD,
   MAP_MAX_HEIGHT,
@@ -452,8 +452,8 @@ const unpackCoords = (coords: any[]) => {
 }
 
 export const categorizeVertices = (polygons) => {
-  const vertices = polygons.flatMap(({ vertices: { posX, posY, posZ } }) => {
-    return { posX, posY, posZ }
+  const vertices = polygons.flatMap(({ vertices }) => {
+    return vertices.flatMap(({ posX, posY, posZ }) => ({ posX, posY, posZ }))
   })
 
   const summary: Record<string, number> = countBy(
