@@ -1,6 +1,6 @@
 import { clone, uniq } from '../faux-ramda'
 import { MapData } from '../helpers'
-import { getRootPath } from '../../rootpath'
+import { getRootPath } from '../rootpath'
 import { POLY_QUAD, POLY_TRANS, POLY_NO_SHADOW, POLY_WATER } from '../constants'
 
 export type TextureDefinition = {

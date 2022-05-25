@@ -17,7 +17,7 @@ const config: MapConfig = {
   bumpFactor: 3,
 }
 
-const project: string = 'on-the-island'
+const project: string = 'alias-nightmare'
 
 ;(async () => {
   switch (project) {

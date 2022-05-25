@@ -7,7 +7,7 @@ import {
   RotationVertex3,
   Vertex3,
 } from '../types'
-import { getRootPath } from '../../rootpath'
+import { getRootPath } from '../rootpath'
 import { PLAYER_HEIGHT_ADJUSTMENT } from '../constants'
 
 export type InjectableProps = {
