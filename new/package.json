@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "validate": "tsc src/index.ts --noEmit --skipLibCheck --target esnext --moduleResolution node",
-    "build": "esbuild ./src/*.ts ./src/**/*.ts --platform=node --format=cjs --outdir=build",
-    "bundle": "esbuild ./src/index.ts --bundle --platform=node --minify --outdir=build --external:./node_modules/*",
-    "run": "node --require dotenv/config build/index.js",
+    "build": "esbuild ./src/index.ts --bundle --platform=node --minify --outdir=build --sourcemap --external:./node_modules/*",
+    "run": "node --require dotenv/config --enable-source-maps build/index.js",
     "dev": "npm run validate && npm run build && npm run run"
   },
   "author": "",
