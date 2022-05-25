@@ -9,9 +9,9 @@
   },
   "scripts": {
     "generate": "npm run generate:validate && npm run generate:build && npm run generate:run",
-    "generate:validate": "tsc -p tsconfig.json",
+    "generate:validate": "tsc -p ./tsconfig.json",
     "generate:build": "esbuild ./src/generate.ts --bundle --platform=node --minify --outdir=build --sourcemap --external:./node_modules/*",
-    "generate:run": "node build/generate.js --require dotenv/config --enable-source-maps"
+    "generate:run": "node ./build/generate.js --require dotenv/config --enable-source-maps"
   },
   "author": "Lajos Meszaros <m_lajos@hotmail.com>",
   "license": "GPL-3.0-or-later",
