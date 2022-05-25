@@ -60,7 +60,7 @@ import { overridePlayerScript } from '../shared/player'
 import { createLampController } from './items/lampController'
 import { ambiences } from '../../assets/ambiences'
 import { UNIT, COLORS } from './constants'
-import { createRune } from '@items/createRune'
+import { createRune } from '../../items/createRune'
 
 const addLamp = (pos, angle, config = {}) => {
   return (mapData) => {
