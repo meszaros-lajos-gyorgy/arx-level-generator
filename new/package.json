@@ -2,15 +2,19 @@
   "name": "arx-level-generator-ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
+  "engines": {
+    "npm": ">=7.0.0",
+    "node": ">=16.0.0"
+  },
   "scripts": {
     "validate": "tsc src/index.ts --noEmit --skipLibCheck --target esnext --moduleResolution node",
     "build": "esbuild ./src/index.ts --bundle --platform=node --minify --outdir=build --sourcemap --external:./node_modules/*",
     "run": "node --require dotenv/config --enable-source-maps build/index.js",
     "dev": "npm run validate && npm run build && npm run run"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Lajos Meszaros <m_lajos@hotmail.com>",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/node": "^17.0.35",
     "dotenv": "^16.0.1",
