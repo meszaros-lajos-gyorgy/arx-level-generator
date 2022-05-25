@@ -1,0 +1,16 @@
+export const countBy = () => {}
+export const partition = () => {}
+export const repeat = () => {}
+export const clone = () => {}
+export const flatten = () => {}
+export const uniq = () => {}
+export const isEmpty = () => {}
+export const reduce = () => {}
+export const times = () => {}
+export const identity = () => {}
+export const addIndex = () => {}
+export const without = () => {}
+export const clamp = () => {}
+export const pluck = () => {}
+export const props = () => {}
+export const any = () => {}
