@@ -1,7 +1,3 @@
-export const countBy = () => {}
-export const partition = () => {}
-export const flatten = () => {}
-
 // https://stackoverflow.com/a/14438954/1806628
 export const uniq = (values) => {
   return values.filter((value, index, self) => {
@@ -49,8 +45,24 @@ export const any = (fn, values) => {
   return false
 }
 
-export const without = (listOfExceptions, items) => {
-  return items.filter((item) => {
+export const without = (listOfExceptions, values) => {
+  return values.filter((item) => {
     return !listOfExceptions.includes(item)
   })
+}
+
+export const countBy = (fn, values) => {
+  return values.reduce((acc, value) => {
+    const key = fn(value)
+    acc[key] = (acc[key] ?? 0) + 1
+    return acc
+  }, {})
+}
+
+const complement = (fn) => {
+  return (...args) => !fn(...args)
+}
+
+export const partition = (fn, values) => {
+  return [values.filter(fn), values.filter(complement(fn))]
 }

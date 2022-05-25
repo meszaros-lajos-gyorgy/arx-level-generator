@@ -1,4 +1,4 @@
-import { times, repeat, clamp, flatten, uniq } from '../../faux-ramda'
+import { times, repeat, clamp, uniq, identity } from '../../faux-ramda'
 import { textures } from '../../assets/textures'
 import { HFLIP, VFLIP } from '../../constants'
 import { setTexture, pickRandom, move } from '../../helpers'
@@ -30,7 +30,7 @@ const addFirstRoom = (width, height, grid) => {
 
 // is every cell of the grid === 0 ?
 const isEmpty = (grid) => {
-  const elementsInGrid = uniq(flatten(grid))
+  const elementsInGrid = uniq(grid.flatMap(identity))
   return elementsInGrid.length === 1 && elementsInGrid[0] === 0
 }
 
