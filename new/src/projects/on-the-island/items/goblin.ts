@@ -6,7 +6,7 @@ import {
   moveTo,
 } from '../../../assets/items'
 import { getInjections } from '../../../scripting'
-import { RotationVector3 } from 'src/types'
+import { RotationVector3 } from '../../../types'
 
 export const createGoblin = (
   pos,
