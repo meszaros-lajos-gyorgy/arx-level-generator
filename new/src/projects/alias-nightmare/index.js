@@ -255,10 +255,9 @@ const generate = async (config) => {
 
   createGravityInducer(origin, mapData)
 
-  islands.reduce(
-    (mapData, config, idx) => island({ ...config, idx })(mapData),
-    mapData,
-  )
+  islands.forEach((config, idx) => {
+    island({ ...config, idx }, mapData)
+  })
 
   bridges(islands, mapData)
 

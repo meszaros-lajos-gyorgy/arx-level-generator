@@ -62,72 +62,74 @@ const findClosestJoint = (a, bx) => {
   return bx[distances.indexOf(Math.min(...distances))]
 }
 
+/*
+island = {
+  pos: [0, 0, 0],
+  entrances: EAST,
+  exits: NORTH,
+  width: 12,
+  height: 10,
+}
+islands = island[]
+*/
 const bridges = (islands, mapData) => {
-  const { origin } = mapData.config
-
   const pairs = islands
     .map(getJoints)
-    .reduce((candidates, island, idx, islands) => {
-      const otherIslands = without([island], islands)
+    .reduce((candidates, joint, idx, joints) => {
+      const otherIslands = without([joint], joints)
 
       const viewAngle = 20
 
-      if (island.north) {
+      if (joint.north) {
         const souths = otherIslands
-          .filter((island) => island.south)
-          .map((island) => island.south)
+          .filter(({ south }) => south !== undefined)
+          .map(({ south }) => south)
           .filter((south) => {
-            const [x, y, z] = subtractVec3(island.north, south)
+            const [x, y, z] = subtractVec3(joint.north, south)
             const angle = radToDeg(Math.atan2(x, z))
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (souths.length) {
-          candidates.push([
-            island.north,
-            findClosestJoint(island.north, souths),
-          ])
+          candidates.push([joint.north, findClosestJoint(joint.north, souths)])
         }
       }
-      if (island.south) {
+      if (joint.south) {
         const norths = otherIslands
-          .filter((island) => island.north)
-          .map((island) => island.north)
+          .filter(({ north }) => north !== undefined)
+          .map(({ north }) => north)
           .filter((north) => {
-            const [x, y, z] = subtractVec3(island.south, north)
+            const [x, y, z] = subtractVec3(joint.south, north)
             const angle = (radToDeg(Math.atan2(x, z)) + 180) % 360
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (norths.length) {
-          candidates.push([
-            island.south,
-            findClosestJoint(island.south, norths),
-          ])
+          candidates.push([joint.south, findClosestJoint(joint.south, norths)])
         }
       }
-      if (island.east) {
+      if (joint.east) {
         const wests = otherIslands
-          .filter((island) => island.west)
-          .map((island) => island.west)
+          .filter(({ west }) => west !== undefined)
+          .map(({ west }) => west)
           .filter((west) => {
-            const [x, y, z] = subtractVec3(island.east, west)
+            const [x, y, z] = subtractVec3(joint.east, west)
             const angle = radToDeg(Math.atan2(x, z)) - 90
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (wests.length) {
-          candidates.push([island.east, findClosestJoint(island.east, wests)])
+          candidates.push([joint.east, findClosestJoint(joint.east, wests)])
         }
       }
-      if (island.west) {
+      if (joint.west) {
         const easts = otherIslands
-          .filter((island) => island.east)
-          .map((island) => island.east)
+          .filter(({ east }) => east !== undefined)
+          .map(({ east }) => east)
           .filter((east) => {
-            const [x, y, z] = subtractVec3(island.west, east)
+            const [x, y, z] = subtractVec3(joint.west, east)
             const angle = radToDeg(Math.atan2(x, z)) + 90
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (easts.length) {
-          candidates.push([island.west, findClosestJoint(island.west, easts)])
+          candidates.push([joint.west, findClosestJoint(joint.west, easts)])
         }
       }
 

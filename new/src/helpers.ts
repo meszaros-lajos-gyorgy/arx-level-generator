@@ -56,6 +56,7 @@ export type MapData = {
   meta: {
     createdAt: string
     generatorVersion: string
+    mapName?: string
   }
   config: MapConfig
   state: {

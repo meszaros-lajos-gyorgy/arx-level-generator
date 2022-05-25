@@ -308,7 +308,7 @@ const createGates = () => {
   }
 }
 
-const island = (config) => (mapData) => {
+const island = (config, mapData) => {
   const id = nanoid(6)
   const { pos, entrances = NONE, width, height } = config
   // exits are locked connection points, entrances are not
@@ -573,8 +573,6 @@ const island = (config) => (mapData) => {
     addLight(move(0, -10, 0, ppCoord), {}, mapData)
   })
   unsetPolygonGroup(mapData)
-
-  return mapData
 }
 
 export default island

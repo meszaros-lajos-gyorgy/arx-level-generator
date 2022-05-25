@@ -1,8 +1,6 @@
 export const countBy = () => {}
 export const partition = () => {}
 export const flatten = () => {}
-export const without = () => {}
-export const any = () => {}
 
 // https://stackoverflow.com/a/14438954/1806628
 export const uniq = (values) => {
@@ -40,4 +38,19 @@ export const props = (keys, obj) => {
     acc.push(obj[key])
     return acc
   }, [])
+}
+
+export const any = (fn, values) => {
+  for (let value in values) {
+    if (fn(value)) {
+      return true
+    }
+  }
+  return false
+}
+
+export const without = (listOfExceptions, items) => {
+  return items.filter((item) => {
+    return !listOfExceptions.includes(item)
+  })
 }
