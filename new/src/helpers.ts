@@ -350,6 +350,8 @@ export const saveToDisk = async (finalizedMapData) => {
   const { levelIdx } = finalizedMapData.config
   const defaultOutputDir = resolve('./dist')
 
+  console.log(process.env.OUTPUTDIR)
+
   const outputDir =
     process.env.OUTPUTDIR ??
     finalizedMapData.config.outputDir ??
