@@ -1,4 +1,3 @@
-import { reduce, addIndex } from '../../faux-ramda'
 import {
   generateBlankMapData,
   movePlayerTo,
@@ -256,10 +255,9 @@ const generate = async (config) => {
 
   createGravityInducer(origin, mapData)
 
-  addIndex(reduce)(
+  islands.reduce(
     (mapData, config, idx) => island({ ...config, idx })(mapData),
     mapData,
-    islands,
   )
 
   bridges(islands, mapData)

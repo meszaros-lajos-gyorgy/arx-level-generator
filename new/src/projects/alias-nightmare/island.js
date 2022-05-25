@@ -1,4 +1,4 @@
-import { props, any, isEmpty } from '../../faux-ramda'
+import { props, any } from '../../faux-ramda'
 import {
   setColor,
   move,
@@ -341,7 +341,7 @@ const island = (config) => (mapData) => {
     markAsUsed(pp)
   })
 
-  if (!isEmpty(ppIndices)) {
+  if (!ppIndices.length) {
     markAsUsed(eventBus)
   }
 

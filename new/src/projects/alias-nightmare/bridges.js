@@ -1,4 +1,4 @@
-import { reduce, addIndex, without } from '../../faux-ramda'
+import { without } from '../../faux-ramda'
 import { NORTH, SOUTH, EAST, WEST } from './constants'
 import {
   move,
@@ -152,16 +152,12 @@ const bridges = (islands, mapData) => {
       return acc
     }, [])
 
-  return addIndex(reduce)(
-    (mapData, [a, b], idx) => {
-      // TODO: render polygons between the 2 points
-      console.log('TODO: render bridge between', a, 'and', b)
+  return pairs.reduce((mapData, [a, b], idx) => {
+    // TODO: render polygons between the 2 points
+    console.log('TODO: render bridge between', a, 'and', b)
 
-      return mapData
-    },
-    mapData,
-    pairs,
-  )
+    return mapData
+  }, mapData)
 }
 
 export default bridges

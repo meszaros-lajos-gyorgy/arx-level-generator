@@ -1,15 +1,7 @@
 export const countBy = () => {}
 export const partition = () => {}
-export const clone = () => {}
 export const flatten = () => {}
-export const isEmpty = () => {}
-export const reduce = () => {}
-export const identity = () => {}
-export const addIndex = () => {}
 export const without = () => {}
-export const clamp = () => {}
-export const pluck = () => {}
-export const props = () => {}
 export const any = () => {}
 
 // https://stackoverflow.com/a/14438954/1806628
@@ -25,4 +17,27 @@ export const times = (fn, repetitions) => {
 
 export const repeat = (value, repetitions) => {
   return Array(repetitions).fill(value)
+}
+
+export const identity = (x) => x
+
+export const clamp = (min, max, n) => {
+  if (n < min) {
+    return min
+  }
+  if (n > max) {
+    return max
+  }
+  return n
+}
+
+export const clone = (data) => {
+  return JSON.parse(JSON.stringify(data))
+}
+
+export const props = (keys, obj) => {
+  return keys.reduce((acc, key) => {
+    acc.push(obj[key])
+    return acc
+  }, [])
 }

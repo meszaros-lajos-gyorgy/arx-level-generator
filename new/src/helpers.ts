@@ -15,7 +15,7 @@ import {
   FtsData,
   LlfData,
 } from './blankMap'
-import { countBy, partition, repeat, clone, flatten } from './faux-ramda'
+import { countBy, partition, repeat, clone } from './faux-ramda'
 import {
   POLY_QUAD,
   MAP_MAX_HEIGHT,
@@ -728,7 +728,7 @@ export const cleanupCache = () => {
 
 export const pickRandomLoot = (lootTable) => {
   const idx = pickRandom(
-    flatten(lootTable.map(({ weight }, idx) => repeat(idx, weight))),
+    lootTable.flatMap(({ weight }, idx) => repeat(idx, weight)),
   )
   return lootTable[idx]
 }

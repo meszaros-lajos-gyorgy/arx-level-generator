@@ -1,4 +1,4 @@
-import { reduce, times, identity } from '../faux-ramda'
+import { times, identity } from '../faux-ramda'
 import { isBetweenInclusive, randomBetween, move } from '../helpers'
 import pillar from './pillar'
 
@@ -75,32 +75,28 @@ const tooCloseToOtherPillars = (x, z) => {
 const pillars =
   (pos, n, radius, excludeRadius = 100, borderGap = [0, 0, 0, 0]) =>
   (mapData) => {
-    return reduce(
-      (mapData) => {
-        const [originalX, originalY, originalZ] = pos
-        let radiusX = radius
-        let radiusZ = radius
-        if (Array.isArray(radius)) {
-          ;[radiusX, radiusZ] = radius
-        }
+    return times(identity, n).reduce((mapData) => {
+      const [originalX, originalY, originalZ] = pos
+      let radiusX = radius
+      let radiusZ = radius
+      if (Array.isArray(radius)) {
+        ;[radiusX, radiusZ] = radius
+      }
 
-        do {
-          x = originalX + randomBetween(-radiusX / 2, radiusX / 2)
-          z = originalZ + randomBetween(-radiusZ / 2, radiusZ / 2)
-        } while (
-          isInExcludeRadius(pos, excludeRadius, x, z) ||
-          isInBorderGap(pos, borderGap, x, z) ||
-          tooCloseToOtherPillars(x, z)
-        )
+      do {
+        x = originalX + randomBetween(-radiusX / 2, radiusX / 2)
+        z = originalZ + randomBetween(-radiusZ / 2, radiusZ / 2)
+      } while (
+        isInExcludeRadius(pos, excludeRadius, x, z) ||
+        isInBorderGap(pos, borderGap, x, z) ||
+        tooCloseToOtherPillars(x, z)
+      )
 
-        return pillar(
-          ...move(x, originalY, z, mapData.config.origin.coords),
-          20,
-        )(mapData)
-      },
-      mapData,
-      times(identity, n),
-    )
+      return pillar(
+        ...move(x, originalY, z, mapData.config.origin.coords),
+        20,
+      )(mapData)
+    }, mapData)
   }
 
 export default pillars

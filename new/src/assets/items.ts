@@ -1,5 +1,5 @@
 import path from 'path'
-import { clone, isEmpty, uniq } from '../faux-ramda'
+import { clone, uniq } from '../faux-ramda'
 import { declare } from '../scripting'
 import {
   RelativeCoords,
@@ -261,7 +261,7 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
     init.push(...tmpScope.injections.init)
   }
 
-  if (isEmpty(init)) {
+  if (init.length) {
     return {}
   } else {
     return { init }
