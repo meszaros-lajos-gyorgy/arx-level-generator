@@ -420,12 +420,14 @@ export const moveTo = (
 }
 
 // an item marked as used will get copied to the output dir, otherwise it's discarded
-// root items can't be marked directly, only by having at least one marked instance
+// root items don't need to be marked explicitly, having at least one marked instance will mark roots too
 export const markAsUsed = (itemRef: ItemRef) => {
   const { src, id } = itemRef
 
-  if (usedItems[src] && id !== 'root') {
-    usedItems[src].instances[id].used = true
+  if (usedItems[src]) {
+    if (id !== 'root') {
+      usedItems[src].instances[id].used = true
+    }
     const root = usedItems[src].root
     if (root) {
       root.used = true
