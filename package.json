@@ -1,7 +1,7 @@
 {
-  "name": "arx-level-generator-ts",
-  "version": "1.0.0",
-  "description": "",
+  "name": "arx-level-generator",
+  "version": "0.17.0",
+  "description": "A tool to generate random Arx Fatalis maps",
   "main": "build/generate.js",
   "engines": {
     "npm": ">=7.0.0",
@@ -20,8 +20,16 @@
     "game:win": "C:/Program Files/Arx Libertatis/arx.exe --loadlevel 1",
     "game:linux": "/home/lali/projektek/arx/ArxLibertatis/build/arx --loadlevel 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meszaros-lajos-gyorgy/arx-level-generator.git"
+  },
   "author": "Lajos Meszaros <m_lajos@hotmail.com>",
   "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/meszaros-lajos-gyorgy/arx-level-generator/issues"
+  },
+  "homepage": "https://github.com/meszaros-lajos-gyorgy/arx-level-generator#readme",
   "dependencies": {
     "arx-level-json-converter": "^1.3.1",
     "color-rgba": "^2.4.0",
