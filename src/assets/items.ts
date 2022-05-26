@@ -262,10 +262,10 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   }
 
   if (init.length) {
-    return {}
-  } else {
     return { init }
   }
+
+  return {}
 }
 
 export const createItem = (

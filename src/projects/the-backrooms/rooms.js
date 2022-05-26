@@ -28,8 +28,7 @@ const addFirstRoom = (width, height, grid) => {
   insertRoom(left, top, width, height, grid)
 }
 
-// is every cell of the grid === 0 ?
-const isEmpty = (grid) => {
+const isEveryCellEmpty = (grid) => {
   const elementsInGrid = uniq(grid.flatMap(identity))
   return elementsInGrid.length === 1 && elementsInGrid[0] === 0
 }
@@ -106,7 +105,7 @@ export const generateGrid = (size) => {
 }
 
 export const addRoom = (width, height, grid) => {
-  if (isEmpty(grid)) {
+  if (isEveryCellEmpty(grid)) {
     return addFirstRoom(width, height, grid)
   }
 
@@ -127,7 +126,7 @@ export const addRoom = (width, height, grid) => {
   })
 
   if (!candidates.length) {
-    return grid
+    return
   }
 
   const candidate = pickRandom(candidates)

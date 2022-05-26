@@ -62,7 +62,8 @@ export const declare = (type, name, initialValue, scope) => {
 }
 
 export const getInjections = (eventName, scope) => {
-  return (
-    (scope === 'global' ? globalScope : scope).injections[eventName] || []
-  ).join('\n  ')
+  if (scope === 'global') {
+    return (globalScope.injections[eventName] ?? []).join('\n ')
+  }
+  return (scope.injections[eventName] ?? []).join('\n ')
 }
