@@ -1,11 +1,11 @@
-import path from 'path'
+import path from "path";
 
-let folder = path.resolve('../')
+let folder = path.resolve(".");
 
 export const getRootPath = () => {
-  return folder
-}
+  return folder;
+};
 
 export const setRootPath = (newFolder) => {
-  folder = newFolder
-}
+  folder = newFolder;
+};
