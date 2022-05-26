@@ -445,7 +445,7 @@ export const exportUsedItems = (mapData: any) => {
         name: 'C:\\ARX\\Graph\\Obj3D\\Interactive\\' + arxifyFilename(filename),
         pos: {
           x: pos.x - spawn[0],
-          y: pos.y - spawn[1] + PLAYER_HEIGHT_ADJUSTMENT,
+          y: pos.y - spawn[1] - PLAYER_HEIGHT_ADJUSTMENT,
           z: pos.z - spawn[2],
         },
         angle,

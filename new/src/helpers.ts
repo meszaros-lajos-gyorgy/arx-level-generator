@@ -355,6 +355,8 @@ export const saveToDisk = async (finalizedMapData) => {
     finalizedMapData.config.outputDir ??
     defaultOutputDir
 
+  console.log('output directory:', outputDir)
+
   if (outputDir === defaultOutputDir) {
     try {
       await fs.promises.rm('dist', { recursive: true })
