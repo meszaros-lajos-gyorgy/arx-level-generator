@@ -1,6 +1,6 @@
 import path from 'path'
 import { clone, uniq } from '../faux-ramda'
-import { declare } from '../scripting'
+import { declare, SCRIPT_EOL } from '../scripting'
 import {
   RelativeCoords,
   RotationVector3,
@@ -227,7 +227,7 @@ export const items = {
   },
 }
 
-const usedItems: Record<string, Item[] & { root?: RootItem }> = {}
+const usedItems: Record<string, { instances: Item[]; root?: RootItem }> = {}
 
 const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   const init: string[] = []
@@ -273,10 +273,10 @@ export const createItem = (
   props: InjectableProps = {},
 ): ItemRef => {
   if (typeof usedItems[item.src] === 'undefined') {
-    usedItems[item.src] = []
+    usedItems[item.src] = { instances: [] }
   }
 
-  const id = usedItems[item.src].length
+  const id = usedItems[item.src].instances.length
 
   const itemInstance: Item = {
     filename: item.src,
@@ -289,7 +289,7 @@ export const createItem = (
     dependencies: [...(item.dependencies ?? [])],
   }
 
-  usedItems[item.src].push(itemInstance)
+  usedItems[item.src].instances.push(itemInstance)
 
   const { name } = path.parse(item.src)
   const numericId = (id + 1).toString().padStart(4, '0')
@@ -308,7 +308,7 @@ export const createRootItem = (
   props: InjectableProps = {},
 ): ItemRef => {
   if (typeof usedItems[item.src] === 'undefined') {
-    usedItems[item.src] = []
+    usedItems[item.src] = { instances: [] }
   }
 
   const rootItem: RootItem = {
@@ -335,8 +335,13 @@ export const createRootItem = (
 export const addDependency = (dependency, itemRef: ItemRef) => {
   const { src, id } = itemRef
 
-  // @ts-ignore
-  usedItems[src][id].dependencies.push(dependency)
+  if (usedItems[src]) {
+    if (id === 'root') {
+      usedItems[src].root?.dependencies.push(dependency)
+    } else {
+      usedItems[src].instances[id].dependencies.push(dependency)
+    }
+  }
 
   return itemRef
 }
@@ -348,11 +353,19 @@ export const addDependencyAs = (
 ) => {
   const { src, id } = itemRef
 
-  // @ts-ignore
-  usedItems[src][id].dependencies.push({
-    source,
-    target,
-  })
+  if (usedItems[src]) {
+    if (id === 'root') {
+      usedItems[src].root?.dependencies.push({
+        source,
+        target,
+      })
+    } else {
+      usedItems[src].instances[id].dependencies.push({
+        source,
+        target,
+      })
+    }
+  }
 
   return itemRef
 }
@@ -363,18 +376,29 @@ export const addScript = (
 ) => {
   const { src, id } = itemRef
 
-  // @ts-ignore
-  usedItems[src][id].script =
-    (usedItems[src] &&
-    usedItems[src][id] &&
-    // @ts-ignore
-    usedItems[src][id].script
-      ? // @ts-ignore
-        usedItems[src][id].script
-      : '') +
-    '\r\n' +
-    '\r\n' +
-    (typeof script === 'function' ? script(itemRef) : script).trim()
+  if (usedItems[src]) {
+    const scriptContent = (
+      typeof script === 'function' ? script(itemRef) : script
+    ).trim()
+
+    if (id === 'root') {
+      const root = usedItems[src].root
+      if (root) {
+        if (root.script) {
+          root.script += SCRIPT_EOL + SCRIPT_EOL + scriptContent
+        } else {
+          root.script = scriptContent
+        }
+      }
+    } else {
+      const instance = usedItems[src].instances[id]
+      if (instance.script) {
+        instance.script += SCRIPT_EOL + SCRIPT_EOL + scriptContent
+      } else {
+        instance.script = scriptContent
+      }
+    }
+  }
 
   return itemRef
 }
@@ -386,29 +410,26 @@ export const moveTo = (
 ) => {
   const { src, id } = itemRef
 
-  // @ts-ignore
-  usedItems[src][id].pos = { x, y, z }
-  // @ts-ignore
-  usedItems[src][id].angle = { a, b, g }
+  if (usedItems[src] && id !== 'root') {
+    const instance = usedItems[src].instances[id]
+    instance.pos = { x, y, z }
+    instance.angle = { a, b, g }
+  }
 
   return itemRef
 }
 
-export const whereIs = (itemRef: ItemRef): ItemRef => {
-  const { src, id } = itemRef
-
-  // @ts-ignore
-  return clone(usedItems[src][id].pos)
-}
-
+// an item marked as used will get copied to the output dir, otherwise it's discarded
+// root items can't be marked directly, only by having at least one marked instance
 export const markAsUsed = (itemRef: ItemRef) => {
   const { src, id } = itemRef
 
-  // @ts-ignore
-  usedItems[src][id].used = true
-  if (usedItems[src].root) {
-    // @ts-ignore
-    usedItems[src].root.used = true
+  if (usedItems[src] && id !== 'root') {
+    usedItems[src].instances[id].used = true
+    const root = usedItems[src].root
+    if (root) {
+      root.used = true
+    }
   }
 
   return itemRef
@@ -431,13 +452,11 @@ export const exportUsedItems = (mapData: any) => {
 
   const copyOfUsedItems = clone(usedItems)
 
-  const itemInstances: (Item | RootItem)[] = Object.values(
-    copyOfUsedItems,
-  ).flatMap((itemInstance) => Object.values(itemInstance))
-
-  const itemsToBeExported = itemInstances.filter(({ identifier, used }) => {
-    return identifier !== 'root' && used === true
-  }) as Item[]
+  const itemsToBeExported = Object.values(copyOfUsedItems)
+    .flatMap(({ instances }) => instances)
+    .filter(({ used }) => {
+      return used === true
+    })
 
   mapData.dlf.interactiveObjects = itemsToBeExported.map(
     ({ filename, pos, angle, identifier, flags }): DlfInteractiveObject => {
@@ -459,40 +478,48 @@ export const exportUsedItems = (mapData: any) => {
 export const exportScripts = (outputDir: string) => {
   const copyOfUsedItems = clone(usedItems)
 
-  const itemInstances: (Item | RootItem)[] = Object.values(
-    copyOfUsedItems,
-  ).flatMap((itemInstance) => Object.values(itemInstance))
+  const itemsToBeExported = Object.values(copyOfUsedItems)
+    .flatMap(({ root, instances }) => {
+      if (root) {
+        return [...instances, root]
+      }
+      return instances
+    })
+    .filter(({ used }) => used === true)
 
   const scriptsToBeExported: Record<string, string> = {}
 
-  return itemInstances
-    .filter(({ used }) => used === true)
-    .reduce((files, item) => {
-      const { dir, name } = path.parse(item.filename)
+  return itemsToBeExported.reduce((files, item) => {
+    const { dir, name } = path.parse(item.filename)
 
-      let filename: string
-      if (item.identifier === 'root') {
-        filename = `${outputDir}/graph/obj3d/interactive/${dir}/${name}.asl`
-      } else {
-        const id = item.identifier.toString().padStart(4, '0')
-        filename = `${outputDir}/graph/obj3d/interactive/${dir}/${name}_${id}/${name}.asl`
-      }
-      files[filename] = item.script
+    let filename: string
+    if (item.identifier === 'root') {
+      filename = `${outputDir}/graph/obj3d/interactive/${dir}/${name}.asl`
+    } else {
+      const id = item.identifier.toString().padStart(4, '0')
+      filename = `${outputDir}/graph/obj3d/interactive/${dir}/${name}_${id}/${name}.asl`
+    }
+    files[filename] = item.script
 
-      return files
-    }, scriptsToBeExported)
+    return files
+  }, scriptsToBeExported)
 }
 
 export const exportDependencies = (outputDir: string) => {
   const copyOfUsedItems = clone(usedItems)
 
-  const itemInstances: (Item | RootItem)[] = Object.values(
-    copyOfUsedItems,
-  ).flatMap((itemInstance) => Object.values(itemInstance))
-
-  const dependencies = itemInstances
+  const itemsToBeExported = Object.values(copyOfUsedItems)
+    .flatMap(({ root, instances }) => {
+      if (root) {
+        return [...instances, root]
+      }
+      return instances
+    })
     .filter(({ used }) => used === true)
-    .flatMap(({ dependencies }) => dependencies)
+
+  const dependencies = itemsToBeExported.flatMap(
+    ({ dependencies }) => dependencies,
+  )
 
   const uniqDependencies = uniq(dependencies)
 

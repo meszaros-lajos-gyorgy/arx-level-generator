@@ -1,5 +1,7 @@
 import rgba from 'color-rgba'
 
+export const SCRIPT_EOL = '\r\n'
+
 const toFloat = (colorChannel) => {
   return Math.round((colorChannel / 256) * 10 ** 6) / 10 ** 6
 }

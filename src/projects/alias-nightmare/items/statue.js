@@ -16,6 +16,9 @@ export const defineStatue = () => {
     hp: 1000,
   })
 
+  declare('int', 'idle', 1, ref)
+  declare('int', 'idleSoundIdx', 0, ref)
+
   addScript((self) => {
     return `
 // component: statue
@@ -206,8 +209,6 @@ ON COLLIDE_NPC {
   addDependency('sfx/statue_jumpscare1.wav', ref)
   addDependency('sfx/statue_jumpscare2.wav', ref)
   addDependency('sfx/statue_no.wav', ref)
-  declare('int', 'idle', 1, ref)
-  declare('int', 'idleSoundIdx', 0, ref)
 
   return ref
 }
