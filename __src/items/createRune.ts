@@ -1,4 +1,4 @@
-import { RotationVector3, Vector3 } from '../types'
+import { RotationVector3, Vector3 } from 'src/types'
 import {
   items,
   markAsUsed,

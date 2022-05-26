@@ -1,14 +1,14 @@
-import { ambiences } from '../../../assets/ambiences'
+import { ambiences } from 'src/assets/ambiences'
 import {
   EXTRAS_EXTINGUISHABLE,
   EXTRAS_SEMIDYNAMIC,
   EXTRAS_SPAWNFIRE,
   EXTRAS_SPAWNSMOKE,
   EXTRAS_STARTEXTINGUISHED,
-} from '../../../constants'
-import { addCoords, addLight, addZone, setColor } from '../../../helpers'
-import { declare, getInjections } from '../../../scripting'
-import { RelativeCoords, RotationVector3 } from '../../../types'
+} from 'src/constants'
+import { addCoords, addLight, addZone, setColor } from 'src/helpers'
+import { declare, getInjections } from 'src/scripting'
+import { RelativeCoords, RotationVector3 } from 'src/types'
 import {
   markAsUsed,
   createItem,

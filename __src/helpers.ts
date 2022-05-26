@@ -15,7 +15,7 @@ import {
   FtsData,
   LlfData,
 } from './blankMap'
-import { countBy, partition, repeat, clone } from './faux-ramda'
+import { countBy, partition, repeat, clone, flatten } from 'ramda'
 import {
   POLY_QUAD,
   MAP_MAX_HEIGHT,
@@ -56,7 +56,6 @@ export type MapData = {
   meta: {
     createdAt: string
     generatorVersion: string
-    mapName?: string
   }
   config: MapConfig
   state: {
@@ -354,8 +353,6 @@ export const saveToDisk = async (finalizedMapData) => {
     process.env.OUTPUTDIR ??
     finalizedMapData.config.outputDir ??
     defaultOutputDir
-
-  console.log('output directory:', outputDir)
 
   if (outputDir === defaultOutputDir) {
     try {
@@ -731,7 +728,7 @@ export const cleanupCache = () => {
 
 export const pickRandomLoot = (lootTable) => {
   const idx = pickRandom(
-    lootTable.flatMap(({ weight }, idx) => repeat(idx, weight)),
+    flatten(lootTable.map(({ weight }, idx) => repeat(idx, weight))),
   )
   return lootTable[idx]
 }

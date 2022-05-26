@@ -1,5 +1,5 @@
-import { createRune } from '../../items/createRune'
-import { identity, uniq } from '../../faux-ramda'
+import { createRune } from '@items/createRune'
+import { identity, uniq } from 'ramda'
 import { ambiences } from '../../assets/ambiences'
 import {
   items,

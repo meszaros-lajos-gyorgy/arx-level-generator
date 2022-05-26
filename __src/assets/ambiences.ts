@@ -1,5 +1,5 @@
-import { clone, uniq } from '../faux-ramda'
-import { getRootPath } from '../rootpath'
+import { clone, uniq } from 'ramda'
+import { getRootPath } from '../../rootpath'
 
 export type AmbienceDefinition = {
   name: string

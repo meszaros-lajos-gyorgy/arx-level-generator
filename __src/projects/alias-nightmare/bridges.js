@@ -1,4 +1,4 @@
-import { without } from '../../faux-ramda'
+import { reduce, addIndex, without } from 'ramda'
 import { NORTH, SOUTH, EAST, WEST } from './constants'
 import {
   move,
@@ -62,74 +62,72 @@ const findClosestJoint = (a, bx) => {
   return bx[distances.indexOf(Math.min(...distances))]
 }
 
-/*
-island = {
-  pos: [0, 0, 0],
-  entrances: EAST,
-  exits: NORTH,
-  width: 12,
-  height: 10,
-}
-islands = island[]
-*/
 const bridges = (islands, mapData) => {
+  const { origin } = mapData.config
+
   const pairs = islands
     .map(getJoints)
-    .reduce((candidates, joint, idx, joints) => {
-      const otherIslands = without([joint], joints)
+    .reduce((candidates, island, idx, islands) => {
+      const otherIslands = without([island], islands)
 
       const viewAngle = 20
 
-      if (joint.north) {
+      if (island.north) {
         const souths = otherIslands
-          .filter(({ south }) => south !== undefined)
-          .map(({ south }) => south)
+          .filter((island) => island.south)
+          .map((island) => island.south)
           .filter((south) => {
-            const [x, y, z] = subtractVec3(joint.north, south)
+            const [x, y, z] = subtractVec3(island.north, south)
             const angle = radToDeg(Math.atan2(x, z))
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (souths.length) {
-          candidates.push([joint.north, findClosestJoint(joint.north, souths)])
+          candidates.push([
+            island.north,
+            findClosestJoint(island.north, souths),
+          ])
         }
       }
-      if (joint.south) {
+      if (island.south) {
         const norths = otherIslands
-          .filter(({ north }) => north !== undefined)
-          .map(({ north }) => north)
+          .filter((island) => island.north)
+          .map((island) => island.north)
           .filter((north) => {
-            const [x, y, z] = subtractVec3(joint.south, north)
+            const [x, y, z] = subtractVec3(island.south, north)
             const angle = (radToDeg(Math.atan2(x, z)) + 180) % 360
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (norths.length) {
-          candidates.push([joint.south, findClosestJoint(joint.south, norths)])
+          candidates.push([
+            island.south,
+            findClosestJoint(island.south, norths),
+          ])
         }
       }
-      if (joint.east) {
+      if (island.east) {
         const wests = otherIslands
-          .filter(({ west }) => west !== undefined)
-          .map(({ west }) => west)
+          .filter((island) => island.west)
+          .map((island) => island.west)
           .filter((west) => {
-            const [x, y, z] = subtractVec3(joint.east, west)
+            const [x, y, z] = subtractVec3(island.east, west)
             const angle = radToDeg(Math.atan2(x, z)) - 90
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (wests.length) {
-          candidates.push([joint.east, findClosestJoint(joint.east, wests)])
+          candidates.push([island.east, findClosestJoint(island.east, wests)])
         }
       }
-      if (joint.west) {
+      if (island.west) {
         const easts = otherIslands
-          .filter(({ east }) => east !== undefined)
-          .map(({ east }) => east)
+          .filter((island) => island.east)
+          .map((island) => island.east)
           .filter((east) => {
-            const [x, y, z] = subtractVec3(joint.west, east)
+            const [x, y, z] = subtractVec3(island.west, east)
             const angle = radToDeg(Math.atan2(x, z)) + 90
             return isBetweenInclusive(-viewAngle, viewAngle, angle)
           })
         if (easts.length) {
-          candidates.push([joint.west, findClosestJoint(joint.west, easts)])
+          candidates.push([island.west, findClosestJoint(island.west, easts)])
         }
       }
 
@@ -154,12 +152,16 @@ const bridges = (islands, mapData) => {
       return acc
     }, [])
 
-  return pairs.reduce((mapData, [a, b], idx) => {
-    // TODO: render polygons between the 2 points
-    console.log('TODO: render bridge between', a, 'and', b)
+  return addIndex(reduce)(
+    (mapData, [a, b], idx) => {
+      // TODO: render polygons between the 2 points
+      console.log('TODO: render bridge between', a, 'and', b)
 
-    return mapData
-  }, mapData)
+      return mapData
+    },
+    mapData,
+    pairs,
+  )
 }
 
 export default bridges

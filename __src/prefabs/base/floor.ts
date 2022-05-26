@@ -1,7 +1,7 @@
 import { POLY_QUAD, POLY_NO_SHADOW, HFLIP, VFLIP } from '../../constants'
 import { useTexture } from '../../assets/textures'
 import { flipPolygon } from '../../helpers'
-import { AbsoluteCoords } from '../../types'
+import { AbsoluteCoords } from 'src/types'
 
 const floor =
   (

@@ -1,5 +1,5 @@
 import path from 'path'
-import { clone, uniq } from '../faux-ramda'
+import { clone, isEmpty, uniq } from 'ramda'
 import { declare } from '../scripting'
 import {
   RelativeCoords,
@@ -7,7 +7,7 @@ import {
   RotationVertex3,
   Vertex3,
 } from '../types'
-import { getRootPath } from '../rootpath'
+import { getRootPath } from '../../rootpath'
 import { PLAYER_HEIGHT_ADJUSTMENT } from '../constants'
 
 export type InjectableProps = {
@@ -261,7 +261,7 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
     init.push(...tmpScope.injections.init)
   }
 
-  if (init.length) {
+  if (isEmpty(init)) {
     return {}
   } else {
     return { init }
@@ -445,7 +445,7 @@ export const exportUsedItems = (mapData: any) => {
         name: 'C:\\ARX\\Graph\\Obj3D\\Interactive\\' + arxifyFilename(filename),
         pos: {
           x: pos.x - spawn[0],
-          y: pos.y - spawn[1] - PLAYER_HEIGHT_ADJUSTMENT,
+          y: pos.y - spawn[1] + PLAYER_HEIGHT_ADJUSTMENT,
           z: pos.z - spawn[2],
         },
         angle,

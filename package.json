@@ -1,72 +1,41 @@
 {
-  "name": "arx-level-generator",
-  "version": "0.17.0",
-  "description": "A tool to generate random Arx Fatalis maps",
-  "main": "src/electron/index.js",
+  "name": "arx-level-generator-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/generate.js",
+  "engines": {
+    "npm": ">=7.0.0",
+    "node": ">=16.0.0"
+  },
   "scripts": {
-    "dev:win": "npm run generate:gamedir:win && npm run compile:gamedir:win && npm run game:win",
-    "dev:linux": "npm run generate:gamedir:linux && npm run compile:gamedir:linux && npm run game:linux",
-    "generate": "ts-node -r tsconfig-paths/register src/generate.ts",
-    "generate:gamedir:win": "set OUTPUTDIR=C:/Program Files/Arx Libertatis&&npm run generate",
-    "generate:gamedir:linux": "export OUTPUTDIR=/home/lali/projektek/arx/ArxLibertatis/build&&npm run generate",
-    "generate:watch": "nodemon src/generate.ts --ignore dist",
+    "dev:win": "npm run generate && npm run compile:gamedir:win && npm run game:win",
+    "dev:linux": "npm run generate && npm run compile:gamedir:linux && npm run game:linux",
+    "generate": "npm run generate:validate && npm run generate:build && npm run generate:run",
+    "generate:validate": "tsc --project ./tsconfig.json",
+    "generate:build": "esbuild ./src/generate.ts --bundle --platform=node --minify --outdir=build --sourcemap --external:arx-level-json-converter --external:color-rgba --external:nanoid --external:node-pkware --external:seedrandom",
+    "generate:run": "node --require dotenv/config --enable-source-maps ./build/generate.js",
     "compile": "sh scripts/compile.sh",
     "compile:gamedir:win": "set OUTPUTDIR=/c/Program Files/Arx Libertatis&&sh scripts/compile.sh",
     "compile:gamedir:linux": "export OUTPUTDIR=/home/lali/projektek/arx/ArxLibertatis/build&&sh scripts/compile.sh",
     "game:win": "C:/Program Files/Arx Libertatis/arx.exe --loadlevel 1",
-    "game:linux": "/home/lali/projektek/arx/ArxLibertatis/build/arx --loadlevel 1",
-    "launcher:build": "ts-node -r tsconfig-paths/register src/electron/build.ts",
-    "launcher:build:watch": "nodemon --watch src src/electron/build.ts -e js,jsx,scss,css,html,png --ignore src/electron/build",
-    "launcher:run": "electron ./src/electron/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/meszaros-lajos-gyorgy/arx-level-generator.git"
+    "game:linux": "/home/lali/projektek/arx/ArxLibertatis/build/arx --loadlevel 1"
   },
   "author": "Lajos Meszaros <m_lajos@hotmail.com>",
   "license": "GPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/meszaros-lajos-gyorgy/arx-level-generator/issues"
-  },
-  "homepage": "https://github.com/meszaros-lajos-gyorgy/arx-level-generator#readme",
   "dependencies": {
     "arx-level-json-converter": "^1.3.1",
-    "color-rgba": "^2.3.0",
-    "nanoid": "^3.2.0",
+    "color-rgba": "^2.4.0",
+    "nanoid": "^3.3.4",
     "node-pkware": "^1.0.1",
-    "ramda": "^0.27.1",
-    "seedrandom": "^3.0.5",
-    "ts-node": "^10.7.0",
-    "tsconfig-paths": "^3.14.1",
-    "typescript": "^4.6.3"
+    "seedrandom": "^3.0.5"
   },
   "devDependencies": {
     "@types/color-rgba": "^2.1.0",
-    "@types/ramda": "^0.28.12",
+    "@types/node": "^17.0.35",
     "@types/seedrandom": "^3.0.2",
-    "classnames": "^2.3.1",
-    "electron": "^16.0.6",
-    "electron-builder": "^22.14.5",
-    "esbuild": "^0.14.14",
-    "esbuild-sass-plugin": "^2.2.4",
-    "nodemon": "^2.0.15",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
-  },
-  "build": {
-    "appId": "com.electron.arx-level-generator",
-    "productName": "Arx Level Generator",
-    "linux": {
-      "target": [
-        "deb",
-        "tar.gz"
-      ]
-    },
-    "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ]
-    }
+    "dotenv": "^16.0.1",
+    "esbuild": "^0.14.39",
+    "nodemon": "^2.0.16",
+    "typescript": "^4.6.4"
   }
 }

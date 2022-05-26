@@ -11,8 +11,8 @@ import {
   isBetween,
   MapData,
 } from '../helpers'
-import { identity, clamp } from '../faux-ramda'
-import { AbsoluteCoords, PosVertex3, Vector3 } from '../types'
+import { identity, clamp, pluck } from 'ramda'
+import { AbsoluteCoords, PosVertex3, Vector3 } from 'src/types'
 
 export type AdjustablePosVertex3 = PosVertex3 & { haveBeenAdjusted?: boolean }
 
@@ -231,14 +231,12 @@ export const connectToNearPolygons = (
 
     Object.values(candidates)
       .sort((a, b) => {
-        const aDistance = Math.min(...a.map(({ distance }) => distance))
-        const bDistance = Math.min(...b.map(({ distance }) => distance))
+        const aDistance = Math.min(...pluck('distance', a))
+        const bDistance = Math.min(...pluck('distance', b))
         return aDistance - bDistance
       })
       .forEach((candidate) => {
-        const smallestDistance = Math.min(
-          ...candidate.map(({ distance }) => distance),
-        )
+        const smallestDistance = Math.min(...pluck('distance', candidate))
 
         candidate
           .filter(
