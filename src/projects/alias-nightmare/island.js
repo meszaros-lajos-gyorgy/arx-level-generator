@@ -84,7 +84,7 @@ ON INITEND {
   ACCEPT
 }
 
->>TOP
+>>TOP {
   IF ( ^$OBJONTOP == "NONE" ) {
     IF ( ${self.state.onme} == 1 ) {
       SET ${self.state.onme} 0
@@ -99,6 +99,7 @@ ON INITEND {
     SENDEVENT CUSTOM ${eventBus.ref} "${id}.pressed"
   }
   ACCEPT
+}
   `
   }, ref)
 
@@ -341,7 +342,7 @@ const island = (config, mapData) => {
     markAsUsed(pp)
   })
 
-  if (!ppIndices.length) {
+  if (ppIndices.length) {
     markAsUsed(eventBus)
   }
 
