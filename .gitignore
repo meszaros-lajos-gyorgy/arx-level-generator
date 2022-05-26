@@ -3,3 +3,8 @@ build
 dist
 .env
 tsconfig.tsbuildinfo
+arx-level-generator-linux-x64
+arx-level-generator-win32-x64
+arx-level-generator-darwin-x64
+src/electron/build
+src/electron/index.js
