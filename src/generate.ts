@@ -4,20 +4,21 @@ import theBackrooms from './projects/the-backrooms/index'
 import onTheIsland from './projects/on-the-island/index'
 import { MapConfig } from './types'
 
-const seed: string = '70448428008674860000' // Math.floor(Math.random() * 1e20).toString()
+const seed: string =
+  process.env.SEED ?? Math.floor(Math.random() * 1e20).toString()
 
 seedrandom(seed, { global: true })
 console.log(`seed: ${seed}`)
 
 const config: MapConfig = {
   origin: { type: 'absolute', coords: [6000, 0, 6000] },
-  levelIdx: 1,
+  levelIdx: parseInt(process.env.LEVEL ?? '1'),
   seed,
   lootTable: [],
   bumpFactor: 3,
 }
 
-const project: string = 'alias-nightmare'
+const project: string = process.env.PROJECT ?? 'alias-nightmare'
 
 ;(async () => {
   switch (project) {

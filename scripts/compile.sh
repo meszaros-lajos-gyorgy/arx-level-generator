@@ -1,10 +1,16 @@
 #!/bin/bash
 
+LEVEL=$(grep LEVEL .env | cut -d "=" -f2 | tr -d '"')
+
+if [ "$LEVEL" = "" ]; then
+  LEVEL=1
+fi
+
+OUTPUTDIR=$(grep OUTPUTDIR .env | cut -d "=" -f2 | tr -d '"')
+
 if [ -z "$OUTPUTDIR" ]; then
   OUTPUTDIR=$(pwd)/dist
 fi
-
-LEVEL=1
 
 cd "$OUTPUTDIR/game/graph/levels/level$LEVEL"
 
