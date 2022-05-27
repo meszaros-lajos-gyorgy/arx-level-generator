@@ -30,5 +30,13 @@
   "item--almond-water": {
     "english": "Almond water",
     "deutsch": "Mandelwasser"
+  },
+  "tutorial--welcome": {
+    "english": "You've noclipped out of reality and landed in the backrooms! You might leave by exiting through an unmarked fire exit.",
+    "deutsch": "Du hast dich aus der Realität herausgekrochen und bist in den Hinterzimmern gelandet! Sie können gehen, indem Sie durch einen nicht markierten Feuerausgang gehen."
+  },
+  "tutorial--lighting": {
+    "english": "Fluorescent lights require electricity, try shooting them with a lightning bolt.",
+    "deutsch": "Leuchtstofflampen benötigen Strom, versuchen Sie, sie mit einem Blitz zu schießen."
   }
 }

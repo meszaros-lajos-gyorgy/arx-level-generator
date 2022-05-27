@@ -220,15 +220,15 @@ ACCEPT
 
 >>WELCOME_MESSAGE {
 PLAY -o "system"
-HEROSAY "You've noclipped out of reality and landed in the backrooms! You might leave by exiting through an unmarked fire exit."
-QUEST "You've noclipped out of reality and landed in the backrooms! You might leave by exiting through an unmarked fire exit."
+HEROSAY [tutorial--welcome]
+QUEST [tutorial--welcome]
 RETURN
 }
 
 >>TUTORIAL_LIGHT {
 PLAY -o "system"
-HEROSAY "Fluorescent lights require electricity, try shooting them with a lightning bolt."
-QUEST "Fluorescent lights require electricity, try shooting them with a lightning bolt."
+HEROSAY [tutorial--lighting]
+QUEST [tutorial--lighting]
 RETURN
 }
     `
