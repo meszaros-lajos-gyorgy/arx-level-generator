@@ -18,6 +18,7 @@ export type InjectableProps = {
   interactive?: boolean
   collision?: boolean
   variant?: string
+  mesh?: string
 }
 
 export type RenderedInjectableProps = {
@@ -249,6 +250,9 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   }
   if (typeof props.collision === 'boolean') {
     init.push(`COLLISION ${props.collision ? 'ON' : 'OFF'}`)
+  }
+  if (typeof props.mesh === 'string') {
+    init.push(`USEMESH ${props.mesh}`)
   }
   if (props.variant) {
     const tmpScope = {

@@ -29,6 +29,7 @@ import { disableBumping, connectToNearPolygons } from '../../prefabs/plain'
 import { getInjections } from '../../scripting'
 import { createCampfire } from './items/campfire'
 import { createGoblin } from './items/goblin'
+import { overridePlayerScript } from '../shared/player'
 
 const createWelcomeMarker = (pos) => {
   const ref = createItem(items.marker)
@@ -102,6 +103,10 @@ const generate = async (config) => {
   const islandRadius = islandSize / 2
   const islandCenter = { x: islandSize / 2, z: islandSize / 2 }
   const islandEdgeOffset = 150
+
+  overridePlayerScript({
+    mesh: 'goblin_base/goblin_base.teo',
+  })
 
   createWelcomeMarker([islandCenter.x, 0, islandCenter.z + islandRadius * 0.5])
 

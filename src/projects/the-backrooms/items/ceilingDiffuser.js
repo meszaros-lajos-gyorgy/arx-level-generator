@@ -20,20 +20,20 @@ export const defineCeilingDiffuser = () => {
     name: 'Ceiling Diffuser',
     interactive: false,
     scale: 0.6,
+    mesh: 'polytrans/polytrans.teo',
   })
 
   addScript((self) => {
     return `
 // component: ceilingDiffuser
 ON INIT {
-${getInjections('init', self)}
-USEMESH "polytrans/polytrans.teo"
-ACCEPT
+  ${getInjections('init', self)}
+  ACCEPT
 }
 
 ON INITEND {
-TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-ceiling-air-diffuser"
-ACCEPT
+  TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-ceiling-air-diffuser"
+  ACCEPT
 }
     `
   }, ref)
@@ -48,8 +48,8 @@ export const createCeilingDiffuser = (pos, angle = [0, 0, 0], config = {}) => {
     return `
 // component: ceilingDiffuser
 ON INIT {
-${getInjections('init', self)}
-ACCEPT
+  ${getInjections('init', self)}
+  ACCEPT
 }
     `
   }, ref)

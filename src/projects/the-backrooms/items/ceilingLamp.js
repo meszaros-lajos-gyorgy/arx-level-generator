@@ -21,6 +21,7 @@ export const defineCeilingLamp = () => {
   const ref = createRootItem(itemDesc, {
     name: 'Ceiling Lamp',
     interactive: false,
+    mesh: 'polytrans/polytrans.teo',
   })
 
   declare('int', 'isOn', 0, ref)
@@ -66,7 +67,6 @@ export const defineCeilingLamp = () => {
 // component: ceilingLamp
 ON INIT {
   ${getInjections('init', self)}
-  USEMESH "polytrans/polytrans.teo"
   ACCEPT
 }
 

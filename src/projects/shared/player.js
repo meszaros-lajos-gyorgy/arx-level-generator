@@ -6,10 +6,10 @@ import {
 } from '../../assets/items'
 import { getInjections, declare } from '../../scripting'
 
-export const overridePlayerScript = () => {
+export const overridePlayerScript = (props = {}) => {
   declare('int', 'TUTORIAL_MAGIC', 100, 'global') // disable magic related tutorial messages in rune_aam.asl
 
-  const ref = createRootItem(items.npc.player)
+  const ref = createRootItem(items.npc.player, props)
 
   addScript((self) => {
     return `
