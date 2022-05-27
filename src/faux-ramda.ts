@@ -32,11 +32,10 @@ export const clone = <T>(data: T): T => {
 }
 
 export const props = <T>(keys: string[], obj: Record<string, T>) => {
-  const result: T[] = []
   return keys.reduce((acc, key) => {
     acc.push(obj[key])
     return acc
-  }, result)
+  }, [] as T[])
 }
 
 export const any = <T>(fn: (value: T) => boolean, values: T[]) => {
@@ -55,12 +54,11 @@ export const without = <T>(listOfExceptions: T[], values: T[]) => {
 }
 
 export const countBy = <T>(fn: (value: T) => string, values: T[]) => {
-  const result: Record<string, number> = {}
   return values.reduce((acc, value) => {
     const key = fn(value)
     acc[key] = (acc[key] ?? 0) + 1
     return acc
-  }, result)
+  }, {} as Record<string, number>)
 }
 
 const complement = (fn) => {

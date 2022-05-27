@@ -61,6 +61,8 @@ import { createLampController } from './items/lampController'
 import { ambiences } from '../../assets/ambiences'
 import { UNIT, COLORS } from './constants'
 import { createRune } from '../../items/createRune'
+import { addTranslations } from '../../assets/i18n'
+import translations from './i18n.json'
 
 const addLamp = (pos, angle, config = {}) => {
   return (mapData) => {
@@ -475,8 +477,7 @@ const createExit = (top, left, wallSegment, key, jumpscareController) => {
   ])
   const angle = rotate
 
-  const ref = createItem(items.doors.lightDoor, { name: 'Unmarked fire exit' })
-  // const ref = createItem(items.doors.lightDoor, { name: "[door--exit]" })
+  const ref = createItem(items.doors.lightDoor, { name: '[door--exit]' })
 
   declare('int', 'lockpickability', 100, ref)
   declare('string', 'type', 'Door_Ylsides', ref)
@@ -524,8 +525,7 @@ const createExit = (top, left, wallSegment, key, jumpscareController) => {
 }
 
 const createKey = (pos, angle = [0, 0, 0], jumpscareCtrl) => {
-  const ref = createItem(items.keys.oliverQuest, { name: 'Fire exit key' })
-  // const ref = createItem(items.keys.oliverQuest, { name: "[key--exit]" })
+  const ref = createItem(items.keys.oliverQuest, { name: '[key--exit]' })
 
   declare('int', 'pickedUp', 0, ref)
 
@@ -560,8 +560,9 @@ const createAlmondWater = (
   variant = 'mana',
   jumpscareCtrl,
 ) => {
-  const ref = createItem(items.magic.potion.mana, { name: 'Almond water' })
-  // const ref = createItem(items.magic.potion.mana, { name: `[item--almond-water]` })
+  const ref = createItem(items.magic.potion.mana, {
+    name: `[item--almond-water]`,
+  })
 
   addDependencyAs(
     'projects/the-backrooms/almondwater.bmp',
@@ -868,6 +869,8 @@ const generate = async (config) => {
         console.error('unknown item', loot)
     }
   })
+
+  addTranslations(translations)
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)

@@ -1,0 +1,34 @@
+{
+  "whisper--do-you-smell-it": {
+    "english": "Do you smell it? It is the smell of how you will rot here next to your precious Alia!",
+    "deutsch": "Riechst du das? Es ist der Gestank deiner verrottenden Leiche nebst deiner geliebten Alia!"
+  },
+  "whisper--drink-it": {
+    "english": "Drink it! Drink it! Drink it! Drink it! Drink it!",
+    "deutsch": "Trink es! Trink es! Trink es! Trink es! Trink es!"
+  },
+  "whisper--drink-the-almond-water": {
+    "english": "Drink the almond water! It will be over faster with that!",
+    "deutsch": "Trink das Mandelwasser, dann ist es schneller vorbei!"
+  },
+  "whisper--magic-wont-save-you": {
+    "english": "Do you really think magic will save you this time?",
+    "deutsch": "Denkst du wirklich dass Magie dich dieses mal rettet?"
+  },
+  "whisper--no-exit": {
+    "english": "It is no use trying to find an exit, Am Sheagar! You will never leave this place!",
+    "deutsch": "Es ist sinnlos nach einem Ausgang zu suchen, Am Shaegar! Du wirst diesen Ort niemals verlassen!"
+  },
+  "door--exit": {
+    "english": "Unmarked fire exit",
+    "deutsch": "Unmarkierter Notausgang"
+  },
+  "key--exit": {
+    "english": "Fire exit key",
+    "deutsch": "Notausgangsschlüssel"
+  },
+  "item--almond-water": {
+    "english": "Almond water",
+    "deutsch": "Mandelwasser"
+  }
+}

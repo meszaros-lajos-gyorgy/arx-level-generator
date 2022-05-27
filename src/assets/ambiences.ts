@@ -38,8 +38,6 @@ export const exportAmbiences = (outputDir: string) => {
   )
   const ambiencesToBeExported = uniq(customAmbiences)
 
-  const filesToBeExported: Record<string, string> = {}
-
   return ambiencesToBeExported.reduce((files, { name, tracks }) => {
     const filename = `${outputDir}/sfx/ambiance/${name}.amb`
     files[filename] = `${getRootPath()}/assets/sfx/ambiance/${name}.amb`
@@ -51,7 +49,7 @@ export const exportAmbiences = (outputDir: string) => {
     }
 
     return files
-  }, filesToBeExported)
+  }, {} as Record<string, string>)
 }
 
 export const resetAmbiences = () => {

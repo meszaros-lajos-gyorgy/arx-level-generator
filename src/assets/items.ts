@@ -493,8 +493,6 @@ export const exportScripts = (outputDir: string) => {
     })
     .filter(({ used }) => used === true)
 
-  const scriptsToBeExported: Record<string, string> = {}
-
   return itemsToBeExported.reduce((files, item) => {
     const { dir, name } = path.parse(item.filename)
 
@@ -508,7 +506,7 @@ export const exportScripts = (outputDir: string) => {
     files[filename] = item.script
 
     return files
-  }, scriptsToBeExported)
+  }, {} as Record<string, string>)
 }
 
 export const exportDependencies = (outputDir: string) => {
@@ -529,8 +527,6 @@ export const exportDependencies = (outputDir: string) => {
 
   const uniqDependencies = uniq(dependencies)
 
-  const filesToBeExported: Record<string, string> = {}
-
   return uniqDependencies.reduce((files, dependency) => {
     if (typeof dependency === 'object') {
       const { target, source } = dependency
@@ -546,7 +542,7 @@ export const exportDependencies = (outputDir: string) => {
     }
 
     return files
-  }, filesToBeExported)
+  }, {} as Record<string, string>)
 }
 
 export const resetItems = () => {

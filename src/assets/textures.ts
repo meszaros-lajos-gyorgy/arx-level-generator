@@ -167,8 +167,6 @@ export const exportTextures = (outputDir: string) => {
   )
   const texturesToBeExported = uniq(customTextures)
 
-  const filesToBeExported: Record<string, string> = {}
-
   return texturesToBeExported.reduce((files, texture) => {
     const filename = `${outputDir}/graph/obj3d/textures/${texture.src}`
     files[filename] = `${getRootPath()}/assets/${
@@ -176,7 +174,7 @@ export const exportTextures = (outputDir: string) => {
     }/${texture.src}`
 
     return files
-  }, filesToBeExported)
+  }, {} as Record<string, string>)
 }
 
 export const resetTextures = () => {

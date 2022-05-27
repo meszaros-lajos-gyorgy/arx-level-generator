@@ -51,6 +51,7 @@ import {
   Vector3,
   Vertex3,
 } from './types'
+import { exportTranslations } from './assets/i18n'
 
 export type MapData = {
   meta: {
@@ -369,6 +370,7 @@ export const saveToDisk = async (finalizedMapData) => {
   let textures = exportTextures(outputDir)
   let ambiences = exportAmbiences(outputDir)
   let dependencies = exportDependencies(outputDir)
+  let translations = exportTranslations(outputDir)
 
   const files = {
     fts: `${outputDir}/game/graph/levels/level${levelIdx}/fast.fts.json`,
@@ -385,6 +387,7 @@ export const saveToDisk = async (finalizedMapData) => {
       ...Object.keys(ambiences),
       ...Object.keys(dependencies),
       ...Object.keys(textures),
+      ...Object.keys(translations),
       files.fts.replace('.fts.json', '.fts'),
       files.dlf.replace('.dlf.json', '.dlf'),
       files.llf.replace('.llf.json', '.llf'),
@@ -403,6 +406,16 @@ export const saveToDisk = async (finalizedMapData) => {
 
   for (let [filename, script] of Object.entries(scripts)) {
     await fs.promises.writeFile(filename, script, 'latin1')
+  }
+
+  for (let [filename, translation] of Object.entries(translations)) {
+    await fs.promises.writeFile(
+      filename,
+      `// ${finalizedMapData.meta.mapName} - Arx Level Generator ${finalizedMapData.meta.generatorVersion}
+
+${translation}`,
+      'utf8',
+    )
   }
 
   // ------------
