@@ -180,56 +180,56 @@ const createWelcomeMarker = (pos, config) => {
     return `
 // component: welcomeMarker
 ON INIT {
-${getInjections('init', self)}
+  ${getInjections('init', self)}
 
-SETCONTROLLEDZONE palette0
+  SETCONTROLLEDZONE palette0
 
-ADDXP 2000 // can't cast lightning bolt at level 0
+  ADDXP 2000 // can't cast lightning bolt at level 0
 
-TIMERwelcome -m 1 2000 GOSUB WELCOME_MESSAGE
+  TIMERwelcome -m 1 2000 GOSUB WELCOME_MESSAGE
 
-ACCEPT
+  ACCEPT
 }
 
 ON CONTROLLEDZONE_ENTER {
-TELEPORT -p ${self.ref}
-ACCEPT
+  TELEPORT -p ${self.ref}
+  ACCEPT
 }
 
 ON GOT_RUNE {
-IF (^$PARAM1 == "aam") {
-  SET ${self.state.hasAam} 1
-}
-IF (^$PARAM1 == "folgora") {
-  SET ${self.state.hasFolgora} 1
-}
-IF (^$PARAM1 == "taar") {
-  SET ${self.state.hasTaar} 1
-}
+  IF (^$PARAM1 == "aam") {
+    SET ${self.state.hasAam} 1
+  }
+  IF (^$PARAM1 == "folgora") {
+    SET ${self.state.hasFolgora} 1
+  }
+  IF (^$PARAM1 == "taar") {
+    SET ${self.state.hasTaar} 1
+  }
 
-IF (${self.state.hasAam} == 1) {
-  IF (${self.state.hasFolgora} == 1) {
-    IF (${self.state.hasTaar} == 1) {
-      GOSUB TUTORIAL_LIGHT
+  IF (${self.state.hasAam} == 1) {
+    IF (${self.state.hasFolgora} == 1) {
+      IF (${self.state.hasTaar} == 1) {
+        GOSUB TUTORIAL_LIGHT
+      }
     }
   }
-}
 
-ACCEPT
+  ACCEPT
 }
 
 >>WELCOME_MESSAGE {
-PLAY -o "system"
-HEROSAY [tutorial--welcome]
-QUEST [tutorial--welcome]
-RETURN
+  PLAY -o "system"
+  HEROSAY [tutorial--welcome]
+  QUEST [tutorial--welcome]
+  RETURN
 }
 
 >>TUTORIAL_LIGHT {
-PLAY -o "system"
-HEROSAY [tutorial--lighting]
-QUEST [tutorial--lighting]
-RETURN
+  PLAY -o "system"
+  HEROSAY [tutorial--lighting]
+  QUEST [tutorial--lighting]
+  RETURN
 }
     `
   }, ref)
@@ -301,141 +301,141 @@ const createJumpscareController = (pos, lampCtrl, ambientLights, config) => {
     return `
 // component jumpscareController
 ON INIT {
-${getInjections('init', self)}
+  ${getInjections('init', self)}
 
-SET #noexitTrigger ^RND_30000
-INC #noexitTrigger 30000
-SET #smellTrigger ^RND_60000
-INC #smellTrigger 40000
+  SET #noexitTrigger ^RND_30000
+  INC #noexitTrigger 30000
+  SET #smellTrigger ^RND_60000
+  INC #smellTrigger 40000
 
-TIMERnoexit -m 1 #noexitTrigger GOSUB WHISPER_NOEXIT
+  TIMERnoexit -m 1 #noexitTrigger GOSUB WHISPER_NOEXIT
 
-TIMERsmell -m 1 #smellTrigger GOSUB WHISPER_SMELL
+  TIMERsmell -m 1 #smellTrigger GOSUB WHISPER_SMELL
 
-ACCEPT
-}
-
-ON PICKUP {
-IF ("almondwater" isin ^$PARAM1) {
-  IF (":slow" isin ^$PARAM1) {
-    INC ${self.state.harmfulAlmondWaterCounter} 1
-  }
-  // TODO: add more harmful almondwater effects here
-}
-
-if (${self.state.harmfulAlmondWaterCounter} != ${
-      self.state.previousHarmfulAlmondWaterCounter
-    }) {
-  if (${self.state.harmfulAlmondWaterCounter} > 2) {
-    set ${self.state.harmfulAlmondWaterCounter} 1
-  }
-
-  SET ${self.state.previousHarmfulAlmondWaterCounter} ${
-      self.state.harmfulAlmondWaterCounter
-    }
-
-  IF (${self.state.harmfulAlmondWaterCounter} == 1) {
-    GOSUB WHISPER_DRINK1
-  }
-  IF (${self.state.harmfulAlmondWaterCounter} == 2) {
-    GOSUB WHISPER_DRINK2
-  }
-}
-
-if (^$PARAM1 == "key:exit") {
-  GOSUB BABY
-}
-
-ACCEPT
-}
-
-ON SPELLCAST {
-IF (^SENDER != PLAYER) {
   ACCEPT
 }
 
-INC ${self.state.magicCntr} 1
-IF (${self.state.magicCntr} == 1) {
-  TIMERspeak -m 1 3000 GOSUB WHISPER_MAGIC
+ON PICKUP {
+  IF ("almondwater" isin ^$PARAM1) {
+    IF (":slow" isin ^$PARAM1) {
+      INC ${self.state.harmfulAlmondWaterCounter} 1
+    }
+    // TODO: add more harmful almondwater effects here
+  }
+
+  if (${self.state.harmfulAlmondWaterCounter} != ${
+      self.state.previousHarmfulAlmondWaterCounter
+    }) {
+    if (${self.state.harmfulAlmondWaterCounter} > 2) {
+      set ${self.state.harmfulAlmondWaterCounter} 1
+    }
+
+    SET ${self.state.previousHarmfulAlmondWaterCounter} ${
+      self.state.harmfulAlmondWaterCounter
+    }
+
+    IF (${self.state.harmfulAlmondWaterCounter} == 1) {
+      GOSUB WHISPER_DRINK1
+    }
+    IF (${self.state.harmfulAlmondWaterCounter} == 2) {
+      GOSUB WHISPER_DRINK2
+    }
+  }
+
+  if (^$PARAM1 == "key:exit") {
+    GOSUB BABY
+  }
+
+  ACCEPT
 }
 
-ACCEPT
+ON SPELLCAST {
+  IF (^SENDER != PLAYER) {
+    ACCEPT
+  }
+
+  INC ${self.state.magicCntr} 1
+  IF (${self.state.magicCntr} == 1) {
+    TIMERspeak -m 1 3000 GOSUB WHISPER_MAGIC
+  }
+
+  ACCEPT
 }
 
 ON OPEN {
-IF (^$PARAM1 == "exit") {
-  GOSUB OUTRO
-}
+  IF (^$PARAM1 == "exit") {
+    GOSUB OUTRO
+  }
 
-ACCEPT
+  ACCEPT
 }
 
 >>WHISPER_NOEXIT {
-SPEAK -p [whisper--no-exit]
-HEROSAY [whisper--no-exit]
-RETURN
+  SPEAK -p [whisper--no-exit]
+  HEROSAY [whisper--no-exit]
+  RETURN
 }
 
 >>WHISPER_DRINK1 {
-SPEAK -p [whisper--drink-the-almond-water]
-HEROSAY [whisper--drink-the-almond-water]
-RETURN
+  SPEAK -p [whisper--drink-the-almond-water]
+  HEROSAY [whisper--drink-the-almond-water]
+  RETURN
 }
 
 >>WHISPER_DRINK2 {
-SPEAK -p [whisper--drink-it]
-HEROSAY [whisper--drink-it]
-RETURN
+  SPEAK -p [whisper--drink-it]
+  HEROSAY [whisper--drink-it]
+  RETURN
 }
 
 >>WHISPER_SMELL {
-SPEAK -p [whisper--do-you-smell-it]
-HEROSAY [whisper--do-you-smell-it]
-RETURN
+  SPEAK -p [whisper--do-you-smell-it]
+  HEROSAY [whisper--do-you-smell-it]
+  RETURN
 }
 
 >>WHISPER_MAGIC {
-SPEAK -p [whisper--magic-wont-save-you]
-HEROSAY [whisper--magic-wont-save-you]
-RETURN
+  SPEAK -p [whisper--magic-wont-save-you]
+  HEROSAY [whisper--magic-wont-save-you]
+  RETURN
 }
 
 >>BABY {
-PLAY -o "magic_spell_slow_down"
-PLAY -o "strange_noise1"
-PLAY -oil "player_heartb"
-SENDEVENT SAVE ${lampCtrl.ref} NOP
-SENDEVENT SETSPEED player 0.3
-WORLDFADE OUT 10 ${color(COLORS.BLOOD)}
-TIMERblinkend -m 1 500 WORLDFADE IN 500 NOP
+  PLAY -o "magic_spell_slow_down"
+  PLAY -o "strange_noise1"
+  PLAY -oil "player_heartb"
+  SENDEVENT SAVE ${lampCtrl.ref} NOP
+  SENDEVENT SETSPEED player 0.3
+  WORLDFADE OUT 10 ${color(COLORS.BLOOD)}
+  TIMERblinkend -m 1 500 WORLDFADE IN 500 NOP
 
-SENDEVENT ON ${ambientLights.ceiling.ref} NOP
+  SENDEVENT ON ${ambientLights.ceiling.ref} NOP
 
-SENDEVENT MUTE ${lampCtrl.ref} NOP
-SENDEVENT OFF ${lampCtrl.ref} "instant"
+  SENDEVENT MUTE ${lampCtrl.ref} NOP
+  SENDEVENT OFF ${lampCtrl.ref} "instant"
 
-TIMERbaby -m 1 2000 PLAY -o "baby"
+  TIMERbaby -m 1 2000 PLAY -o "baby"
 
-TIMERstopheartbeat -m 1 15000 PLAY -os "player_heartb"
+  TIMERstopheartbeat -m 1 15000 PLAY -os "player_heartb"
 
-TIMERambOff1 -m 1 15000 SENDEVENT OFF ${ambientLights.ceiling.ref} NOP
+  TIMERambOff1 -m 1 15000 SENDEVENT OFF ${ambientLights.ceiling.ref} NOP
 
-TIMERlampUnmute -m 1 15000 SENDEVENT UNMUTE ${lampCtrl.ref} NOP
-TIMERend -m 1 15500 SENDEVENT RESTORE ${lampCtrl.ref} NOP
-TIMERspeedrestore -m 1 15500 SENDEVENT SETSPEED player 1
+  TIMERlampUnmute -m 1 15000 SENDEVENT UNMUTE ${lampCtrl.ref} NOP
+  TIMERend -m 1 15500 SENDEVENT RESTORE ${lampCtrl.ref} NOP
+  TIMERspeedrestore -m 1 15500 SENDEVENT SETSPEED player 1
 
-RETURN
+  RETURN
 }
 
 >>OUTRO {
-TIMERmute -m 1 1500 SENDEVENT MUTE ${lampCtrl.ref} NOP
-PLAYERINTERFACE HIDE
-SETPLAYERCONTROLS OFF
-TIMERfadeout -m 1 700 WORLDFADE OUT 300 ${color('khaki')}
-PLAY -o "backrooms-outro" // [o] = emit from player
-TIMERfadeout2 -m 1 18180 WORLDFADE OUT 0 ${color('black')}
-TIMERendgame -m 1 20000 END_GAME
-RETURN
+  TIMERmute -m 1 1500 SENDEVENT MUTE ${lampCtrl.ref} NOP
+  PLAYERINTERFACE HIDE
+  SETPLAYERCONTROLS OFF
+  TIMERfadeout -m 1 700 WORLDFADE OUT 300 ${color('khaki')}
+  PLAY -o "backrooms-outro" // [o] = emit from player
+  TIMERfadeout2 -m 1 18180 WORLDFADE OUT 0 ${color('black')}
+  TIMERendgame -m 1 20000 END_GAME
+  RETURN
 }
     `
   }, ref)
@@ -492,30 +492,30 @@ const createExit = (top, left, wallSegment, key, jumpscareController) => {
 
   addScript((self) => {
     return `
-  // component: exit
-  ON INIT {
-    ${getInjections('init', self)}
+// component: exit
+ON INIT {
+  ${getInjections('init', self)}
+  ACCEPT
+}
+  
+ON LOAD {
+  USE_MESH "DOOR_YLSIDES\\DOOR_YLSIDES.TEO"
+  ACCEPT
+}
+
+ON ACTION {
+  IF (${self.state.unlock} == 0) {
     ACCEPT
   }
-   
-  ON LOAD {
-    USE_MESH "DOOR_YLSIDES\\DOOR_YLSIDES.TEO"
+
+  IF (${self.state.open} == 1) {
     ACCEPT
   }
-  
-  ON ACTION {
-    IF (${self.state.unlock} == 0) {
-      ACCEPT
-    }
-  
-    IF (${self.state.open} == 1) {
-      ACCEPT
-    }
-  
-    SENDEVENT OPEN ${jumpscareController.ref} "exit"
-  
-    ACCEPT
-  }
+
+  SENDEVENT OPEN ${jumpscareController.ref} "exit"
+
+  ACCEPT
+}
         `
   }, ref)
 
@@ -533,18 +533,18 @@ const createKey = (pos, angle = [0, 0, 0], jumpscareCtrl) => {
     return `
 // component: key
 ON INIT {
-${getInjections('init', self)}
-OBJECT_HIDE SELF NO
-ACCEPT
+  ${getInjections('init', self)}
+  OBJECT_HIDE SELF NO
+  ACCEPT
 }
 
 ON INVENTORYIN {
-IF (${self.state.pickedUp} == 0) {
-  SET ${self.state.pickedUp} 0
-  SENDEVENT PICKUP ${jumpscareCtrl.ref} "key:exit"
-}
+  IF (${self.state.pickedUp} == 0) {
+    SET ${self.state.pickedUp} 0
+    SENDEVENT PICKUP ${jumpscareCtrl.ref} "key:exit"
+  }
 
-ACCEPT
+  ACCEPT
 }
     `
   }, ref)
@@ -576,65 +576,65 @@ const createAlmondWater = (
     return `
 // component: almondWater
 ON INIT {
-${getInjections('init', self)}
-ACCEPT
+  ${getInjections('init', self)}
+  ACCEPT
 }
 
 ON IDENTIFY {
-REFUSE
+  REFUSE
 }
 
 ON INVENTORYIN {
-IF (${self.state.pickedUp} == 0) {
-  SET ${self.state.pickedUp} 0
-  SENDEVENT PICKUP ${jumpscareCtrl.ref} "almondwater:${variant}"
-}
+  IF (${self.state.pickedUp} == 0) {
+    SET ${self.state.pickedUp} 0
+    SENDEVENT PICKUP ${jumpscareCtrl.ref} "almondwater:${variant}"
+  }
 
-ACCEPT
+  ACCEPT
 }
 
 ON INVENTORYUSE {
-PLAY "drink"
+  PLAY "drink"
 
-// TODO: make sure to handle effects, which have duration from running parallel
+  // TODO: make sure to handle effects, which have duration from running parallel
 
-IF (${self.state.variant} == "xp") {
-  // TODO: add an effect
-  ADDXP 2000
-}
-
-IF (${self.state.variant} == "mana") {
-  IF (^PLAYER_MAXMANA > 0) {
-    // only in ArxLibertatis 1.3+
-    SPECIALFX MANA ^PLAYER_MAXMANA // TODO: only add half the player's mana
-  } ELSE {
-    SPECIALFX MANA 25
+  IF (${self.state.variant} == "xp") {
+    // TODO: add an effect
+    ADDXP 2000
   }
-}
 
-IF (${self.state.variant} == "slow") {
-  PLAY -o "magic_spell_slow_down"
-  PLAY -oil "player_heartb"
-  SENDEVENT SETSPEED player 0.5
-  TIMERpenalty -m 1 7000 SENDEVENT SETSPEED player 1
-  TIMERend -m 1 7000 PLAY -o "magic_spell_slow_down_end"
-  TIMERstopheartbeat -m 1 7000 PLAY -os "player_heartb"
-}
+  IF (${self.state.variant} == "mana") {
+    IF (^PLAYER_MAXMANA > 0) {
+      // only in ArxLibertatis 1.3+
+      SPECIALFX MANA ^PLAYER_MAXMANA // TODO: only add half the player's mana
+    } ELSE {
+      SPECIALFX MANA 25
+    }
+  }
 
-IF (${self.state.variant} == "speed") {
-  PLAY -o "magic_spell_speedstart"
-  PLAY -oil "player_heartb"
-  SENDEVENT SETSPEED player 2
-  TIMERbonusend -m 1 10000 SENDEVENT SETSPEED player 1
-  TIMERend -m 1 10000 PLAY -o "magic_spell_speedend"
-  TIMERstopheartbeat -m 1 10000 PLAY -os "player_heartb"
-}
+  IF (${self.state.variant} == "slow") {
+    PLAY -o "magic_spell_slow_down"
+    PLAY -oil "player_heartb"
+    SENDEVENT SETSPEED player 0.5
+    TIMERpenalty -m 1 7000 SENDEVENT SETSPEED player 1
+    TIMERend -m 1 7000 PLAY -o "magic_spell_slow_down_end"
+    TIMERstopheartbeat -m 1 7000 PLAY -os "player_heartb"
+  }
 
-OBJECT_HIDE SELF YES
-// can't call destroy self immediately, because it kills timers too
-TIMERgarbagecollect -m 1 15000 DESTROY SELF
+  IF (${self.state.variant} == "speed") {
+    PLAY -o "magic_spell_speedstart"
+    PLAY -oil "player_heartb"
+    SENDEVENT SETSPEED player 2
+    TIMERbonusend -m 1 10000 SENDEVENT SETSPEED player 1
+    TIMERend -m 1 10000 PLAY -o "magic_spell_speedend"
+    TIMERstopheartbeat -m 1 10000 PLAY -os "player_heartb"
+  }
 
-REFUSE
+  OBJECT_HIDE SELF YES
+  // can't call destroy self immediately, because it kills timers too
+  TIMERgarbagecollect -m 1 15000 DESTROY SELF
+
+  REFUSE
 }
     `
   }, ref)
@@ -652,17 +652,17 @@ const createSpawnContainer = (pos, angle, contents = []) => {
     return `
 // component: spawn container
 ON INIT {
-${getInjections('init', self)}
+  ${getInjections('init', self)}
 
-setscale 75
+  setscale 75
 
-${contents
-  .map(({ ref }) => {
-    return `inventory addfromscene "${ref}"`
-  })
-  .join('  \n')}
+  ${contents
+    .map(({ ref }) => {
+      return `inventory addfromscene "${ref}"`
+    })
+    .join('  \n')}
 
-ACCEPT
+  ACCEPT
 }
     `
   }, ref)
