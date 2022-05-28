@@ -41,3 +41,7 @@ export const exportTranslations = (outputDir: string) => {
     return acc
   }, {} as Record<string, string>)
 }
+
+export const resetTranslations = () => {
+  usedTranslations = {}
+}

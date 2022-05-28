@@ -51,7 +51,7 @@ import {
   Vector3,
   Vertex3,
 } from './types'
-import { exportTranslations } from './assets/i18n'
+import { exportTranslations, resetTranslations } from './assets/i18n'
 
 export type MapData = {
   meta: {
@@ -740,6 +740,7 @@ export const cleanupCache = () => {
   resetItems()
   resetAmbiences()
   resetTextures()
+  resetTranslations()
 }
 
 export const pickRandomLoot = (lootTable) => {
