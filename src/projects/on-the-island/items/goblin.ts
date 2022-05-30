@@ -19,8 +19,8 @@ export const createGoblin = (
     return `
 // component: goblin
 ON INIT {
-${getInjections('init', self)}
-ACCEPT
+  ${getInjections('init', self)}
+  ACCEPT
 }
     `
   }, ref)

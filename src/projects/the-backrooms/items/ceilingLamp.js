@@ -278,8 +278,8 @@ export const createCeilingLamp = (pos, angle = [0, 0, 0], config = {}) => {
     return `
 // component: ceilingLamp
 ON INIT {
-${getInjections('init', self)}
-ACCEPT
+  ${getInjections('init', self)}
+  ACCEPT
 }
     `
   }, ref)
