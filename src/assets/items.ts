@@ -232,6 +232,7 @@ const usedItems: Record<string, { instances: Item[]; root?: RootItem }> = {}
 
 const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   const init: string[] = []
+  const initend: string[] = []
 
   if (props.name) {
     init.push(`SETNAME "${props.name}"`)
@@ -252,7 +253,7 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
     init.push(`COLLISION ${props.collision ? 'ON' : 'OFF'}`)
   }
   if (typeof props.mesh === 'string') {
-    init.push(`USEMESH ${props.mesh}`)
+    initend.push(`USEMESH ${props.mesh}`)
   }
   if (props.variant) {
     const tmpScope = {
@@ -265,11 +266,17 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
     init.push(...tmpScope.injections.init)
   }
 
+  const result: Record<string, string[]> = {}
+
   if (init.length) {
-    return { init }
+    result.init = init
   }
 
-  return {}
+  if (initend.length) {
+    result.initend = initend
+  }
+
+  return result
 }
 
 export const createItem = (

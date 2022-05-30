@@ -32,6 +32,7 @@ ON INIT {
 }
 
 ON INITEND {
+  ${getInjections('initend', self)}
   TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-ceiling-air-diffuser"
   ACCEPT
 }

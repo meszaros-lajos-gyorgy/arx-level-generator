@@ -146,6 +146,11 @@ ON INIT {
   ACCEPT
 }
 
+ON INITEND {
+  ${getInjections('initend', self)}
+  ACCEPT
+}
+
 ON OUCH {
   IF (^#PARAM1 > 20) {
     SPEAK [Player_ouch_strong] NOP

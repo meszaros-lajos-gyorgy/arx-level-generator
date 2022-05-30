@@ -266,9 +266,9 @@ ON INIT {
 }
 ON INITEND {
   IF (${self.state.isWide} == 1) {
-    USE_MESH "L2_Gobel_portcullis_big\\L2_Gobel_portcullis_big.teo"
+    USEMESH "L2_Gobel_portcullis_big\\L2_Gobel_portcullis_big.teo"
   } ELSE {
-    USE_MESH "L2_Gobel_portcullis\\L2_Gobel_portcullis.teo"
+    USEMESH "L2_Gobel_portcullis\\L2_Gobel_portcullis.teo"
   }
 
   ACCEPT

@@ -71,6 +71,7 @@ ON INIT {
 }
 
 ON INITEND {
+  ${getInjections('initend', self)}
   SET ${self.state.oldIsOn} ${self.state.isOn}
 
   if (${self.state.isOn} == 1) {
