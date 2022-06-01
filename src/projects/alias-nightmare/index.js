@@ -217,7 +217,7 @@ const generate = async (config) => {
   defineStatue()
   createStatue(islands[2].pos)
 
-  createFallSaver(islands[0].pos, welcomeMarker)
+  // createFallSaver(islands[0].pos, welcomeMarker)
 
   const mapData = generateBlankMapData(config)
 
@@ -253,7 +253,7 @@ const generate = async (config) => {
     PATH_RGB,
   )(mapData)
 
-  createGravityInducer(origin, mapData)
+  // createGravityInducer(origin, mapData)
 
   islands.forEach((config, idx) => {
     island({ ...config, idx }, mapData)
