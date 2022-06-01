@@ -375,6 +375,24 @@ export const renderGrid = (grid, mapData) => {
         width,
         unit: UNIT,
       })(mapData)
+      wall(
+        move(
+          ...decalOffset.right,
+          move(
+            0,
+            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            0,
+            coords,
+          ),
+        ),
+        'right',
+        {
+          height: 1,
+          width,
+          textureRotation: 180,
+          unit: UNIT,
+        },
+      )(mapData)
 
       if (isLeftCornerConcave) {
         wall(move(...decalOffset.right, coords), 'right', {
@@ -421,6 +439,24 @@ export const renderGrid = (grid, mapData) => {
         width,
         unit: UNIT,
       })(mapData)
+      wall(
+        move(
+          ...decalOffset.left,
+          move(
+            0,
+            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            0,
+            coords,
+          ),
+        ),
+        'left',
+        {
+          height: 1,
+          width,
+          textureRotation: 180,
+          unit: UNIT,
+        },
+      )(mapData)
 
       if (isLeftCornerConcave) {
         wall(
@@ -467,6 +503,24 @@ export const renderGrid = (grid, mapData) => {
         width,
         unit: UNIT,
       })(mapData)
+      wall(
+        move(
+          ...decalOffset.front,
+          move(
+            0,
+            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            0,
+            coords,
+          ),
+        ),
+        'front',
+        {
+          height: 1,
+          width,
+          textureRotation: 180,
+          unit: UNIT,
+        },
+      )(mapData)
 
       if (isLeftCornerConcave) {
         wall(
@@ -512,6 +566,24 @@ export const renderGrid = (grid, mapData) => {
         width,
         unit: UNIT,
       })(mapData)
+      wall(
+        move(
+          ...decalOffset.back,
+          move(
+            0,
+            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            0,
+            coords,
+          ),
+        ),
+        'back',
+        {
+          height: 1,
+          width,
+          textureRotation: 180,
+          unit: UNIT,
+        },
+      )(mapData)
 
       if (isLeftCornerConcave) {
         wall(move(...decalOffset.back, coords), 'back', {
