@@ -27,6 +27,7 @@ ON INITEND {
     }
     ACCEPT
   }
+
   IF ( ${self.state.onme} == 0 ) {
     SET ${self.state.onme} 1
     PLAYANIM ACTION1
@@ -36,6 +37,10 @@ ON INITEND {
 }
   `
   }, ref)
+
+  // TODO: read weight of the item on top
+  // TODO: can it detect multiple items on top?
+  // TODO: alternative ways to detect if item is on top?
 
   return ref
 }

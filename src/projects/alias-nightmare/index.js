@@ -10,6 +10,7 @@ import {
   setTexture,
   setPolygonGroup,
   unsetPolygonGroup,
+  move,
 } from '../../helpers'
 import island from './island'
 import { colors, NONE, ALL, NORTH, EAST, SOUTH, WEST } from './constants'
@@ -31,6 +32,8 @@ import { plain } from '../../prefabs'
 import { textures } from '../../assets/textures'
 import { MAP_MAX_WIDTH, MAP_MAX_HEIGHT, PATH_RGB } from '../../constants'
 import { disableBumping } from '../../prefabs/plain'
+import { createStone } from './items/stone'
+import { overridePlayerScript } from '../shared/player'
 
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
@@ -67,11 +70,6 @@ const createWelcomeMarker = (pos, config) => {
   >>READY {
     CINEMASCOPE -s OFF
     SETPLAYERCONTROLS ON
-  
-    INVENTORY PLAYERADD special/wall_block/wall_block
-    INVENTORY PLAYERADD special/wall_block/wall_block
-    INVENTORY PLAYERADD special/wall_block/wall_block
-    INVENTORY PLAYERADD special/wall_block/wall_block
   
     ACCEPT
   }
@@ -172,6 +170,8 @@ const createGravityInducer = (origin, mapData) => {
 const generate = async (config) => {
   const { origin } = config
 
+  overridePlayerScript()
+
   const islands = [
     {
       pos: [0, 0, 0],
@@ -218,6 +218,23 @@ const generate = async (config) => {
   createStatue(islands[2].pos)
 
   // createFallSaver(islands[0].pos, welcomeMarker)
+
+  createStone(move(-100, -10, 0, islands[0].pos), [0, 0, 0], {
+    weight: 1,
+    scale: 0.7,
+  })
+  createStone(move(-200, -10, 0, islands[0].pos), [0, 0, 0], {
+    weight: 3,
+    scale: 1.2,
+  })
+  createStone(move(-200, -10, -100, islands[0].pos), [0, 0, 0], {
+    weight: 2,
+    scale: 0.9,
+  })
+  createStone(move(-100, -10, -100, islands[0].pos), [0, 0, 0], {
+    weight: 1,
+    scale: 0.8,
+  })
 
   const mapData = generateBlankMapData(config)
 

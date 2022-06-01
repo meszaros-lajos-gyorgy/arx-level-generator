@@ -26,6 +26,7 @@ ON INITEND {
   ${getInjections('initend', self)}
   ACCEPT
 }
+
 ON CLOSE {
   IF (${self.state.isOpen} == 0) {
     ACCEPT
@@ -49,6 +50,9 @@ ON OPEN {
 }
 `
   }, ref)
+
+  // TODO: create custom animation with timer (raise and lower gate)
+  // TODO: variable speed for the custom animation
 
   return ref
 }

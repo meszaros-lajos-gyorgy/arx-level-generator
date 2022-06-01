@@ -225,6 +225,10 @@ export const items = {
       src: 'fix_inter/fire_camp/fire_camp.teo',
       native: true,
     },
+    stone: {
+      src: 'items/special/wall_block/wall_block.teo',
+      native: true,
+    },
   },
 }
 
