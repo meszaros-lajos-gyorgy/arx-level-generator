@@ -1,5 +1,5 @@
-const { createItem, addScript, items } = require('../../../assets/items')
-const { declare, getInjections } = require('../../../scripting')
+import { addScript, createItem, items } from '../../../assets/items'
+import { declare, getInjections } from '../../../scripting'
 
 export const createEventBus = (gates) => {
   const ref = createItem(items.marker)
