@@ -175,8 +175,8 @@ const generate = async (config) => {
   const islands = [
     {
       pos: [0, 0, 0],
-      entrances: EAST,
-      exits: NORTH,
+      entrances: NONE,
+      exits: ALL,
       width: 12,
       height: 10,
     },
@@ -223,18 +223,18 @@ const generate = async (config) => {
     weight: 1,
     scale: 0.7,
   })
-  createStone(move(-200, -10, 0, islands[0].pos), [0, 0, 0], {
-    weight: 3,
-    scale: 1.2,
-  })
-  createStone(move(-200, -10, -100, islands[0].pos), [0, 0, 0], {
-    weight: 2,
-    scale: 0.9,
-  })
-  createStone(move(-100, -10, -100, islands[0].pos), [0, 0, 0], {
-    weight: 1,
-    scale: 0.8,
-  })
+  // createStone(move(-200, -10, 0, islands[0].pos), [0, 0, 0], {
+  //   weight: 3,
+  //   scale: 1.2,
+  // })
+  // createStone(move(-200, -10, -100, islands[0].pos), [0, 0, 0], {
+  //   weight: 2,
+  //   scale: 0.9,
+  // })
+  // createStone(move(-100, -10, -100, islands[0].pos), [0, 0, 0], {
+  //   weight: 1,
+  //   scale: 0.8,
+  // })
 
   const mapData = generateBlankMapData(config)
 

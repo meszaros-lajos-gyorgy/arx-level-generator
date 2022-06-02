@@ -14,7 +14,7 @@ ON INIT {
 }
 
 ON INITEND {
-  TIMERontop -im 0 500 GOTO TOP
+  TIMERontop -im 0 100 GOTO TOP
   ACCEPT
 }
 

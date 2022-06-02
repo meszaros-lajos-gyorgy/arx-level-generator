@@ -24,29 +24,30 @@ ON INIT {
 }
 ON INITEND {
   ${getInjections('initend', self)}
+  COLLISION ON
   ACCEPT
 }
 
-ON CLOSE {
-  IF (${self.state.isOpen} == 0) {
-    ACCEPT
-  }
-  SET ${self.state.isOpen} 0
-  PLAYANIM -e ACTION2 COLLISION ON
-  VIEWBLOCK ON
-  PLAY ~£closesfx~
-  REFUSE
+ON RAISE {
+  MOVE 0 -80 0
+  GOSUB STOPSOUND
+  PLAY -i ~£opensfx~
+  TIMERstopsound -m 1 600 GOSUB STOPSOUND
+  ACCEPT
 }
-ON OPEN {
-  IF (${self.state.isOpen} == 1) {
-    ACCEPT
-  }
-  SET ${self.state.isOpen} 1
-  PLAYANIM -e ACTION1 COLLISION OFF
-  PLAY ~£opensfx~
-  VIEWBLOCK OFF
-  ANCHOR_BLOCK OFF
-  REFUSE
+
+ON LOWER {
+  MOVE 0 80 0
+  GOSUB STOPSOUND
+  PLAY -i ~£closesfx~
+  TIMERstopsound -m 1 600 GOSUB STOPSOUND
+  ACCEPT
+}
+
+>>STOPSOUND {
+  PLAY -s ~£opensfx~
+  PLAY -s ~£closesfx~
+  RETURN
 }
 `
   }, ref)
