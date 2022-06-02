@@ -15,7 +15,7 @@ export const createStone = (pos, angle = [0, 0, 0], props = {}) => {
     ...props,
   })
 
-  declare('int', 'weight', weight, ref)
+  declare('public int', 'weight', weight, ref)
 
   addScript((self) => {
     return `

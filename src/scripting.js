@@ -50,6 +50,16 @@ export const declare = (type, name, initialValue, scope) => {
         scope.state[name] = `£${name}`
         value = `"${initialValue}"`
         break
+      case 'public int':
+        scope.state[name] = `#${scope.ref}___${name}`
+        break
+      case 'public float':
+        scope.state[name] = `&${scope.ref}___${name}`
+        break
+      case 'public string':
+        scope.state[name] = `$${scope.ref}___${name}`
+        value = `"${initialValue}"`
+        break
     }
 
     if (value !== undefined) {
