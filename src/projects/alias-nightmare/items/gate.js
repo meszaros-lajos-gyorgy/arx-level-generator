@@ -6,6 +6,9 @@ const meshes = {
   narrow: 'L2_Gobel_portcullis\\L2_Gobel_portcullis.teo',
 }
 
+const FPS = 30
+const fpsInMs = 1000 / FPS
+
 export const createGate = (orientation, props = {}) => {
   const isWide = props.isWide ?? false
 
@@ -13,7 +16,8 @@ export const createGate = (orientation, props = {}) => {
     mesh: isWide ? meshes.wide : meshes.narrow,
   })
 
-  declare('int', 'isOpen', props.isOpen ?? false ? 1 : 0, ref)
+  // TODO: handle props.isOpen
+  // declare('int', 'isOpen', props.isOpen ?? false ? 1 : 0, ref)
 
   addScript((self) => {
     return `
@@ -29,24 +33,39 @@ ON INITEND {
 }
 
 ON RAISE {
-  MOVE 0 -80 0
+  GOSUB STOPANIM
   GOSUB STOPSOUND
   PLAY -i ~£opensfx~
-  TIMERstopsound -m 1 600 GOSUB STOPSOUND
+  GOSUB RAISE_STEP
+  ACCEPT
+}
+
+>>RAISE_STEP {
+  MOVE 0 -100 0
   ACCEPT
 }
 
 ON LOWER {
-  MOVE 0 80 0
+  GOSUB STOPANIM
   GOSUB STOPSOUND
   PLAY -i ~£closesfx~
-  TIMERstopsound -m 1 600 GOSUB STOPSOUND
+  GOSUB LOWER_STEP
+  ACCEPT
+}
+
+>>LOWER_STEP {
+  MOVE 0 100 0
   ACCEPT
 }
 
 >>STOPSOUND {
   PLAY -s ~£opensfx~
   PLAY -s ~£closesfx~
+  RETURN
+}
+
+>>STOPANIM {
+  TIMERmove OFF
   RETURN
 }
 `
