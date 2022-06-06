@@ -28,7 +28,7 @@ import { declare, color, getInjections } from '../../scripting'
 import bridges from './bridges'
 import { createSmellyFlower } from './items/smellyFlower'
 import { createStatue, defineStatue } from './items/statue'
-import { plain } from '../../prefabs'
+import { pillars, plain } from '../../prefabs'
 import { textures } from '../../assets/textures'
 import { MAP_MAX_WIDTH, MAP_MAX_HEIGHT, PATH_RGB } from '../../constants'
 import { disableBumping } from '../../prefabs/plain'
@@ -217,8 +217,6 @@ const generate = async (config) => {
   defineStatue()
   createStatue(islands[2].pos)
 
-  // createFallSaver(islands[0].pos, welcomeMarker)
-
   createStone(move(-100, -10, 0, islands[0].pos), [0, 0, 0], {
     weight: 1,
     scale: 0.7,
@@ -270,7 +268,11 @@ const generate = async (config) => {
     PATH_RGB,
   )(mapData)
 
+  // createFallSaver(islands[0].pos, welcomeMarker)
   // createGravityInducer(origin, mapData)
+
+  // setTexture(textures.stone.humanPriest4, mapData)
+  // pillars(islands[0].pos, 20, 5000, 1000, [200, 200, 0, 0], mapData)
 
   islands.forEach((config, idx) => {
     island({ ...config, idx }, mapData)

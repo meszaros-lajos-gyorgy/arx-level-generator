@@ -64,14 +64,14 @@ const createFishSpawn = (pos) => {
 }
 
 const createBarrel = (pos, angle, contents = []) => {
-  const ref = createItem(items.containers.barrel)
+  const ref = createItem(items.containers.barrel, {
+    scale: 0.7,
+  })
   addScript((self) => {
     return `
 // component: barrel
 ON INIT {
 ${getInjections('init', self)}
-
-// setscale 75
 
 ${contents
   .map(({ ref }) => {
@@ -166,7 +166,7 @@ const generate = async (config) => {
   )
   createCards([
     islandCenter.x - islandRadius + islandEdgeOffset,
-    -120,
+    -90,
     islandCenter.z + 30,
   ])
 
