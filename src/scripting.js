@@ -1,9 +1,10 @@
 import rgba from 'color-rgba'
+import { roundToNDecimals } from './helpers'
 
 export const SCRIPT_EOL = '\r\n'
 
 const toFloat = (colorChannel) => {
-  return Math.round((colorChannel / 256) * 10 ** 6) / 10 ** 6
+  return roundToNDecimals(6, colorChannel / 256)
 }
 
 export const color = (colorDefinition) => {

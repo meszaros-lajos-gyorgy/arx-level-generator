@@ -749,3 +749,7 @@ export const pickRandomLoot = (lootTable) => {
   )
   return lootTable[idx]
 }
+
+export const roundToNDecimals = (decimals: number, x: number) => {
+  return Math.round(x * 10 ** decimals) / 10 ** decimals
+}

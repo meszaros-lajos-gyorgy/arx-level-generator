@@ -175,8 +175,8 @@ const generate = async (config) => {
   const islands = [
     {
       pos: [0, 0, 0],
-      entrances: NONE,
-      exits: ALL,
+      entrances: EAST,
+      exits: NORTH,
       width: 12,
       height: 10,
     },
