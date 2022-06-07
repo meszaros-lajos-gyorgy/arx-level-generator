@@ -231,9 +231,7 @@ const calculateNormals = (mapData: any) => {
 export const finalize = (mapData: MapData) => {
   const finalizedMapData: any = clone(mapData)
 
-  const ungroupedPolygons = Object.values(mapData.fts.polygons).flatMap(
-    (polygonGroup) => polygonGroup,
-  )
+  const ungroupedPolygons = Object.values(mapData.fts.polygons).flat(1)
   const numberOfPolygons = ungroupedPolygons.length
 
   finalizedMapData.fts.polygons = ungroupedPolygons
