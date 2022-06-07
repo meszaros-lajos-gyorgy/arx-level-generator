@@ -104,9 +104,10 @@ export const generateGrid = (size) => {
   return times(() => repeat(0, size), size)
 }
 
-export const addRoom = (width, height, grid) => {
+export const addRoom = (width, height, depth, grid) => {
   if (isEveryCellEmpty(grid)) {
-    return addFirstRoom(width, height, grid)
+    addFirstRoom(width, depth, grid)
+    return true
   }
 
   let candidates = []
@@ -122,11 +123,11 @@ export const addRoom = (width, height, grid) => {
   }
 
   candidates = candidates.filter(([x, z]) => {
-    return canFitRoomAtPos(x, z, width, height, grid)
+    return canFitRoomAtPos(x, z, width, depth, grid)
   })
 
   if (!candidates.length) {
-    return
+    return false
   }
 
   const candidate = pickRandom(candidates)
@@ -135,13 +136,14 @@ export const addRoom = (width, height, grid) => {
     candidate[0],
     candidate[1],
     width,
-    height,
+    depth,
     grid,
   )
 
-  const startingPos = pickRandom(variants)
+  const [startX, startZ] = pickRandom(variants)
 
-  insertRoom(startingPos[0], startingPos[1], width, height, grid)
+  insertRoom(startX, startZ, width, depth, grid)
+  return true
 }
 
 const decalOffset = {

@@ -777,21 +777,18 @@ const generate = async (config) => {
 
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
 
+  const grid = generateGrid(20) // 50*50 = 2500, okay; 50^3 = 12500!!! not okay
+  addRoom(3, 2, 3, grid)
+
   let roomCounter = 1
-
-  const grid = generateGrid(50)
-  addRoom(3, 3, grid)
-
-  let oldGrid = JSON.stringify(grid)
   for (let i = 0; i < config.numberOfRooms; i++) {
-    addRoom(
+    const newRoomAdded = addRoom(
       randomBetween(...config.roomDimensions.width),
+      2,
       randomBetween(...config.roomDimensions.depth),
       grid,
     )
-    let newGrid = JSON.stringify(grid)
-    if (newGrid !== oldGrid) {
-      oldGrid = newGrid
+    if (newRoomAdded) {
       roomCounter++
     }
   }
@@ -839,20 +836,20 @@ const generate = async (config) => {
 
   const lampsToBeCreated = []
 
-  for (let y = 0; y < grid.length; y++) {
-    for (let x = 0; x < grid[y].length; x++) {
-      if (isOccupied(x, y, grid)) {
-        floors.push([x, y])
+  for (let z = 0; z < grid.length; z++) {
+    for (let x = 0; x < grid[z].length; x++) {
+      if (isOccupied(x, z, grid)) {
+        floors.push([x, z])
 
         const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
         const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
 
-        if (x % 3 === 0 && y % 3 === 0) {
+        if (x % 3 === 0 && z % 3 === 0) {
           lampsToBeCreated.push({
             pos: [
               left + x * UNIT - 50 + offsetX,
               -(config.roomDimensions.height * UNIT - 10),
-              -(top + y * UNIT) - 50 + offsetZ,
+              -(top + z * UNIT) - 50 + offsetZ,
             ],
             config: {
               on: randomBetween(0, 100) < config.percentOfLightsOn,
@@ -863,22 +860,22 @@ const generate = async (config) => {
             createCeilingDiffuser([
               left + x * UNIT - 50 + offsetX,
               -(config.roomDimensions.height * UNIT - 5),
-              -(top + y * UNIT) - 50 + offsetZ,
+              -(top + z * UNIT) - 50 + offsetZ,
             ])
           }
         }
 
-        if (isOccupied(x - 1, y, grid) !== true) {
-          wallSegments.push([x - 1, y, 'right'])
+        if (isOccupied(x - 1, z, grid) !== true) {
+          wallSegments.push([x - 1, z, 'right'])
         }
-        if (isOccupied(x + 1, y, grid) !== true) {
-          wallSegments.push([x + 1, y, 'left'])
+        if (isOccupied(x + 1, z, grid) !== true) {
+          wallSegments.push([x + 1, z, 'left'])
         }
-        if (isOccupied(x, y + 1, grid) !== true) {
-          wallSegments.push([x, y + 1, 'front'])
+        if (isOccupied(x, z + 1, grid) !== true) {
+          wallSegments.push([x, z + 1, 'front'])
         }
-        if (isOccupied(x, y - 1, grid) !== true) {
-          wallSegments.push([x, y - 1, 'back'])
+        if (isOccupied(x, z - 1, grid) !== true) {
+          wallSegments.push([x, z - 1, 'back'])
         }
       }
     }
@@ -941,8 +938,11 @@ const generate = async (config) => {
     jumpscareCtrl,
   )
 
-  createExit(top, left, pickRandom(wallSegments), key, jumpscareCtrl)
-  pickRandoms(30, wallSegments).forEach((wallSegment) => {
+  pickRandoms(30, wallSegments).forEach((wallSegment, idx) => {
+    if (idx === 0) {
+      createExit(top, left, wallSegment, key, jumpscareCtrl)
+      return
+    }
     createWallPlug(top, left, wallSegment, {
       variant: pickRandom(['clean', 'dirty', 'old']),
     })
