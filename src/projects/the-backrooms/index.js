@@ -152,8 +152,18 @@ const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
 
   addDependencyAs(
-    'blank-map.bmp',
+    'reset/map.bmp',
     `graph/levels/level${config.levelIdx}/map.bmp`,
+    ref,
+  )
+  addDependencyAs(
+    'reset/empty-gauge.bmp',
+    'graph/interface/bars/empty_gauge_red.bmp',
+    ref,
+  )
+  addDependencyAs(
+    'reset/filled-gauge.bmp',
+    'graph/interface/bars/filled_gauge_red.bmp',
     ref,
   )
   addDependencyAs(
@@ -162,8 +172,18 @@ const createWelcomeMarker = (pos, config) => {
     ref,
   )
   addDependencyAs(
-    'projects/the-backrooms/progressbar.bmp',
+    'projects/the-backrooms/interface/progressbar.bmp',
     `graph/interface/menus/load_full_level.bmp`,
+    ref,
+  )
+  addDependencyAs(
+    'projects/the-backrooms/interface/battery-full.bmp',
+    'graph/interface/bars/filled_gauge_blue.bmp',
+    ref,
+  )
+  addDependencyAs(
+    'projects/the-backrooms/interface/battery-empty.bmp',
+    'graph/interface/bars/empty_gauge_blue.bmp',
     ref,
   )
   addDependencyAs(

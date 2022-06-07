@@ -38,7 +38,7 @@ const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
   declare('int', 'hadIntro', 0, ref)
   addDependencyAs(
-    'blank-map.bmp',
+    'reset/map.bmp',
     `graph/levels/level${config.levelIdx}/map.bmp`,
     ref,
   )
