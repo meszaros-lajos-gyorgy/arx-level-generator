@@ -33,7 +33,7 @@ const isEveryCellEmpty = (grid) => {
   return elementsInGrid.length === 1 && elementsInGrid[0] === 0
 }
 
-// is the X/Y position of the grid === 1 ?
+// is the x/z position of the grid === 1 ?
 export const isOccupied = (x, z, grid) => {
   if (typeof grid[z] === 'undefined') {
     return null
