@@ -8,24 +8,24 @@ import wall from '../../prefabs/wall'
 
 export const getRadius = (grid) => (grid.length - 1) / 2
 
-const insertRoom = (originX, originZ, width, height, grid) => {
-  for (let z = 0; z < height; z++) {
+const insertRoom = (originX, originZ, width, depth, grid) => {
+  for (let z = 0; z < depth; z++) {
     for (let x = 0; x < width; x++) {
       grid[originZ + z][originX + x] = 1
     }
   }
 }
 
-const addFirstRoom = (width, height, grid) => {
+const addFirstRoom = (width, depth, grid) => {
   const radius = getRadius(grid)
 
   width = clamp(1, radius * 2 + 1, width)
-  height = clamp(1, radius * 2 + 1, height)
+  depth = clamp(1, radius * 2 + 1, depth)
 
   const originX = radius - Math.floor(width / 2)
-  const originZ = radius - Math.floor(height / 2)
+  const originZ = radius - Math.floor(depth / 2)
 
-  insertRoom(originX, originZ, width, height, grid)
+  insertRoom(originX, originZ, width, depth, grid)
 }
 
 const isEveryCellEmpty = (grid) => {
@@ -46,8 +46,8 @@ export const isOccupied = (x, z, grid) => {
 }
 
 // starting from originX/originZ does a width/depth sized rectangle only occupy 0 slots?
-const canFitRoom = (originX, originZ, width, height, grid) => {
-  for (let z = originZ; z < originZ + height; z++) {
+const canFitRoom = (originX, originZ, width, depth, grid) => {
+  for (let z = originZ; z < originZ + depth; z++) {
     for (let x = originX; x < originX + width; x++) {
       if (isOccupied(x, z, grid) !== false) {
         return false
@@ -58,12 +58,12 @@ const canFitRoom = (originX, originZ, width, height, grid) => {
   return true
 }
 
-// is there a variation of a width/height sized rectangle containing the position x/z which
+// is there a variation of a width/depth sized rectangle containing the position x/z which
 // can occupy only 0 slots?
-const canFitRoomAtPos = (x, z, width, height, grid) => {
-  for (let j = 0; j < height; j++) {
+const canFitRoomAtPos = (x, z, width, depth, grid) => {
+  for (let j = 0; j < depth; j++) {
     for (let i = 0; i < width; i++) {
-      if (canFitRoom(x - i, z - j, width, height, grid)) {
+      if (canFitRoom(x - i, z - j, width, depth, grid)) {
         return true
       }
     }
@@ -82,12 +82,12 @@ const isConnected = (x, z, grid) => {
   )
 }
 
-const getFittingVariants = (x, z, width, height, grid) => {
+const getFittingVariants = (x, z, width, depth, grid) => {
   const variations = []
 
-  for (let j = 0; j < height; j++) {
+  for (let j = 0; j < depth; j++) {
     for (let i = 0; i < width; i++) {
-      if (canFitRoom(x - i, z - j, width, height, grid)) {
+      if (canFitRoom(x - i, z - j, width, depth, grid)) {
         variations.push([x - i, z - j])
       }
     }
