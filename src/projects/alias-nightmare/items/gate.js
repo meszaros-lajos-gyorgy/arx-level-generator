@@ -61,7 +61,9 @@ ON RAISE {
   GOSUB STOPSOUND
   GOSUB SOUND_LOOP_RAISE
   TIMERend -m 1 ${raiseAnimMs} GOTO SOUND_END_RAISE
-  TIMERmove -m 1 ${raiseAnimMs} GOTO MOVE_STEP_RAISE
+  TIMERmove -m ${Math.ceil(
+    raiseAnimMs / fpsInMs,
+  )} ${fpsInMs} GOTO MOVE_STEP_RAISE
   ACCEPT
 }
 
@@ -70,18 +72,20 @@ ON LOWER {
   GOSUB STOPSOUND
   GOSUB SOUND_LOOP_LOWER
   TIMERend -m 1 ${lowerAnimMs} GOTO SOUND_END_LOWER
-  TIMERmove -m 1 ${lowerAnimMs} GOTO MOVE_STEP_LOWER
+  TIMERmove -m ${Math.ceil(
+    lowerAnimMs / fpsInMs,
+  )} ${fpsInMs} GOTO MOVE_STEP_LOWER
   ACCEPT
 }
 
 >>MOVE_STEP_RAISE {
   HEROSAY "move up"
-  MOVE 0 -100 0
+  MOVE 0 -10 0
   ACCEPT
 }
 
 >>MOVE_STEP_LOWER {
-  MOVE 0 100 0
+  MOVE 0 10 0
   ACCEPT
 }
 
