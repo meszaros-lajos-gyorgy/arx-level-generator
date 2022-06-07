@@ -70,15 +70,15 @@ const addLamp = (pos, angle, config = {}) => {
     const isOn = config.on ?? false
     const lampEntity = createCeilingLamp(pos, angle, { on: isOn })
 
-    const roomHeight = mapData.config.roomDimensions.height
+    const size = 2
 
     setColor('white', mapData)
     addLight(
       move(0, 20, 0, pos),
       {
         fallstart: 100,
-        fallend: 500 * roomHeight,
-        intensity: 1.3 - roomHeight * 0.1,
+        fallend: 500 * size,
+        intensity: 1.3 - size * 0.1,
         exFlicker: toFloatRgb(toRgba('#1f1f07')),
         extras:
           EXTRAS_SEMIDYNAMIC |
