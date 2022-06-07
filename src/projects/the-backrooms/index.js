@@ -781,15 +781,20 @@ const generate = async (config) => {
   addRoom(3, 2, 3, grid)
 
   let roomCounter = 1
+  const notFittingCombos = []
   for (let i = 0; i < config.numberOfRooms; i++) {
-    const newRoomAdded = addRoom(
-      randomBetween(...config.roomDimensions.width),
-      2,
-      randomBetween(...config.roomDimensions.depth),
-      grid,
-    )
+    const width = Math.round(randomBetween(...config.roomDimensions.width))
+    const height = 2
+    const depth = Math.round(randomBetween(...config.roomDimensions.depth))
+    const hash = `${width}|${height}|${depth}`
+    if (notFittingCombos.includes(hash)) {
+      continue
+    }
+    const newRoomAdded = addRoom(width, height, depth, grid)
     if (newRoomAdded) {
       roomCounter++
+    } else {
+      notFittingCombos.push(hash)
     }
   }
 

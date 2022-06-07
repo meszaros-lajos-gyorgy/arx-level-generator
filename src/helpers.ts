@@ -530,7 +530,7 @@ export const pickRandoms = (n, set) => {
     let remaining = set.slice()
     let matches = []
     for (let i = 0; i < n; i++) {
-      let idx = randomBetween(0, remaining.length)
+      let idx = Math.floor(randomBetween(0, remaining.length))
       matches = matches.concat(remaining.splice(idx, 1))
     }
     return matches
