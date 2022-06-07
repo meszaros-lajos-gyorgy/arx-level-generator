@@ -156,36 +156,36 @@ const createWelcomeMarker = (pos, config) => {
     `graph/levels/level${config.levelIdx}/map.bmp`,
     ref,
   )
-  addDependencyAs(
-    'reset/empty-gauge.bmp',
-    'graph/interface/bars/empty_gauge_red.bmp',
-    ref,
-  )
-  addDependencyAs(
-    'reset/filled-gauge.bmp',
-    'graph/interface/bars/filled_gauge_red.bmp',
-    ref,
-  )
+  // addDependencyAs(
+  //   'reset/empty-gauge.bmp',
+  //   'graph/interface/bars/empty_gauge_red.bmp',
+  //   ref,
+  // )
+  // addDependencyAs(
+  //   'reset/filled-gauge.bmp',
+  //   'graph/interface/bars/filled_gauge_red.bmp',
+  //   ref,
+  // )
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
     `graph/levels/level${config.levelIdx}/loading.bmp`,
     ref,
   )
-  addDependencyAs(
-    'projects/the-backrooms/interface/progressbar.bmp',
-    `graph/interface/menus/load_full_level.bmp`,
-    ref,
-  )
-  addDependencyAs(
-    'projects/the-backrooms/interface/battery-full.bmp',
-    'graph/interface/bars/filled_gauge_blue.bmp',
-    ref,
-  )
-  addDependencyAs(
-    'projects/the-backrooms/interface/battery-empty.bmp',
-    'graph/interface/bars/empty_gauge_blue.bmp',
-    ref,
-  )
+  // addDependencyAs(
+  //   'projects/the-backrooms/interface/progressbar.bmp',
+  //   `graph/interface/menus/load_full_level.bmp`,
+  //   ref,
+  // )
+  // addDependencyAs(
+  //   'projects/the-backrooms/interface/battery-full.bmp',
+  //   'graph/interface/bars/filled_gauge_blue.bmp',
+  //   ref,
+  // )
+  // addDependencyAs(
+  //   'projects/the-backrooms/interface/battery-empty.bmp',
+  //   'graph/interface/bars/empty_gauge_blue.bmp',
+  //   ref,
+  // )
   addDependencyAs(
     'projects/the-backrooms/sfx/no-sound.wav',
     'sfx/magic_spell_ignite.wav',
