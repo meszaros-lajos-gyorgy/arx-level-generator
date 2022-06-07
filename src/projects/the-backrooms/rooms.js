@@ -151,6 +151,13 @@ const decalOffset = {
   back: [0, 0, -1],
 }
 
+const decalOffset2 = {
+  right: [2, 0, 0],
+  left: [-2, 0, 0],
+  front: [0, 0, 2],
+  back: [0, 0, -2],
+}
+
 const getRightWalls = (wallSegments) => {
   return wallSegments
     .filter(([x, y, direction]) => direction === 'right')
@@ -416,6 +423,13 @@ export const renderGrid = (grid, mapData) => {
           },
         )(mapData)
       }
+
+      setTexture(textures.backrooms.rails, mapData)
+      wall(move(...decalOffset2.right, coords), 'right', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
     },
   )
 
@@ -480,6 +494,13 @@ export const renderGrid = (grid, mapData) => {
           unit: UNIT,
         })(mapData)
       }
+
+      setTexture(textures.backrooms.rails, mapData)
+      wall(move(...decalOffset2.left, coords), 'left', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
     },
   )
 
@@ -544,6 +565,13 @@ export const renderGrid = (grid, mapData) => {
           unit: UNIT,
         })(mapData)
       }
+
+      setTexture(textures.backrooms.rails, mapData)
+      wall(move(...decalOffset2.front, coords), 'front', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
     },
   )
 
@@ -607,6 +635,13 @@ export const renderGrid = (grid, mapData) => {
           },
         )(mapData)
       }
+
+      setTexture(textures.backrooms.rails, mapData)
+      wall(move(...decalOffset2.back, coords), 'back', {
+        height: 1,
+        width,
+        unit: UNIT,
+      })(mapData)
     },
   )
 }

@@ -27,7 +27,7 @@ const project: string = process.env.PROJECT ?? 'alias-nightmare'
         ...config,
         numberOfRooms: 20,
         roomDimensions: { width: [1, 5], depth: [1, 5], height: 2 },
-        percentOfLightsOn: 35,
+        percentOfLightsOn: 100,
         lootTable: [
           {
             name: 'almondWater',

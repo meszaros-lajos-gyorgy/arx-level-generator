@@ -63,6 +63,7 @@ import { UNIT, COLORS } from './constants'
 import { createRune } from '../../items/createRune'
 import { addTranslations } from '../../assets/i18n'
 import translations from './i18n.json'
+import { textures, useTexture } from '../../assets/textures'
 
 const addLamp = (pos, angle, config = {}) => {
   return (mapData) => {
@@ -155,6 +156,11 @@ const createWelcomeMarker = (pos, config) => {
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
     `graph/levels/level${config.levelIdx}/loading.bmp`,
+    ref,
+  )
+  addDependencyAs(
+    'projects/the-backrooms/progressbar.bmp',
+    `graph/interface/menus/load_full_level.bmp`,
     ref,
   )
   addDependencyAs(
@@ -646,15 +652,15 @@ ON INVENTORYUSE {
 }
 
 const createSpawnContainer = (pos, angle, contents = []) => {
-  const ref = createItem(items.containers.barrel)
+  const ref = createItem(items.containers.barrel, {
+    scale: 0.75,
+  })
 
   addScript((self) => {
     return `
 // component: spawn container
 ON INIT {
   ${getInjections('init', self)}
-
-  setscale 75
 
   ${contents
     .map(({ ref }) => {
@@ -669,6 +675,72 @@ ON INIT {
 
   moveTo({ type: 'relative', coords: pos }, angle, ref)
   markAsUsed(ref)
+  return ref
+}
+
+// TODO: place this into definedWallPlug
+// TODO: render wallplugs as wallPlug instead of polytrans
+useTexture(textures.backrooms.socket.clean)
+useTexture(textures.backrooms.socket.dirty)
+useTexture(textures.backrooms.socket.old)
+
+const createWallPlug = (top, left, wallSegment, config = {}) => {
+  const [wallX, wallZ, wallFace] = wallSegment
+
+  let translate = [0, 0, 0]
+  let rotate = [0, 0, 0]
+
+  const tmp = 91
+
+  switch (wallFace) {
+    case 'left':
+      translate = [-tmp, -50, -0]
+      rotate = [0, 180, 0]
+      break
+    case 'right':
+      translate = [tmp, -50, 0]
+      rotate = [0, 0, 0]
+      break
+    case 'back':
+      translate = [0, -50, -tmp]
+      rotate = [0, 270, 0]
+      break
+    case 'front':
+      translate = [-0, -50, tmp]
+      rotate = [0, 90, 0]
+      break
+  }
+
+  const pos = move(...translate, [
+    left + wallX * UNIT,
+    0,
+    -(top + wallZ * UNIT),
+  ])
+  const angle = rotate
+
+  const ref = createItem(items.shape.cube, {
+    scale: 0.2,
+    collision: false,
+    interactive: false,
+  })
+
+  addScript((self) => {
+    return `
+// component: wall plug
+ON INIT {
+  ${getInjections('init', self)}
+  ACCEPT
+}
+ON INITEND {
+  TWEAK SKIN "[stone]_ground_caves_wet05" "socket-${config.variant ?? 'clean'}"
+  ACCEPT
+}
+    `
+  }, ref)
+
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+
   return ref
 }
 
@@ -847,6 +919,11 @@ const generate = async (config) => {
   )
 
   createExit(top, left, pickRandom(wallSegments), key, jumpscareCtrl)
+  pickRandoms(30, wallSegments).forEach((wallSegment) => {
+    createWallPlug(top, left, wallSegment, {
+      variant: pickRandom(['clean', 'dirty', 'old']),
+    })
+  })
 
   lootSlots.forEach(([x, z]) => {
     const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100

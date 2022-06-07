@@ -86,6 +86,10 @@ export const items = {
     native: true,
   },
   mechanisms: {
+    dissidentLock: {
+      src: 'fix_inter/dissident_lock/dissident_lock.teo',
+      native: true,
+    },
     pressurePlate: {
       src: 'fix_inter/pressurepad_gob/pressurepad_gob.teo',
       native: true,

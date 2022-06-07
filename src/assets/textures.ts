@@ -85,6 +85,11 @@ export const textures = {
       src: 'backrooms-[stone]-wall2.jpg',
       native: false,
     },
+    wallRail: {
+      path: 'projects/the-backrooms/textures',
+      src: 'backrooms-[stone]-wall2.jpg',
+      native: false,
+    },
     carpet: {
       path: 'projects/the-backrooms/textures',
       src: 'backrooms-[fabric]-carpet.jpg',
@@ -125,6 +130,32 @@ export const textures = {
       src: 'mold-edge.jpg',
       native: false,
       flags: POLY_QUAD | POLY_TRANS | POLY_NO_SHADOW,
+    },
+    socket: {
+      clean: {
+        path: 'projects/the-backrooms/textures',
+        src: 'socket-clean.bmp',
+        native: false,
+        flags: POLY_QUAD | POLY_NO_SHADOW,
+      },
+      dirty: {
+        path: 'projects/the-backrooms/textures',
+        src: 'socket-dirty.bmp',
+        native: false,
+        flags: POLY_QUAD | POLY_NO_SHADOW,
+      },
+      old: {
+        path: 'projects/the-backrooms/textures',
+        src: 'socket-old.bmp',
+        native: false,
+        flags: POLY_QUAD | POLY_NO_SHADOW,
+      },
+    },
+    rails: {
+      path: 'projects/the-backrooms/textures',
+      src: 'rails.bmp',
+      native: false,
+      flags: POLY_QUAD | POLY_NO_SHADOW,
     },
   },
   water: {
