@@ -42,7 +42,6 @@ import {
   createItem,
   items,
   addDependencyAs,
-  addDependency,
 } from '../../assets/items'
 import { getInjections, declare, color } from '../../scripting'
 import {
@@ -152,7 +151,11 @@ const addAmbientLight = (pos, config = {}) => {
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
 
-  addDependency('graph/levels/level1/map.bmp', ref)
+  addDependencyAs(
+    'blank-map.bmp',
+    `graph/levels/level${config.levelIdx}/map.bmp`,
+    ref,
+  )
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
     `graph/levels/level${config.levelIdx}/loading.bmp`,

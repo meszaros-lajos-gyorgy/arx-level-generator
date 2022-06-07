@@ -22,7 +22,6 @@ import {
   moveTo,
   addScript,
   addDependencyAs,
-  addDependency,
 } from '../../assets/items'
 import { declare, color, getInjections } from '../../scripting'
 import bridges from './bridges'
@@ -38,7 +37,11 @@ import { overridePlayerScript } from '../shared/player'
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
   declare('int', 'hadIntro', 0, ref)
-  addDependency('graph/levels/level1/map.bmp', ref)
+  addDependencyAs(
+    'blank-map.bmp',
+    `graph/levels/level${config.levelIdx}/map.bmp`,
+    ref,
+  )
   addDependencyAs(
     'projects/alias-nightmare/loading.bmp',
     `graph/levels/level${config.levelIdx}/loading.bmp`,
