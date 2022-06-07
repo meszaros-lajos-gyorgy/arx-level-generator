@@ -8,10 +8,10 @@ import wall from '../../prefabs/wall'
 
 export const getRadius = (grid) => (grid.length - 1) / 2
 
-const insertRoom = (left, top, width, height, grid) => {
+const insertRoom = (originX, originZ, width, height, grid) => {
   for (let z = 0; z < height; z++) {
     for (let x = 0; x < width; x++) {
-      grid[top + z][left + x] = 1
+      grid[originZ + z][originX + x] = 1
     }
   }
 }
@@ -22,10 +22,10 @@ const addFirstRoom = (width, height, grid) => {
   width = clamp(1, radius * 2 + 1, width)
   height = clamp(1, radius * 2 + 1, height)
 
-  const left = radius - Math.floor(width / 2)
-  const top = radius - Math.floor(height / 2)
+  const originX = radius - Math.floor(width / 2)
+  const originZ = radius - Math.floor(height / 2)
 
-  insertRoom(left, top, width, height, grid)
+  insertRoom(originX, originZ, width, height, grid)
 }
 
 const isEveryCellEmpty = (grid) => {
@@ -45,10 +45,10 @@ export const isOccupied = (x, z, grid) => {
   return grid[z][x] === 1
 }
 
-// starting from left/top does a width/height sized rectangle only occupy 0 slots?
-const canFitRoom = (left, top, width, height, grid) => {
-  for (let z = top; z < top + height; z++) {
-    for (let x = left; x < left + width; x++) {
+// starting from originX/originZ does a width/depth sized rectangle only occupy 0 slots?
+const canFitRoom = (originX, originZ, width, height, grid) => {
+  for (let z = originZ; z < originZ + height; z++) {
+    for (let x = originX; x < originX + width; x++) {
       if (isOccupied(x, z, grid) !== false) {
         return false
       }
@@ -267,8 +267,8 @@ const getBackWalls = (wallSegments) => {
 export const renderGrid = (grid, mapData) => {
   const { roomDimensions } = mapData.config
   const radius = getRadius(grid)
-  const top = -radius * UNIT + UNIT / 2
-  const left = -radius * UNIT + UNIT / 2
+  const originZ = -radius * UNIT + UNIT / 2
+  const originX = -radius * UNIT + UNIT / 2
 
   const wallSegments = []
 
@@ -343,7 +343,7 @@ export const renderGrid = (grid, mapData) => {
       if (grid[z][x] === 1) {
         setTexture(textures.backrooms.carpetDirty, mapData)
         plain(
-          [left + x * UNIT, 0, -(top + z * UNIT)],
+          [originX + x * UNIT, 0, -(originZ + z * UNIT)],
           [UNIT / 100, UNIT / 100],
           'floor',
           disableBumping,
@@ -355,7 +355,11 @@ export const renderGrid = (grid, mapData) => {
 
         setTexture(textures.backrooms.ceiling, mapData)
         plain(
-          [left + x * UNIT, -(UNIT * roomDimensions.height), -(top + z * UNIT)],
+          [
+            originX + x * UNIT,
+            -(UNIT * roomDimensions.height),
+            -(originZ + z * UNIT),
+          ],
           [UNIT / 100, UNIT / 100],
           'ceiling',
           disableBumping,
@@ -367,9 +371,9 @@ export const renderGrid = (grid, mapData) => {
   rightWalls.forEach(
     ({ x, z, width, isLeftCornerConcave, isRightCornerConcave }) => {
       const coords = [
-        left + x * UNIT - UNIT / 2,
+        originX + x * UNIT - UNIT / 2,
         0,
-        -(top + (z + width) * UNIT) - UNIT / 2,
+        -(originZ + (z + width) * UNIT) - UNIT / 2,
       ]
 
       setTexture(
@@ -438,9 +442,9 @@ export const renderGrid = (grid, mapData) => {
   leftWalls.forEach(
     ({ x, z, width, isLeftCornerConcave, isRightCornerConcave }) => {
       const coords = [
-        left + x * UNIT + UNIT / 2,
+        originX + x * UNIT + UNIT / 2,
         0,
-        -(top + (z + width) * UNIT) - UNIT / 2,
+        -(originZ + (z + width) * UNIT) - UNIT / 2,
       ]
 
       setTexture(
@@ -509,9 +513,9 @@ export const renderGrid = (grid, mapData) => {
   frontWalls.forEach(
     ({ x, z, width, isLeftCornerConcave, isRightCornerConcave }) => {
       const coords = [
-        left + (x - 1) * UNIT - UNIT / 2,
+        originX + (x - 1) * UNIT - UNIT / 2,
         0,
-        -(top + z * UNIT) - UNIT / 2,
+        -(originZ + z * UNIT) - UNIT / 2,
       ]
 
       setTexture(
@@ -580,9 +584,9 @@ export const renderGrid = (grid, mapData) => {
   backWalls.forEach(
     ({ x, z, width, isLeftCornerConcave, isRightCornerConcave }) => {
       const coords = [
-        left + (x - 1) * UNIT - UNIT / 2,
+        originX + (x - 1) * UNIT - UNIT / 2,
         0,
-        -(top + z * UNIT) + UNIT / 2,
+        -(originZ + z * UNIT) + UNIT / 2,
       ]
       setTexture(
         textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],

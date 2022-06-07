@@ -474,7 +474,13 @@ ON OPEN {
   return ref
 }
 
-const createExit = (top, left, wallSegment, key, jumpscareController) => {
+const createExit = (
+  originX,
+  originZ,
+  wallSegment,
+  key,
+  jumpscareController,
+) => {
   const [wallX, wallZ, wallFace] = wallSegment
 
   let translate = [0, 0, 0]
@@ -500,9 +506,9 @@ const createExit = (top, left, wallSegment, key, jumpscareController) => {
   }
 
   const pos = move(...translate, [
-    left + wallX * UNIT,
+    originX + wallX * UNIT,
     0,
-    -(top + wallZ * UNIT),
+    -(originZ + wallZ * UNIT),
   ])
   const angle = rotate
 
@@ -707,7 +713,7 @@ useTexture(textures.backrooms.socket.clean)
 useTexture(textures.backrooms.socket.dirty)
 useTexture(textures.backrooms.socket.old)
 
-const createWallPlug = (top, left, wallSegment, config = {}) => {
+const createWallPlug = (originX, originZ, wallSegment, config = {}) => {
   const [wallX, wallZ, wallFace] = wallSegment
 
   let translate = [0, 0, 0]
@@ -735,9 +741,9 @@ const createWallPlug = (top, left, wallSegment, config = {}) => {
   }
 
   const pos = move(...translate, [
-    left + wallX * UNIT,
+    originX + wallX * UNIT,
     0,
-    -(top + wallZ * UNIT),
+    -(originZ + wallZ * UNIT),
   ])
   const angle = rotate
 
@@ -828,8 +834,8 @@ const generate = async (config) => {
   renderGrid(grid, mapData)
 
   const radius = getRadius(grid)
-  const top = -radius * UNIT + UNIT / 2
-  const left = -radius * UNIT + UNIT / 2
+  const originZ = -radius * UNIT + UNIT / 2
+  const originX = -radius * UNIT + UNIT / 2
 
   const wallSegments = []
   const floors = []
@@ -852,9 +858,9 @@ const generate = async (config) => {
         if (x % 3 === 0 && z % 3 === 0) {
           lampsToBeCreated.push({
             pos: [
-              left + x * UNIT - 50 + offsetX,
+              originX + x * UNIT - 50 + offsetX,
               -(config.roomDimensions.height * UNIT - 10),
-              -(top + z * UNIT) - 50 + offsetZ,
+              -(originZ + z * UNIT) - 50 + offsetZ,
             ],
             config: {
               on: randomBetween(0, 100) < config.percentOfLightsOn,
@@ -863,9 +869,9 @@ const generate = async (config) => {
         } else {
           if (Math.random() < 0.05) {
             createCeilingDiffuser([
-              left + x * UNIT - 50 + offsetX,
+              originX + x * UNIT - 50 + offsetX,
               -(config.roomDimensions.height * UNIT - 5),
-              -(top + z * UNIT) - 50 + offsetZ,
+              -(originZ + z * UNIT) - 50 + offsetZ,
             ])
           }
         }
@@ -938,17 +944,17 @@ const generate = async (config) => {
   lootSlots.splice(keySlot, 1)
 
   const key = createKey(
-    [left + keyX * UNIT - 50, 0, -(top + keyZ * UNIT) - 50],
+    [originX + keyX * UNIT - 50, 0, -(originZ + keyZ * UNIT) - 50],
     [0, 0, 0],
     jumpscareCtrl,
   )
 
   pickRandoms(30, wallSegments).forEach((wallSegment, idx) => {
     if (idx === 0) {
-      createExit(top, left, wallSegment, key, jumpscareCtrl)
+      createExit(originX, originZ, wallSegment, key, jumpscareCtrl)
       return
     }
-    createWallPlug(top, left, wallSegment, {
+    createWallPlug(originX, originZ, wallSegment, {
       variant: pickRandom(['clean', 'dirty', 'old']),
     })
   })
@@ -957,9 +963,9 @@ const generate = async (config) => {
     const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const pos = [
-      left + x * UNIT - 50 + offsetX,
+      originX + x * UNIT - 50 + offsetX,
       0,
-      -(top + z * UNIT) - 50 + offsetZ,
+      -(originZ + z * UNIT) - 50 + offsetZ,
     ]
 
     const loot = pickRandomLoot(config.lootTable)
