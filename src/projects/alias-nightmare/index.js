@@ -91,8 +91,8 @@ const createFallSaver = (pos, target) => {
 
   declare('int', 'isCatching', 0, ref)
   addDependencyAs(
-    'projects/alias-nightmare/UruLink.wav',
-    `sfx/UruLink.wav`,
+    'projects/alias-nightmare/sfx/uru-link.wav',
+    `sfx/uru-link.wav`,
     ref,
   )
   addScript((self) => {
@@ -116,7 +116,7 @@ ON CONTROLLEDZONE_ENTER {
 
 >>FADEOUT {
   WORLDFADE OUT 300 ${color('black')}
-  PLAY -o "UruLink"
+  PLAY -o "uru-link"
   RETURN
 }
 
@@ -207,6 +207,7 @@ const generate = async (config) => {
   ]
 
   const welcomeMarker = createWelcomeMarker(islands[0].pos, config)
+
   /*
   createHangingCorpse([-300, -150, -200], [0, 145, 0], {
     name: "[public_falan_tomb]",

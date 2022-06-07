@@ -32,7 +32,7 @@ export const createGate = (orientation, props = {}) => {
 
   sounds.forEach((filename) => {
     addDependencyAs(
-      `projects/alias-nightmare/${filename}.wav`,
+      `projects/alias-nightmare/sfx/${filename}.wav`,
       `sfx/${filename}.wav`,
       ref,
     )
