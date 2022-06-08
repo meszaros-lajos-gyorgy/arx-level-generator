@@ -115,12 +115,15 @@ ON COMBINE {
         PLAY -p "thief_bag"
       }
     }
+    IF (${ref.state.variant} == "old") {
+      PLAY -p "thief_bag"
+    }
   }
   ACCEPT
 }
 
 >>ELECTROCUTE {
-  DO_DAMAGE player 5
+  QUAKE 300 500 10
   SPEAK -p "player_ouch_medium"
   PLAY "player_heartb"
   RETURN
