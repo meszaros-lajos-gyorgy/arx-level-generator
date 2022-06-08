@@ -162,9 +162,9 @@ const decalOffset2 = {
 
 const getRightWalls = (wallSegments) => {
   return wallSegments
-    .filter(([x, z, direction]) => direction === 'right')
-    .sort(([ax, az], [bx, bz]) => ax - bx || az - bz)
-    .reduce((walls, [x, z]) => {
+    .filter(([x, y, z, direction]) => direction === 'right')
+    .sort(([ax, ay, az], [bx, by, bz]) => ax - bx || ay - by || az - bz)
+    .reduce((walls, [x, y, z]) => {
       const adjacentWallIdx = walls.findIndex(
         (wall) => wall.x === x && wall.z + wall.width === z,
       )
@@ -188,9 +188,9 @@ const getRightWalls = (wallSegments) => {
 
 const getLeftWalls = (wallSegments) => {
   return wallSegments
-    .filter(([x, z, direction]) => direction === 'left')
-    .sort(([ax, az], [bx, bz]) => ax - bx || az - bz)
-    .reduce((walls, [x, z]) => {
+    .filter(([x, y, z, direction]) => direction === 'left')
+    .sort(([ax, ay, az], [bx, by, bz]) => ax - bx || ay - by || az - bz)
+    .reduce((walls, [x, y, z]) => {
       const adjacentWallIdx = walls.findIndex(
         (wall) => wall.x === x && wall.z + wall.width === z,
       )
@@ -214,9 +214,9 @@ const getLeftWalls = (wallSegments) => {
 
 const getFrontWalls = (wallSegments) => {
   return wallSegments
-    .filter(([x, z, direction]) => direction === 'front')
-    .sort(([ax, az], [bx, bz]) => az - bz || ax - bx)
-    .reduce((walls, [x, z]) => {
+    .filter(([x, y, z, direction]) => direction === 'front')
+    .sort(([ax, ay, az], [bx, by, bz]) => az - bz || ay - by || ax - bx)
+    .reduce((walls, [x, y, z]) => {
       const adjacentWallIdx = walls.findIndex(
         (wall) => wall.z === z && wall.x + wall.width === x,
       )
@@ -240,9 +240,9 @@ const getFrontWalls = (wallSegments) => {
 
 const getBackWalls = (wallSegments) => {
   return wallSegments
-    .filter(([x, z, direction]) => direction === 'back')
-    .sort(([ax, az], [bx, bz]) => az - bz || ax - bx)
-    .reduce((walls, [x, z]) => {
+    .filter(([x, y, z, direction]) => direction === 'back')
+    .sort(([ax, ay, az], [bx, by, bz]) => az - bz || ay - by || ax - bx)
+    .reduce((walls, [x, y, z]) => {
       const adjacentWallIdx = walls.findIndex(
         (wall) => wall.z === z && wall.x + wall.width === x,
       )
@@ -276,16 +276,16 @@ export const renderGrid = (grid, mapData) => {
     for (let x = 0; x < grid[z].length; x++) {
       if (grid[z][x] === 1) {
         if (isOccupied(x - 1, z, grid) !== true) {
-          wallSegments.push([x, z, 'right'])
+          wallSegments.push([x, 0, z, 'right'])
         }
         if (isOccupied(x + 1, z, grid) !== true) {
-          wallSegments.push([x, z, 'left'])
+          wallSegments.push([x, 0, z, 'left'])
         }
         if (isOccupied(x, z + 1, grid) !== true) {
-          wallSegments.push([x, z, 'front'])
+          wallSegments.push([x, 0, z, 'front'])
         }
         if (isOccupied(x, z - 1, grid) !== true) {
-          wallSegments.push([x, z, 'back'])
+          wallSegments.push([x, 0, z, 'back'])
         }
       }
     }
