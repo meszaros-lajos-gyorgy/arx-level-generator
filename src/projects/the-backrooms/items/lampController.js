@@ -5,7 +5,7 @@ import {
   createItem,
   items,
 } from '../../../assets/items'
-import { getInjections } from '../../../scripting'
+import { declare, getInjections } from '../../../scripting'
 
 export const createLampController = (pos, lamps) => {
   const ref = createItem(items.marker)

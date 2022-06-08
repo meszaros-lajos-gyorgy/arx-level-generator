@@ -18,8 +18,6 @@ export const defineWallPlug = () => {
   useTexture(textures.backrooms.socket.broken)
   useTexture(textures.backrooms.socket.old)
 
-  declare('int', 'wallPlugHasPower', 1, 'global')
-
   const ref = createRootItem(itemDesc, {
     name: '[item--wallplug]',
     interactive: true,
@@ -88,11 +86,12 @@ ON INITEND {
 }
 
 ON COMBINE {
-  IF (#wallPlugHasPower == 0) {
-    ACCEPT
-  }
-
   IF ("key_" isin ^CLASS_~^$PARAM1~) {
+    IF (#powerOn == 0) {
+      PLAY -p "thief_bag"
+      ACCEPT
+    }
+
     IF (${ref.state.variant} == "broken") {
       IF (^RND_100 < 70) {
         PLAY -p "sfx_spark"
@@ -100,10 +99,10 @@ ON COMBINE {
         IF (^RND_100 < 30) {
           GOSUB SHUTDOWN
         }
-      } ELSE {
-        PLAY -p "thief_bag"
+        ACCEPT
       }
     }
+
     IF (${ref.state.variant} == "old") {
       IF (^RND_100 < 30) {
         PLAY -p "sfx_spark"
@@ -111,27 +110,27 @@ ON COMBINE {
         IF (^RND_100 < 30) {
           GOSUB SHUTDOWN
         }
-      } ELSE {
-        PLAY -p "thief_bag"
+        ACCEPT
       }
     }
-    IF (${ref.state.variant} == "old") {
-      PLAY -p "thief_bag"
-    }
+
+    PLAY -p "thief_bag"
   }
+
   ACCEPT
 }
 
 >>ELECTROCUTE {
   QUAKE 300 500 10
-  SPEAK -p "player_ouch_medium"
-  PLAY "player_heartb"
+  SPEAK -op "player_ouch_medium"
+  PLAY -oil "player_heartb"
+  TIMERstopheartbeat -m 1 1700 PLAY -s "player_heartb"
   RETURN
 }
 
 >>SHUTDOWN {
-  SET #wallPlugHasPower 0
   SENDEVENT POWEROUT ${jumpscareCtrl.ref} NOP
+  TIMERsmalldelay -m 1 100 SET #powerOn 0
   RETURN
 }
     `

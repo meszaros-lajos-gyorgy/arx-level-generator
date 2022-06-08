@@ -439,7 +439,7 @@ ON POWEROUT {
 
   TIMERbaby -m 1 2000 PLAY -o "baby"
 
-  TIMERstopheartbeat -m 1 15000 PLAY -os "player_heartb"
+  TIMERstopheartbeat -m 1 15000 PLAY -s "player_heartb"
 
   TIMERambOff1 -m 1 15000 SENDEVENT OFF ${ambientLights.ceiling.ref} NOP
 
@@ -647,7 +647,7 @@ ON INVENTORYUSE {
     SENDEVENT SETSPEED player 0.5
     TIMERpenalty -m 1 7000 SENDEVENT SETSPEED player 1
     TIMERend -m 1 7000 PLAY -o "magic_spell_slow_down_end"
-    TIMERstopheartbeat -m 1 7000 PLAY -os "player_heartb"
+    TIMERstopheartbeat -m 1 7000 PLAY -s "player_heartb"
   }
 
   IF (${self.state.variant} == "speed") {
@@ -656,7 +656,7 @@ ON INVENTORYUSE {
     SENDEVENT SETSPEED player 2
     TIMERbonusend -m 1 10000 SENDEVENT SETSPEED player 1
     TIMERend -m 1 10000 PLAY -o "magic_spell_speedend"
-    TIMERstopheartbeat -m 1 10000 PLAY -os "player_heartb"
+    TIMERstopheartbeat -m 1 10000 PLAY -s "player_heartb"
   }
 
   OBJECT_HIDE SELF YES

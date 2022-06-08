@@ -18,6 +18,8 @@ export const defineCeilingLamp = () => {
   useTexture(textures.backrooms.ceilingLampOn)
   useTexture(textures.backrooms.ceilingLampOff)
 
+  declare('int', 'powerOn', 1, 'global')
+
   const ref = createRootItem(itemDesc, {
     interactive: false,
     mesh: 'polytrans/polytrans.teo',
@@ -87,6 +89,10 @@ ON INITEND {
 }
 
 ON ON {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   SET ${self.state.isOn} 1
   if (^$PARAM1 == "instant") {
     SET ${self.state.instantSwitching} 1
@@ -98,6 +104,10 @@ ON ON {
 }
 
 ON OFF {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   SET ${self.state.isOn} 0
   if (^$PARAM1 == "instant") {
     SET ${self.state.instantSwitching} 1
@@ -109,17 +119,29 @@ ON OFF {
 }
 
 ON SAVE {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   SET ${self.state.savedIsOn} ${self.state.isOn}
   ACCEPT
 }
 
 ON RESTORE {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   SET ${self.state.isOn} ${self.state.savedIsOn}
   GOTO SWITCH
   ACCEPT
 }
 
 ON RANDOM {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   IF (^RND_100 > 50) {
     SET ${self.state.isOn} 1
   } ELSE {
@@ -135,6 +157,10 @@ ON RANDOM {
 }
 
 ON HIT {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   IF (^$PARAM2 == "spell") {
     IF (lightning_strike isin ^$PARAM3) {
       SET ${self.state.caster} ~^SENDER~
@@ -226,12 +252,20 @@ ON HIT {
 }
 
 ON MUTE {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   SET ${self.state.muted} 1
   GOTO VOLUME
   ACCEPT
 }
 
 ON UNMUTE {
+  if (#powerOn == 0) {
+    ACCEPT
+  }
+
   SET ${self.state.muted} 0
   GOTO VOLUME
   ACCEPT
