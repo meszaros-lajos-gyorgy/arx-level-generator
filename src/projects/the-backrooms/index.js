@@ -63,6 +63,12 @@ import { createRune } from '../../items/createRune'
 import { addTranslations } from '../../assets/i18n'
 import translations from './i18n.json'
 import { defineWallPlug, createWallPlug } from './items/wallPlug'
+import {
+  hideHealthbar,
+  hideMinimap,
+  hideStealthIndicator,
+  removeSound,
+} from '../shared/reset'
 
 const addLamp = (pos, angle, config = {}) => {
   return (mapData) => {
@@ -151,21 +157,14 @@ const addAmbientLight = (pos, config = {}) => {
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
 
-  addDependencyAs(
-    'reset/map.bmp',
-    `graph/levels/level${config.levelIdx}/map.bmp`,
-    ref,
-  )
-  // addDependencyAs(
-  //   'reset/empty-gauge.bmp',
-  //   'graph/interface/bars/empty_gauge_red.bmp',
-  //   ref,
-  // )
-  // addDependencyAs(
-  //   'reset/filled-gauge.bmp',
-  //   'graph/interface/bars/filled_gauge_red.bmp',
-  //   ref,
-  // )
+  hideMinimap(config.levelIdx, ref)
+  hideHealthbar(ref)
+  hideStealthIndicator(ref)
+
+  removeSound('sfx/magic_spell_ignite.wav', ref)
+  removeSound('sfx/magic_spell_douse.wav', ref)
+  removeSound('sfx/player_level_up.wav', ref)
+
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
     `graph/levels/level${config.levelIdx}/loading.bmp`,
@@ -186,21 +185,7 @@ const createWelcomeMarker = (pos, config) => {
   //   'graph/interface/bars/empty_gauge_blue.bmp',
   //   ref,
   // )
-  addDependencyAs(
-    'projects/the-backrooms/sfx/no-sound.wav',
-    'sfx/magic_spell_ignite.wav',
-    ref,
-  )
-  addDependencyAs(
-    'projects/the-backrooms/sfx/no-sound.wav',
-    'sfx/magic_spell_douse.wav',
-    ref,
-  )
-  addDependencyAs(
-    'projects/the-backrooms/sfx/no-sound.wav',
-    'sfx/player_level_up.wav',
-    ref,
-  )
+
   declare('int', 'hasAam', 0, ref)
   declare('int', 'hasFolgora', 0, ref)
   declare('int', 'hasTaar', 0, ref)
