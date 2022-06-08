@@ -481,7 +481,7 @@ const createExit = (
   key,
   jumpscareController,
 ) => {
-  const [wallX, wallZ, wallFace] = wallSegment
+  const [wallX, wallY, wallZ, wallFace] = wallSegment
 
   let translate = [0, 0, 0]
   let rotate = [0, 0, 0]
@@ -714,7 +714,7 @@ useTexture(textures.backrooms.socket.dirty)
 useTexture(textures.backrooms.socket.old)
 
 const createWallPlug = (originX, originZ, wallSegment, config = {}) => {
-  const [wallX, wallZ, wallFace] = wallSegment
+  const [wallX, wallY, wallZ, wallFace] = wallSegment
 
   let translate = [0, 0, 0]
   let rotate = [0, 0, 0]
@@ -877,16 +877,16 @@ const generate = async (config) => {
         }
 
         if (isOccupied(x - 1, z, grid) !== true) {
-          wallSegments.push([x - 1, z, 'right'])
+          wallSegments.push([x - 1, 0, z, 'right'])
         }
         if (isOccupied(x + 1, z, grid) !== true) {
-          wallSegments.push([x + 1, z, 'left'])
+          wallSegments.push([x + 1, 0, z, 'left'])
         }
         if (isOccupied(x, z + 1, grid) !== true) {
-          wallSegments.push([x, z + 1, 'front'])
+          wallSegments.push([x, 0, z + 1, 'front'])
         }
         if (isOccupied(x, z - 1, grid) !== true) {
-          wallSegments.push([x, z - 1, 'back'])
+          wallSegments.push([x, 0, z - 1, 'back'])
         }
       }
     }
