@@ -62,7 +62,7 @@ import { UNIT, COLORS } from './constants'
 import { createRune } from '../../items/createRune'
 import { addTranslations } from '../../assets/i18n'
 import translations from './i18n.json'
-import { textures, useTexture } from '../../assets/textures'
+import { defineWallPlug, createWallPlug } from './items/wallPlug'
 
 const addLamp = (pos, angle, config = {}) => {
   return (mapData) => {
@@ -399,6 +399,15 @@ ON OPEN {
   ACCEPT
 }
 
+ON POWEROUT {
+  PLAY -p "sfx_electric"
+  PLAY -o power_down
+
+  SENDEVENT OFF ${lampCtrl.ref} NOP
+
+  ACCEPT
+}
+
 >>WHISPER_NOEXIT {
   SPEAK -p [whisper--no-exit]
   HEROSAY [whisper--no-exit]
@@ -707,35 +716,35 @@ ON INIT {
   return ref
 }
 
-// TODO: place this into definedWallPlug
-// TODO: render wallplugs as wallPlug instead of polytrans
-useTexture(textures.backrooms.socket.clean)
-useTexture(textures.backrooms.socket.dirty)
-useTexture(textures.backrooms.socket.old)
-
-const createWallPlug = (originX, originZ, wallSegment, config = {}) => {
+const placeWallPlug = (
+  originX,
+  originZ,
+  wallSegment,
+  config = {},
+  jumpscareCtrl,
+) => {
   const [wallX, wallY, wallZ, wallFace] = wallSegment
 
   let translate = [0, 0, 0]
   let rotate = [0, 0, 0]
 
-  const tmp = 91
+  const wallOffset = 91
 
   switch (wallFace) {
     case 'left':
-      translate = [-tmp, -50, -0]
+      translate = [-wallOffset, -50, -0]
       rotate = [0, 180, 0]
       break
     case 'right':
-      translate = [tmp, -50, 0]
+      translate = [wallOffset, -50, 0]
       rotate = [0, 0, 0]
       break
     case 'back':
-      translate = [0, -50, -tmp]
+      translate = [0, -50, -wallOffset]
       rotate = [0, 270, 0]
       break
     case 'front':
-      translate = [-0, -50, tmp]
+      translate = [-0, -50, wallOffset]
       rotate = [0, 90, 0]
       break
   }
@@ -747,31 +756,10 @@ const createWallPlug = (originX, originZ, wallSegment, config = {}) => {
   ])
   const angle = rotate
 
-  const ref = createItem(items.shape.cube, {
-    scale: 0.2,
-    collision: false,
-    interactive: false,
-  })
-
-  addScript((self) => {
-    return `
-// component: wall plug
-ON INIT {
-  ${getInjections('init', self)}
-  ACCEPT
+  return createWallPlug(pos, angle, config, jumpscareCtrl)
 }
-ON INITEND {
-  TWEAK SKIN "[stone]_ground_caves_wet05" "socket-${config.variant ?? 'clean'}"
-  ACCEPT
-}
-    `
-  }, ref)
 
-  moveTo({ type: 'relative', coords: pos }, angle, ref)
-  markAsUsed(ref)
-
-  return ref
-}
+defineWallPlug()
 
 const generate = async (config) => {
   const { origin } = config
@@ -949,14 +937,20 @@ const generate = async (config) => {
     jumpscareCtrl,
   )
 
-  pickRandoms(30, wallSegments).forEach((wallSegment, idx) => {
+  pickRandoms(20, wallSegments).forEach((wallSegment, idx) => {
     if (idx === 0) {
       createExit(originX, originZ, wallSegment, key, jumpscareCtrl)
       return
     }
-    createWallPlug(originX, originZ, wallSegment, {
-      variant: pickRandom(['clean', 'dirty', 'old']),
-    })
+    placeWallPlug(
+      originX,
+      originZ,
+      wallSegment,
+      {
+        variant: pickRandom(['clean', 'broken', 'old']),
+      },
+      jumpscareCtrl,
+    )
   })
 
   lootSlots.forEach(([x, z]) => {

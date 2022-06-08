@@ -19,7 +19,6 @@ export const defineCeilingLamp = () => {
   useTexture(textures.backrooms.ceilingLampOff)
 
   const ref = createRootItem(itemDesc, {
-    name: 'Ceiling Lamp',
     interactive: false,
     mesh: 'polytrans/polytrans.teo',
   })
@@ -30,6 +29,7 @@ export const defineCeilingLamp = () => {
   declare('int', 'muted', 0, ref)
   declare('int', 'oldMuted', -1, ref)
   declare('int', 'instantSwitching', 0, ref)
+  declare('string', 'caster', '', ref)
 
   addDependencyAs(
     'projects/the-backrooms/sfx/fluorescent-lamp-plink.wav',
@@ -137,6 +137,7 @@ ON RANDOM {
 ON HIT {
   IF (^$PARAM2 == "spell") {
     IF (lightning_strike isin ^$PARAM3) {
+      SET ${self.state.caster} ~^SENDER~
       SENDEVENT ON SELF ""
     }
     IF (douse isin ^$PARAM3) {
@@ -152,6 +153,10 @@ ON HIT {
   }
 
   SET ${self.state.oldIsOn} ${self.state.isOn}
+
+  IF (${self.state.caster} == "player") {
+    SET ${self.state.caster} ""
+  }
 
   if (${self.state.isOn} == 1) {
     if (${self.state.instantSwitching} == 1) {

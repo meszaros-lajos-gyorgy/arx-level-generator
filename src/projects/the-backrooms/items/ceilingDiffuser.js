@@ -17,7 +17,6 @@ export const defineCeilingDiffuser = () => {
   useTexture(textures.backrooms.ceilingDiffuser)
 
   const ref = createRootItem(itemDesc, {
-    name: 'Ceiling Diffuser',
     interactive: false,
     scale: 0.6,
     mesh: 'polytrans/polytrans.teo',

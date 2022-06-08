@@ -38,5 +38,17 @@
   "tutorial--lighting": {
     "english": "Fluorescent lights require electricity, try shooting them with a lightning bolt.",
     "deutsch": "Leuchtstofflampen benötigen Strom, versuchen Sie, sie mit einem Blitz zu schießen."
+  },
+  "item--wallplug": {
+    "english": "Wall outlet",
+    "deutsch": "Steckdose"
+  },
+  "item--wallplug-old": {
+    "english": "Old wall outlet",
+    "deutsch": "alte Steckdose"
+  },
+  "item--wallplug-broken": {
+    "english": "Broken wall outlet",
+    "deutsch": "kaputte Steckdose"
   }
 }

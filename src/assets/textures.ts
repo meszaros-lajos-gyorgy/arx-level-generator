@@ -138,9 +138,9 @@ export const textures = {
         native: false,
         flags: POLY_QUAD | POLY_NO_SHADOW,
       },
-      dirty: {
+      broken: {
         path: 'projects/the-backrooms/textures',
-        src: 'socket-dirty.bmp',
+        src: 'socket-broken.bmp',
         native: false,
         flags: POLY_QUAD | POLY_NO_SHADOW,
       },
