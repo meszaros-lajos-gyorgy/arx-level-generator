@@ -24,6 +24,7 @@ ON SAVE {
 }
 
 ON RESTORE {
+  HEROSAY "restore"
   ${lamps.map(({ ref }) => `SENDEVENT RESTORE ${ref} NOP`).join(`\n  `)}
   ACCEPT
 }

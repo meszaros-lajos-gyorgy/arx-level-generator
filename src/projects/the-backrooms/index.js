@@ -388,6 +388,7 @@ ON POWEROUT {
   PLAY -p "sfx_electric"
   PLAY -o power_down
 
+  SENDEVENT SAVE ${lampCtrl.ref} NOP
   SENDEVENT OFF ${lampCtrl.ref} NOP
 
   ACCEPT

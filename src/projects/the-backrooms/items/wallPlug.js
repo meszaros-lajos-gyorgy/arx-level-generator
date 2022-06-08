@@ -130,7 +130,7 @@ ON COMBINE {
 
 >>SHUTDOWN {
   SENDEVENT POWEROUT ${jumpscareCtrl.ref} NOP
-  TIMERsmalldelay -m 1 100 SET #powerOn 0
+  TIMERsmalldelay -m 1 200 SET #powerOn 0
   RETURN
 }
     `
