@@ -361,8 +361,6 @@ export const addDependency = (dependency, itemRef: ItemRef) => {
       usedItems[src].instances[id].dependencies.push(dependency)
     }
   }
-
-  return itemRef
 }
 
 export const addDependencyAs = (
@@ -385,8 +383,6 @@ export const addDependencyAs = (
       })
     }
   }
-
-  return itemRef
 }
 
 export const addScript = (
@@ -418,8 +414,6 @@ export const addScript = (
       }
     }
   }
-
-  return itemRef
 }
 
 export const moveTo = (
@@ -434,8 +428,6 @@ export const moveTo = (
     instance.pos = { x, y, z }
     instance.angle = { a, b, g }
   }
-
-  return itemRef
 }
 
 // an item marked as used will get copied to the output dir, otherwise it's discarded
@@ -452,8 +444,6 @@ export const markAsUsed = (itemRef: ItemRef) => {
       root.used = true
     }
   }
-
-  return itemRef
 }
 
 // source: https://stackoverflow.com/a/40011873/1806628
