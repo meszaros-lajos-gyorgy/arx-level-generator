@@ -741,11 +741,34 @@ export const cleanupCache = () => {
   resetTranslations()
 }
 
-export const pickRandomLoot = (lootTable) => {
-  const idx = pickRandom(
-    lootTable.flatMap(({ weight }, idx) => repeat(idx, weight)),
-  )
-  return lootTable[idx]
+export const sum = (numbers: number[]) => {
+  return numbers.reduce((sum, n) => sum + n, 0)
+}
+
+export const randomSort = <T>(items: T[]) => {
+  const clonedItems = clone(items)
+  const sortedItems: T[] = []
+
+  while (clonedItems.length) {
+    const idx = pickRandomIdx(clonedItems)
+    sortedItems.push(clonedItems.splice(idx, 1)[0])
+  }
+
+  return sortedItems
+}
+
+export const pickRandomLoot = (amount: number, lootTable: any[]) => {
+  const weights = lootTable.map(({ weight }) => weight)
+  const totalWeight = sum(weights)
+  const percentages = weights.map((weight) => weight / totalWeight)
+
+  const weightedLootTable = percentages
+    .map((weight, idx) => ({ idx, weight: Math.ceil(weight * amount) }))
+    .sort((a, b) => a.weight - b.weight)
+    .flatMap(({ weight, idx }) => repeat(lootTable[idx], weight))
+    .slice(0, amount)
+
+  return randomSort(weightedLootTable)
 }
 
 export const roundToNDecimals = (decimals: number, x: number) => {

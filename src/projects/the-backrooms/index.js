@@ -926,23 +926,32 @@ const generate = async (config) => {
     jumpscareCtrl,
   )
 
-  pickRandoms(20, wallSegments).forEach((wallSegment, idx) => {
+  const wallPlugTypes = pickRandomLoot(20, [
+    { variant: 'clean', weight: 7 },
+    { variant: 'old', weight: 4 },
+    { variant: 'broken', weight: 1 },
+  ])
+
+  pickRandoms(21, wallSegments).forEach((wallSegment, idx) => {
     if (idx === 0) {
       createExit(originX, originZ, wallSegment, key, jumpscareCtrl)
       return
     }
+
     placeWallPlug(
       originX,
       originZ,
       wallSegment,
       {
-        variant: pickRandom(['clean', 'broken', 'old']),
+        variant: wallPlugTypes[idx - 1].variant,
       },
       jumpscareCtrl,
     )
   })
 
-  lootSlots.forEach(([x, z]) => {
+  const generalLoot = pickRandomLoot(lootSlots.length, config.lootTable)
+
+  lootSlots.forEach(([x, z], idx) => {
     const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const pos = [
@@ -951,7 +960,7 @@ const generate = async (config) => {
       -(originZ + z * UNIT) - 50 + offsetZ,
     ]
 
-    const loot = pickRandomLoot(config.lootTable)
+    const loot = generalLoot[idx]
 
     switch (loot.name) {
       case 'almondWater':
@@ -960,7 +969,7 @@ const generate = async (config) => {
         }
         break
       default:
-        console.error('unknown item', loot)
+        console.error('unknown loot item', loot)
     }
   })
 

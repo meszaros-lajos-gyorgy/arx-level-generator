@@ -129,7 +129,7 @@ ON ACTION {
   PLAY -oil "player_heartb"
   TIMERstopheartbeat -m 1 1700 PLAY -s "player_heartb"
 
-  IF (^RND_100 < 70) {
+  IF (^RND_100 < 50) {
     GOSUB SHUTDOWN
   }
 
