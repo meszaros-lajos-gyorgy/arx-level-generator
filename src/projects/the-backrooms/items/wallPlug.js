@@ -88,6 +88,7 @@ ON INITEND {
 ON COMBINE {
   IF ("key_" isin ^CLASS_~^$PARAM1~) {
     GOSUB TOUCH_POWER
+    GOSUB SHUTDOWN
   }
 
   ACCEPT
@@ -103,18 +104,16 @@ ON ACTION {
     RETURN
   }
 
-  IF (${ref.state.variant} == "broken") {
-    IF (^RND_100 < 70) {
+  IF (${ref.state.variant} == "old") {
+    IF (^RND_100 < 50) {
       GOSUB ELECTROCUTE
       RETURN
     }
   }
 
-  IF (${ref.state.variant} == "old") {
-    IF (^RND_100 < 30) {
-      GOSUB ELECTROCUTE
-      RETURN
-    }
+  IF (${ref.state.variant} == "broken") {
+    GOSUB ELECTROCUTE
+    RETURN
   }
 
   PLAY -p "thief_bag"
@@ -123,16 +122,12 @@ ON ACTION {
 }
 
 >>ELECTROCUTE {
+  // TODO: drain all mana
   PLAY -p "sfx_spark"
   QUAKE 300 500 10
   SPEAK -op "player_ouch_medium"
   PLAY -oil "player_heartb"
   TIMERstopheartbeat -m 1 1700 PLAY -s "player_heartb"
-
-  IF (^RND_100 < 50) {
-    GOSUB SHUTDOWN
-  }
-
   RETURN
 }
 
