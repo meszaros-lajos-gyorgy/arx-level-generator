@@ -122,7 +122,7 @@ ON ACTION {
 }
 
 >>ELECTROCUTE {
-  // TODO: drain all mana
+  DODAMAGE -n player ^player_mana
   PLAY -p "sfx_spark"
   QUAKE 300 500 10
   SPEAK -op "player_ouch_medium"
