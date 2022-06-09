@@ -41,11 +41,11 @@ export const removeSound = (filename: string, anyItemRef: ItemRef) => {
   addDependencyAs('reset/no-sound.wav', filename, anyItemRef)
 }
 
-export const useGlebRodinsFont = (anyItemRef: ItemRef) => {
+export const useWillowModifiedFont = (anyItemRef: ItemRef) => {
   ;['arx.ttf', 'arx_base.ttf', 'arx_default.ttf', 'arx_russian.ttf'].forEach(
     (filename) => {
       addDependencyAs(
-        `reset/font/glebRodin/${filename}`,
+        `reset/font/willow-modified/${filename}`,
         `misc/${filename}`,
         anyItemRef,
       )

@@ -68,7 +68,7 @@ import {
   hideMinimap,
   hideStealthIndicator,
   removeSound,
-  useGlebRodinsFont,
+  useWillowModifiedFont,
 } from '../shared/reset'
 
 const addLamp = (pos, angle, config = {}) => {
@@ -166,7 +166,7 @@ const createWelcomeMarker = (pos, config) => {
   removeSound('sfx/magic_spell_douse.wav', ref)
   removeSound('sfx/player_level_up.wav', ref)
 
-  useGlebRodinsFont(ref)
+  useWillowModifiedFont(ref)
 
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
