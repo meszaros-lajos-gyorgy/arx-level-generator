@@ -561,7 +561,6 @@ export const exportDependencies = (outputDir: string) => {
 }
 
 export const resetItems = () => {
-  // https://bobbyhadz.com/blog/javascript-clear-object-delete-all-properties#clear-an-object-in-javascript
   for (const key in usedItems) {
     delete usedItems[key]
   }
