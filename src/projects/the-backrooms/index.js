@@ -348,7 +348,9 @@ ON PICKUP {
   }
 
   if (^$PARAM1 == "key:exit") {
-    GOSUB BABY
+    if (#powerOn == 1) {
+      GOSUB BABY
+    }
   }
 
   ACCEPT
