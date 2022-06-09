@@ -301,6 +301,8 @@ const createJumpscareController = (pos, lampCtrl, ambientLights, config) => {
   declare('int', 'harmfulAlmondWaterCounter', 0, ref)
   declare('int', 'previousHarmfulAlmondWaterCounter', -1, ref)
   declare('int', 'hadTutorialPowerout', 0, ref)
+  declare('int', 'whisperEnabled', 1, ref)
+  declare('int', 'hadBabyHallucination', 0, ref)
 
   addScript((self) => {
     return `
@@ -314,7 +316,6 @@ ON INIT {
   INC #smellTrigger 40000
 
   TIMERnoexit -m 1 #noexitTrigger GOSUB WHISPER_NOEXIT
-
   TIMERsmell -m 1 #smellTrigger GOSUB WHISPER_SMELL
 
   ACCEPT
@@ -349,7 +350,10 @@ ON PICKUP {
 
   if (^$PARAM1 == "key:exit") {
     if (#powerOn == 1) {
-      GOSUB BABY
+      if (${self.state.hadBabyHallucination} == 0) {
+        set ${self.state.hadBabyHallucination} 1
+        GOSUB BABY
+      }
     }
   }
 
@@ -393,36 +397,67 @@ ON POWEROUT {
 }
 
 >>WHISPER_NOEXIT {
-  SPEAK -p [whisper--no-exit]
+  IF (${self.state.whisperEnabled} == 0) {
+    RETURN
+  }
+  SET ${self.state.whisperEnabled} 0
+  SPEAK -p [whisper--no-exit] TIMERspeakAgain -m 1 200 SET ${
+    self.state.whisperEnabled
+  } 1
   HEROSAY [whisper--no-exit]
   RETURN
 }
 
 >>WHISPER_DRINK1 {
-  SPEAK -p [whisper--drink-the-almond-water]
+  IF (${self.state.whisperEnabled} == 0) {
+    RETURN
+  }
+  SET ${self.state.whisperEnabled} 0
+  SPEAK -p [whisper--drink-the-almond-water] TIMERspeakAgain -m 1 200 SET ${
+    self.state.whisperEnabled
+  } 1
   HEROSAY [whisper--drink-the-almond-water]
   RETURN
 }
 
 >>WHISPER_DRINK2 {
-  SPEAK -p [whisper--drink-it]
+  IF (${self.state.whisperEnabled} == 0) {
+    RETURN
+  }
+  SET ${self.state.whisperEnabled} 0
+  SPEAK -p [whisper--drink-it] TIMERspeakAgain -m 1 200 SET ${
+    self.state.whisperEnabled
+  } 1
   HEROSAY [whisper--drink-it]
   RETURN
 }
 
 >>WHISPER_SMELL {
-  SPEAK -p [whisper--do-you-smell-it]
+  IF (${self.state.whisperEnabled} == 0) {
+    RETURN
+  }
+  SET ${self.state.whisperEnabled} 0
+  SPEAK -p [whisper--do-you-smell-it] TIMERspeakAgain -m 1 200 SET ${
+    self.state.whisperEnabled
+  } 1
   HEROSAY [whisper--do-you-smell-it]
   RETURN
 }
 
 >>WHISPER_MAGIC {
-  SPEAK -p [whisper--magic-wont-save-you]
+  IF (${self.state.whisperEnabled} == 0) {
+    RETURN
+  }
+  SET ${self.state.whisperEnabled} 0
+  SPEAK -p [whisper--magic-wont-save-you] TIMERspeakAgain -m 1 200 SET ${
+    self.state.whisperEnabled
+  } 1
   HEROSAY [whisper--magic-wont-save-you]
   RETURN
 }
 
 >>BABY {
+  SET ${self.state.whisperEnabled} 0
   PLAY -o "magic_spell_slow_down"
   PLAY -o "strange_noise1"
   PLAY -oil "player_heartb"
@@ -436,20 +471,26 @@ ON POWEROUT {
   SENDEVENT MUTE ${lampCtrl.ref} NOP
   SENDEVENT OFF ${lampCtrl.ref} "instant"
 
+  TIMERpowerOff -m 1 100 SET #powerOn 0
+
   TIMERbaby -m 1 2000 PLAY -o "baby"
 
   TIMERstopheartbeat -m 1 15000 PLAY -s "player_heartb"
 
   TIMERambOff1 -m 1 15000 SENDEVENT OFF ${ambientLights.ceiling.ref} NOP
 
+  TIMERpowerOn -m 1 14900 SET #powerOn 1
   TIMERlampUnmute -m 1 15000 SENDEVENT UNMUTE ${lampCtrl.ref} NOP
   TIMERend -m 1 15500 SENDEVENT RESTORE ${lampCtrl.ref} NOP
-  TIMERspeedrestore -m 1 15500 SENDEVENT SETSPEED player 1
+  TIMERspeedrestore -m 1 15500 SENDEVENT SETSPEED player 1 SET ${
+    self.state.whisperEnabled
+  } 1
 
   RETURN
 }
 
 >>OUTRO {
+  SET ${self.state.whisperEnabled} 0
   TIMERmute -m 1 1500 SENDEVENT MUTE ${lampCtrl.ref} NOP
   PLAYERINTERFACE HIDE
   SETPLAYERCONTROLS OFF
