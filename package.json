@@ -28,7 +28,8 @@
     "color-rgba": "^2.4.0",
     "nanoid": "^3.3.4",
     "node-pkware": "^1.0.1",
-    "seedrandom": "^3.0.5"
+    "seedrandom": "^3.0.5",
+    "tiny-glob": "^0.2.9"
   },
   "devDependencies": {
     "@types/color-rgba": "^2.1.0",

@@ -12,6 +12,7 @@ esbuild ./src/generate.ts\
   --external:color-rgba\
   --external:nanoid\
   --external:node-pkware\
-  --external:seedrandom
+  --external:seedrandom\
+  --external:tiny-glob
 
 node --require dotenv/config --enable-source-maps ./build/generate.js

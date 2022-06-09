@@ -514,7 +514,11 @@ export const exportScripts = (outputDir: string) => {
   }, {} as Record<string, string>)
 }
 
-export const exportDependencies = (outputDir: string) => {
+const resolveGlob = async (source, target) => {
+  return [[source, target]]
+}
+
+export const exportDependencies = async (outputDir: string) => {
   const copyOfUsedItems = clone(usedItems)
 
   const itemsToBeExported = Object.values(copyOfUsedItems)
@@ -530,24 +534,39 @@ export const exportDependencies = (outputDir: string) => {
     ({ dependencies }) => dependencies,
   )
 
-  const uniqDependencies = uniq(dependencies)
+  const rootPath = getRootPath()
 
-  return uniqDependencies.reduce((files, dependency) => {
+  return uniq(dependencies).reduce(async (accumulatorP, dependency) => {
+    let source: string
+    let target: string
+
     if (typeof dependency === 'object') {
-      const { target, source } = dependency
-      const { dir: dir1, name: name1, ext: ext1 } = path.parse(target)
-      const { dir: dir2, name: name2, ext: ext2 } = path.parse(source)
-      files[
-        `${outputDir}/${dir1}/${name1}${ext1}`
-      ] = `${getRootPath()}/assets/${dir2}/${name2}${ext2}`
+      const {
+        dir: dir1,
+        name: name1,
+        ext: ext1,
+      } = path.parse(dependency.target)
+      const {
+        dir: dir2,
+        name: name2,
+        ext: ext2,
+      } = path.parse(dependency.source)
+      source = `${rootPath}/assets/${dir2}/${name2}${ext2}`
+      target = `${outputDir}/${dir1}/${name1}${ext1}`
     } else {
       const { dir, name, ext } = path.parse(dependency)
-      const target = `${outputDir}/${dir}/${name}${ext}`
-      files[target] = `${getRootPath()}/assets/${dir}/${name}${ext}`
+      source = `${rootPath}/assets/${dir}/${name}${ext}`
+      target = `${outputDir}/${dir}/${name}${ext}`
     }
 
+    const files = await accumulatorP
+
+    ;(await resolveGlob(source, target)).forEach(([source, target]) => {
+      files[target] = source
+    })
+
     return files
-  }, {} as Record<string, string>)
+  }, Promise.resolve({}) as Promise<Record<string, string>>)
 }
 
 export const resetItems = () => {

@@ -168,26 +168,13 @@ const createWelcomeMarker = (pos, config) => {
 
   useWillowModifiedFont(ref)
 
+  // addDependencyAs('projects/the-backrooms/graph/**/*', 'graph', ref)
+
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
     `graph/levels/level${config.levelIdx}/loading.bmp`,
     ref,
   )
-  // addDependencyAs(
-  //   'projects/the-backrooms/interface/progressbar.bmp',
-  //   `graph/interface/menus/load_full_level.bmp`,
-  //   ref,
-  // )
-  // addDependencyAs(
-  //   'projects/the-backrooms/interface/battery-full.bmp',
-  //   'graph/interface/bars/filled_gauge_blue.bmp',
-  //   ref,
-  // )
-  // addDependencyAs(
-  //   'projects/the-backrooms/interface/battery-empty.bmp',
-  //   'graph/interface/bars/empty_gauge_blue.bmp',
-  //   ref,
-  // )
 
   declare('int', 'hasAam', 0, ref)
   declare('int', 'hasFolgora', 0, ref)

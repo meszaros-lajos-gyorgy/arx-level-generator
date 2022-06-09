@@ -367,8 +367,8 @@ export const saveToDisk = async (finalizedMapData) => {
   let scripts = exportScripts(outputDir)
   let textures = exportTextures(outputDir)
   let ambiences = exportAmbiences(outputDir)
-  let dependencies = exportDependencies(outputDir)
   let translations = exportTranslations(outputDir)
+  let dependencies = await exportDependencies(outputDir)
 
   const files = {
     fts: `${outputDir}/game/graph/levels/level${levelIdx}/fast.fts.json`,
