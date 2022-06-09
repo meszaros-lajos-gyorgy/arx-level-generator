@@ -300,6 +300,7 @@ const createJumpscareController = (pos, lampCtrl, ambientLights, config) => {
   declare('int', 'magicCntr', 0, ref)
   declare('int', 'harmfulAlmondWaterCounter', 0, ref)
   declare('int', 'previousHarmfulAlmondWaterCounter', -1, ref)
+  declare('int', 'hadTutorialPowerout', 0, ref)
 
   addScript((self) => {
     return `
@@ -381,6 +382,11 @@ ON POWEROUT {
   SENDEVENT SAVE ${lampCtrl.ref} NOP
   SENDEVENT OFF ${lampCtrl.ref} NOP
 
+  IF(${self.state.hadTutorialPowerout} == 0) {
+    SET ${self.state.hadTutorialPowerout} 1
+    TIMERtutorial -m 1 2000 GOSUB TUTORIAL_POWEROUT
+  }
+
   ACCEPT
 }
 
@@ -449,6 +455,13 @@ ON POWEROUT {
   PLAY -o "backrooms-outro" // [o] = emit from player
   TIMERfadeout2 -m 1 18180 WORLDFADE OUT 0 ${color('black')}
   TIMERendgame -m 1 20000 END_GAME
+  RETURN
+}
+
+>>TUTORIAL_POWEROUT {
+  PLAY -o "system"
+  HEROSAY [tutorial--powerout]
+  QUEST [tutorial--powerout]
   RETURN
 }
     `

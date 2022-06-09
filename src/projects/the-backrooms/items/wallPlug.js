@@ -87,44 +87,52 @@ ON INITEND {
 
 ON COMBINE {
   IF ("key_" isin ^CLASS_~^$PARAM1~) {
-    IF (#powerOn == 0) {
-      PLAY -p "thief_bag"
-      ACCEPT
-    }
-
-    IF (${ref.state.variant} == "broken") {
-      IF (^RND_100 < 70) {
-        PLAY -p "sfx_spark"
-        GOSUB ELECTROCUTE
-        IF (^RND_100 < 30) {
-          GOSUB SHUTDOWN
-        }
-        ACCEPT
-      }
-    }
-
-    IF (${ref.state.variant} == "old") {
-      IF (^RND_100 < 30) {
-        PLAY -p "sfx_spark"
-        GOSUB ELECTROCUTE
-        IF (^RND_100 < 30) {
-          GOSUB SHUTDOWN
-        }
-        ACCEPT
-      }
-    }
-
-    PLAY -p "thief_bag"
+    GOSUB TOUCH_POWER
   }
 
   ACCEPT
 }
 
+ON ACTION {
+  GOSUB TOUCH_POWER
+  ACCEPT
+}
+
+>>TOUCH_POWER {
+  IF (#powerOn == 0) {
+    RETURN
+  }
+
+  IF (${ref.state.variant} == "broken") {
+    IF (^RND_100 < 70) {
+      GOSUB ELECTROCUTE
+      RETURN
+    }
+  }
+
+  IF (${ref.state.variant} == "old") {
+    IF (^RND_100 < 30) {
+      GOSUB ELECTROCUTE
+      RETURN
+    }
+  }
+
+  PLAY -p "thief_bag"
+
+  RETURN
+}
+
 >>ELECTROCUTE {
+  PLAY -p "sfx_spark"
   QUAKE 300 500 10
   SPEAK -op "player_ouch_medium"
   PLAY -oil "player_heartb"
   TIMERstopheartbeat -m 1 1700 PLAY -s "player_heartb"
+
+  IF (^RND_100 < 70) {
+    GOSUB SHUTDOWN
+  }
+
   RETURN
 }
 
