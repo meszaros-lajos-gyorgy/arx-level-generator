@@ -525,13 +525,11 @@ const resolveGlob = async (source, target) => {
     return [[source, target]]
   }
 
-  // TODO: handle globs
+  const root = source.match(/^[^*{]*/)[0].replace(/\/$/, '')
 
-  console.log('-----------------')
-  console.log(target)
-  console.log(sources)
-
-  return []
+  return sources.map((source) => {
+    return [source, source.replace(root, target)]
+  })
 }
 
 export const exportDependencies = async (outputDir: string) => {
