@@ -9,6 +9,7 @@ import {
 } from '../types'
 import { getRootPath } from '../rootpath'
 import { PLAYER_HEIGHT_ADJUSTMENT } from '../constants'
+import glob from 'tiny-glob'
 
 export type InjectableProps = {
   name?: string
@@ -515,7 +516,22 @@ export const exportScripts = (outputDir: string) => {
 }
 
 const resolveGlob = async (source, target) => {
-  return [[source, target]]
+  const sources = await glob(source, { absolute: true })
+  if (sources.length === 0) {
+    return []
+  }
+
+  if (sources.length === 1 && sources[0] === source) {
+    return [[source, target]]
+  }
+
+  // TODO: handle globs
+
+  console.log('-----------------')
+  console.log(target)
+  console.log(sources)
+
+  return []
 }
 
 export const exportDependencies = async (outputDir: string) => {
@@ -552,11 +568,15 @@ export const exportDependencies = async (outputDir: string) => {
         ext: ext2,
       } = path.parse(dependency.source)
       source = `${rootPath}/assets/${dir2}/${name2}${ext2}`
-      target = `${outputDir}/${dir1}/${name1}${ext1}`
+      target = [outputDir, dir1, `${name1}${ext1}`]
+        .filter((p) => p.length > 0)
+        .join('/')
     } else {
       const { dir, name, ext } = path.parse(dependency)
       source = `${rootPath}/assets/${dir}/${name}${ext}`
-      target = `${outputDir}/${dir}/${name}${ext}`
+      target = [outputDir, dir, `${name}${ext}`]
+        .filter((p) => p.length > 0)
+        .join('/')
     }
 
     const files = await accumulatorP

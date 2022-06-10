@@ -168,7 +168,7 @@ const createWelcomeMarker = (pos, config) => {
 
   useWillowModifiedFont(ref)
 
-  // addDependencyAs('projects/the-backrooms/graph/**/*', 'graph', ref)
+  addDependencyAs('projects/the-backrooms/graph/**/*.{jpg,bmp}', 'graph', ref)
 
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
