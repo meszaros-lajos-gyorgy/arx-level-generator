@@ -40,8 +40,8 @@
     "deutsch": "Leuchtstofflampen benötigen Strom, versuchen Sie, sie mit einem Blitz zu schießen."
   },
   "tutorial--powerout": {
-    "english": "The breaker popped! Find the breaker and turn the electricity back on.",
-    "deutsch": "Die Sicherung ist rausgeflogen! Finde Die Sicherung und stell den Strom wieder an."
+    "english": "The breaker popped!",
+    "deutsch": "Die Sicherung ist rausgeflogen!"
   },
   "item--wallplug": {
     "english": "Wall outlet",
