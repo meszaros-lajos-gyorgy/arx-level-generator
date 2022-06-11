@@ -8,7 +8,7 @@ import wall from '../../prefabs/wall'
 
 export const getRadius = (grid) => (grid.length - 1) / 2
 
-const insertRoom = (originX, originY, originZ, width, depth, grid) => {
+const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
   for (let z = 0; z < depth; z++) {
     for (let x = 0; x < width; x++) {
       grid[originZ + z][originX + x] = 1
@@ -16,17 +16,18 @@ const insertRoom = (originX, originY, originZ, width, depth, grid) => {
   }
 }
 
-const addFirstRoom = (width, depth, grid) => {
+const addFirstRoom = (width, height, depth, grid) => {
   const radius = getRadius(grid)
 
   width = clamp(1, radius * 2 + 1, width)
+  height = clamp(1, radius * 2 + 1, height)
   depth = clamp(1, radius * 2 + 1, depth)
 
   const originX = radius - Math.floor(width / 2)
-  const originY = 0
+  const originY = radius - Math.floor(height / 2)
   const originZ = radius - Math.floor(depth / 2)
 
-  insertRoom(originX, originY, originZ, width, depth, grid)
+  insertRoom(originX, originY, originZ, width, height, depth, grid)
 }
 
 const isEveryCellEmpty = (grid) => {
@@ -107,7 +108,7 @@ export const generateGrid = (size) => {
 
 export const addRoom = (width, height, depth, grid) => {
   if (isEveryCellEmpty(grid)) {
-    addFirstRoom(width, depth, grid)
+    addFirstRoom(width, height, depth, grid)
     return true
   }
 
@@ -143,7 +144,7 @@ export const addRoom = (width, height, depth, grid) => {
 
   const [startX, startY, startZ] = pickRandom(variants)
 
-  insertRoom(startX, startY, startZ, width, depth, grid)
+  insertRoom(startX, startY, startZ, width, height, depth, grid)
   return true
 }
 
