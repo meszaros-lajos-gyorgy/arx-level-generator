@@ -869,7 +869,7 @@ const generate = async (config) => {
 
   for (let z = 0; z < grid.length; z++) {
     let y = 0
-    for (let x = 0; x < grid[z].length; x++) {
+    for (let x = 0; x < grid[z][0].length; x++) {
       if (isOccupied(x, y, z, grid)) {
         floors.push([x, y, z])
 

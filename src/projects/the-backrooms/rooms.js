@@ -12,7 +12,7 @@ const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
   for (let z = 0; z < depth; z++) {
     let y = 0
     for (let x = 0; x < width; x++) {
-      grid[originZ + z][originX + x] = 1
+      grid[originZ + z][0][originX + x] = 1
     }
   }
 }
@@ -41,11 +41,11 @@ export const isOccupied = (x, y, z, grid) => {
   if (typeof grid[z] === 'undefined') {
     return null
   }
-  if (typeof grid[z][x] === 'undefined') {
+  if (typeof grid[z][0][x] === 'undefined') {
     return null
   }
 
-  return grid[z][x] === 1
+  return grid[z][0][x] === 1
 }
 
 // starting from originX/originZ does a width/depth sized rectangle only occupy 0 slots?
@@ -108,8 +108,7 @@ export const generateGrid = (size) => {
 
   const [sizeX, sizeY, sizeZ] = [size, size, size]
 
-  return times(() => repeat(0, sizeX), sizeZ)
-  // return times(() => times(() => repeat(0, sizeX), sizeY), sizeZ)
+  return times(() => times(() => repeat(0, sizeX), sizeY), sizeZ)
 }
 
 export const addRoom = (width, height, depth, grid) => {
@@ -122,8 +121,8 @@ export const addRoom = (width, height, depth, grid) => {
 
   for (let z = 0; z < grid.length; z++) {
     let y = 0
-    for (let x = 0; x < grid[z].length; x++) {
-      if (grid[z][x] !== 1) {
+    for (let x = 0; x < grid[z][0].length; x++) {
+      if (grid[z][0][x] !== 1) {
         if (isConnected(x, y, z, grid)) {
           candidates.push([x, y, z])
         }
@@ -284,8 +283,8 @@ export const renderGrid = (grid, mapData) => {
 
   for (let z = 0; z < grid.length; z++) {
     let y = 0
-    for (let x = 0; x < grid[z].length; x++) {
-      if (grid[z][x] === 1) {
+    for (let x = 0; x < grid[z][0].length; x++) {
+      if (grid[z][0][x] === 1) {
         if (isOccupied(x - 1, y, z, grid) !== true) {
           wallSegments.push([x, 0, z, 'right'])
         }
@@ -350,31 +349,33 @@ export const renderGrid = (grid, mapData) => {
   })
 
   for (let z = 0; z < grid.length; z++) {
-    for (let x = 0; x < grid[z].length; x++) {
-      if (grid[z][x] === 1) {
-        setTexture(textures.backrooms.carpetDirty, mapData)
-        plain(
-          [originX + x * UNIT, 0, -(originZ + z * UNIT)],
-          [UNIT / 100, UNIT / 100],
-          'floor',
-          disableBumping,
-          () => ({
-            textureRotation: pickRandom([0, 90, 180, 270]),
-            textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-          }),
-        )(mapData)
+    for (let y = 0; y < grid.length; y++) {
+      for (let x = 0; x < grid[z][y].length; x++) {
+        if (grid[z][y][x] === 1) {
+          setTexture(textures.backrooms.carpetDirty, mapData)
+          plain(
+            [originX + x * UNIT, 0, -(originZ + z * UNIT)],
+            [UNIT / 100, UNIT / 100],
+            'floor',
+            disableBumping,
+            () => ({
+              textureRotation: pickRandom([0, 90, 180, 270]),
+              textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+            }),
+          )(mapData)
 
-        setTexture(textures.backrooms.ceiling, mapData)
-        plain(
-          [
-            originX + x * UNIT,
-            -(UNIT * roomDimensions.height),
-            -(originZ + z * UNIT),
-          ],
-          [UNIT / 100, UNIT / 100],
-          'ceiling',
-          disableBumping,
-        )(mapData)
+          setTexture(textures.backrooms.ceiling, mapData)
+          plain(
+            [
+              originX + x * UNIT,
+              -(UNIT * roomDimensions.height),
+              -(originZ + z * UNIT),
+            ],
+            [UNIT / 100, UNIT / 100],
+            'ceiling',
+            disableBumping,
+          )(mapData)
+        }
       }
     }
   }
