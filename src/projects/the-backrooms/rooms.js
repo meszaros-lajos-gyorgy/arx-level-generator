@@ -10,6 +10,7 @@ export const getRadius = (grid) => (grid.length - 1) / 2
 
 const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
   for (let z = 0; z < depth; z++) {
+    let y = 0
     for (let x = 0; x < width; x++) {
       grid[originZ + z][originX + x] = 1
     }
@@ -36,7 +37,7 @@ const isEveryCellEmpty = (grid) => {
 }
 
 // is the x/z position of the grid === 1 ?
-export const isOccupied = (x, z, grid) => {
+export const isOccupied = (x, y, z, grid) => {
   if (typeof grid[z] === 'undefined') {
     return null
   }
@@ -50,8 +51,9 @@ export const isOccupied = (x, z, grid) => {
 // starting from originX/originZ does a width/depth sized rectangle only occupy 0 slots?
 const canFitRoom = (originX, originZ, width, depth, grid) => {
   for (let z = originZ; z < originZ + depth; z++) {
+    let y = 0
     for (let x = originX; x < originX + width; x++) {
-      if (isOccupied(x, z, grid) !== false) {
+      if (isOccupied(x, y, z, grid) !== false) {
         return false
       }
     }
@@ -75,12 +77,12 @@ const canFitRoomAtPos = (x, z, width, depth, grid) => {
 }
 
 // is the x/z slot surrounded by at least 1 slot containing 1? (north/south/east/west, no diagonals)
-const isConnected = (x, z, grid) => {
+const isConnected = (x, y, z, grid) => {
   return (
-    isOccupied(x - 1, z, grid) ||
-    isOccupied(x + 1, z, grid) ||
-    isOccupied(x, z - 1, grid) ||
-    isOccupied(x, z + 1, grid)
+    isOccupied(x - 1, y, z, grid) ||
+    isOccupied(x + 1, y, z, grid) ||
+    isOccupied(x, y, z - 1, grid) ||
+    isOccupied(x, y, z + 1, grid)
   )
 }
 
@@ -88,9 +90,10 @@ const getFittingVariants = (x, y, z, width, depth, grid) => {
   const variations = []
 
   for (let k = 0; k < depth; k++) {
+    let j = 0
     for (let i = 0; i < width; i++) {
       if (canFitRoom(x - i, z - k, width, depth, grid)) {
-        variations.push([x - i, 0, z - k])
+        variations.push([x - i, y - j, z - k])
       }
     }
   }
@@ -103,7 +106,9 @@ export const generateGrid = (size) => {
     size++
   }
 
-  return times(() => repeat(0, size), size)
+  const [sizeX, sizeY, sizeZ] = [size, size, size]
+
+  return times(() => repeat(0, sizeX), sizeZ)
 }
 
 export const addRoom = (width, height, depth, grid) => {
@@ -115,10 +120,11 @@ export const addRoom = (width, height, depth, grid) => {
   let candidates = []
 
   for (let z = 0; z < grid.length; z++) {
+    let y = 0
     for (let x = 0; x < grid[z].length; x++) {
       if (grid[z][x] !== 1) {
-        if (isConnected(x, z, grid)) {
-          candidates.push([x, 0, z])
+        if (isConnected(x, y, z, grid)) {
+          candidates.push([x, y, z])
         }
       }
     }
@@ -276,18 +282,19 @@ export const renderGrid = (grid, mapData) => {
   const wallSegments = []
 
   for (let z = 0; z < grid.length; z++) {
+    let y = 0
     for (let x = 0; x < grid[z].length; x++) {
       if (grid[z][x] === 1) {
-        if (isOccupied(x - 1, z, grid) !== true) {
+        if (isOccupied(x - 1, y, z, grid) !== true) {
           wallSegments.push([x, 0, z, 'right'])
         }
-        if (isOccupied(x + 1, z, grid) !== true) {
+        if (isOccupied(x + 1, y, z, grid) !== true) {
           wallSegments.push([x, 0, z, 'left'])
         }
-        if (isOccupied(x, z + 1, grid) !== true) {
+        if (isOccupied(x, y, z + 1, grid) !== true) {
           wallSegments.push([x, 0, z, 'front'])
         }
-        if (isOccupied(x, z - 1, grid) !== true) {
+        if (isOccupied(x, y, z - 1, grid) !== true) {
           wallSegments.push([x, 0, z, 'back'])
         }
       }

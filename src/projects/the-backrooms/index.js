@@ -853,8 +853,9 @@ const generate = async (config) => {
   renderGrid(grid, mapData)
 
   const radius = getRadius(grid)
-  const originZ = -radius * UNIT + UNIT / 2
   const originX = -radius * UNIT + UNIT / 2
+  const originY = -radius * UNIT + UNIT / 2
+  const originZ = -radius * UNIT + UNIT / 2
 
   const wallSegments = []
   const floors = []
@@ -867,9 +868,10 @@ const generate = async (config) => {
   const lampsToBeCreated = []
 
   for (let z = 0; z < grid.length; z++) {
+    let y = 0
     for (let x = 0; x < grid[z].length; x++) {
-      if (isOccupied(x, z, grid)) {
-        floors.push([x, 0, z])
+      if (isOccupied(x, y, z, grid)) {
+        floors.push([x, y, z])
 
         const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
         const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
@@ -895,17 +897,17 @@ const generate = async (config) => {
           }
         }
 
-        if (isOccupied(x - 1, z, grid) !== true) {
-          wallSegments.push([x - 1, 0, z, 'right'])
+        if (isOccupied(x - 1, y, z, grid) !== true) {
+          wallSegments.push([x - 1, y, z, 'right'])
         }
-        if (isOccupied(x + 1, z, grid) !== true) {
-          wallSegments.push([x + 1, 0, z, 'left'])
+        if (isOccupied(x + 1, y, z, grid) !== true) {
+          wallSegments.push([x + 1, y, z, 'left'])
         }
-        if (isOccupied(x, z + 1, grid) !== true) {
-          wallSegments.push([x, 0, z + 1, 'front'])
+        if (isOccupied(x, y, z + 1, grid) !== true) {
+          wallSegments.push([x, y, z + 1, 'front'])
         }
-        if (isOccupied(x, z - 1, grid) !== true) {
-          wallSegments.push([x, 0, z - 1, 'back'])
+        if (isOccupied(x, y, z - 1, grid) !== true) {
+          wallSegments.push([x, y, z - 1, 'back'])
         }
       }
     }
@@ -995,6 +997,7 @@ const generate = async (config) => {
 
   lootSlots.forEach(([x, y, z], idx) => {
     const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
+    const offsetY = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const pos = [
       originX + x * UNIT - 50 + offsetX,
