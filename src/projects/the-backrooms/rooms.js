@@ -88,7 +88,7 @@ const getFittingVariants = (x, z, width, depth, grid) => {
   for (let j = 0; j < depth; j++) {
     for (let i = 0; i < width; i++) {
       if (canFitRoom(x - i, z - j, width, depth, grid)) {
-        variations.push([x - i, z - j])
+        variations.push([x - i, 0, z - j])
       }
     }
   }
@@ -116,13 +116,13 @@ export const addRoom = (width, height, depth, grid) => {
     for (let x = 0; x < grid[z].length; x++) {
       if (grid[z][x] !== 1) {
         if (isConnected(x, z, grid)) {
-          candidates.push([x, z])
+          candidates.push([x, 0, z])
         }
       }
     }
   }
 
-  candidates = candidates.filter(([x, z]) => {
+  candidates = candidates.filter(([x, y, z]) => {
     return canFitRoomAtPos(x, z, width, depth, grid)
   })
 
@@ -130,17 +130,17 @@ export const addRoom = (width, height, depth, grid) => {
     return false
   }
 
-  const candidate = pickRandom(candidates)
+  const [candidateX, candidateY, candidateZ] = pickRandom(candidates)
 
   const variants = getFittingVariants(
-    candidate[0],
-    candidate[1],
+    candidateX,
+    candidateZ,
     width,
     depth,
     grid,
   )
 
-  const [startX, startZ] = pickRandom(variants)
+  const [startX, startY, startZ] = pickRandom(variants)
 
   insertRoom(startX, startZ, width, depth, grid)
   return true

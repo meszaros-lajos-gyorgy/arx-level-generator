@@ -791,11 +791,10 @@ const placeWallPlug = (
   return createWallPlug(pos, angle, config, jumpscareCtrl)
 }
 
-defineWallPlug()
-
 const generate = async (config) => {
   const { origin } = config
 
+  defineWallPlug()
   defineCeilingLamp()
   defineCeilingDiffuser()
 
