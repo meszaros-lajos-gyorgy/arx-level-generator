@@ -868,46 +868,50 @@ const generate = async (config) => {
   const lampsToBeCreated = []
 
   for (let z = 0; z < grid.length; z++) {
-    let y = 0
-    for (let x = 0; x < grid[z][0].length; x++) {
-      if (isOccupied(x, y, z, grid)) {
-        floors.push([x, y, z])
+    for (let y = 0; y < grid[z].length; y++) {
+      for (let x = 0; x < grid[z][y].length; x++) {
+        if (isOccupied(x, y, z, grid)) {
+          floors.push([x, y, z])
 
-        const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
-        const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
+          const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
+          const offsetY = 100
+          const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
 
-        if (x % 3 === 0 && z % 3 === 0) {
-          lampsToBeCreated.push({
-            pos: [
-              originX + x * UNIT - 50 + offsetX,
-              -(config.roomDimensions.height * UNIT - 10),
-              -(originZ + z * UNIT) - 50 + offsetZ,
-            ],
-            config: {
-              on: randomBetween(0, 100) < config.percentOfLightsOn,
-            },
-          })
-        } else {
-          if (Math.random() < 0.05) {
-            createCeilingDiffuser([
-              originX + x * UNIT - 50 + offsetX,
-              -(config.roomDimensions.height * UNIT - 5),
-              -(originZ + z * UNIT) - 50 + offsetZ,
-            ])
+          if (y === 12) {
+            if (x % 3 === 0 && z % 3 === 0) {
+              lampsToBeCreated.push({
+                pos: [
+                  originX + x * UNIT - 50 + offsetX,
+                  -(originY + y * UNIT) + 10 + offsetY,
+                  -(originZ + z * UNIT) - 50 + offsetZ,
+                ],
+                config: {
+                  on: randomBetween(0, 100) < config.percentOfLightsOn,
+                },
+              })
+            } else {
+              if (Math.random() < 0.05) {
+                createCeilingDiffuser([
+                  originX + x * UNIT - 50 + offsetX,
+                  -(originY + y * UNIT) + 5 + offsetY,
+                  -(originZ + z * UNIT) - 50 + offsetZ,
+                ])
+              }
+            }
           }
-        }
 
-        if (isOccupied(x - 1, y, z, grid) !== true) {
-          wallSegments.push([x - 1, y, z, 'right'])
-        }
-        if (isOccupied(x + 1, y, z, grid) !== true) {
-          wallSegments.push([x + 1, y, z, 'left'])
-        }
-        if (isOccupied(x, y, z + 1, grid) !== true) {
-          wallSegments.push([x, y, z + 1, 'front'])
-        }
-        if (isOccupied(x, y, z - 1, grid) !== true) {
-          wallSegments.push([x, y, z - 1, 'back'])
+          if (isOccupied(x - 1, y, z, grid) !== true) {
+            wallSegments.push([x - 1, y, z, 'right'])
+          }
+          if (isOccupied(x + 1, y, z, grid) !== true) {
+            wallSegments.push([x + 1, y, z, 'left'])
+          }
+          if (isOccupied(x, y, z + 1, grid) !== true) {
+            wallSegments.push([x, y, z + 1, 'front'])
+          }
+          if (isOccupied(x, y, z - 1, grid) !== true) {
+            wallSegments.push([x, y, z - 1, 'back'])
+          }
         }
       }
     }
@@ -924,11 +928,7 @@ const generate = async (config) => {
   )
   const taar = createRune('taar', spawnContainerPos, [0, 0, 0], welcomeMarker)
 
-  const spawnContainer = createSpawnContainer(
-    spawnContainerPos,
-    [0, 0, 0],
-    [aam, folgora, taar],
-  )
+  createSpawnContainer(spawnContainerPos, [0, 0, 0], [aam, folgora, taar])
 
   const importantLocations = [spawnContainerPos]
 
