@@ -84,13 +84,13 @@ const isConnected = (x, z, grid) => {
   )
 }
 
-const getFittingVariants = (x, z, width, depth, grid) => {
+const getFittingVariants = (x, y, z, width, depth, grid) => {
   const variations = []
 
-  for (let j = 0; j < depth; j++) {
+  for (let k = 0; k < depth; k++) {
     for (let i = 0; i < width; i++) {
-      if (canFitRoom(x - i, z - j, width, depth, grid)) {
-        variations.push([x - i, 0, z - j])
+      if (canFitRoom(x - i, z - k, width, depth, grid)) {
+        variations.push([x - i, 0, z - k])
       }
     }
   }
@@ -136,6 +136,7 @@ export const addRoom = (width, height, depth, grid) => {
 
   const variants = getFittingVariants(
     candidateX,
+    candidateY,
     candidateZ,
     width,
     depth,
