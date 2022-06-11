@@ -799,9 +799,11 @@ const generate = async (config) => {
 
   overridePlayerScript()
 
+  /*
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
+  */
 
-  const grid = generateGrid(20) // 50*50 = 2500, okay; 50^3 = 12500!!! not okay
+  const grid = generateGrid(5) // 50*50 = 2500, okay; 50^3 = 12500!!! not okay
   addRoom(3, 2, 3, grid)
 
   let roomCounter = 1
@@ -826,9 +828,9 @@ const generate = async (config) => {
   config.numberOfRooms = roomCounter
 
   const mapData = generateBlankMapData(config)
-
   mapData.meta.mapName = 'The Backrooms'
 
+  /*
   movePlayerTo(
     {
       type: 'relative',
@@ -849,8 +851,11 @@ const generate = async (config) => {
     5000,
   )(mapData)
   setColor('#0b0c10', mapData)
+  */
+  setColor('#dddddd', mapData)
   renderGrid(grid, mapData)
 
+  /*
   const radius = getRadius(grid)
   const originX = -radius * UNIT + UNIT / 2
   const originY = -radius * UNIT + UNIT / 2
@@ -1016,6 +1021,7 @@ const generate = async (config) => {
         console.error('unknown loot item', loot)
     }
   })
+  */
 
   addTranslations(translations)
 

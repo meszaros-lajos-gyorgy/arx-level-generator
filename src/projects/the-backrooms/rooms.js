@@ -9,10 +9,12 @@ import wall from '../../prefabs/wall'
 export const getRadius = (grid) => (grid.length - 1) / 2
 
 const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
+  console.log(originX, originY, originZ, width, height, depth)
   for (let z = 0; z < depth; z++) {
-    let y = 0
-    for (let x = 0; x < width; x++) {
-      grid[originZ + z][0][originX + x] = 1
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        grid[originZ + z][originY + y][originX + x] = 1
+      }
     }
   }
 }
@@ -41,23 +43,24 @@ export const isOccupied = (x, y, z, grid) => {
   if (typeof grid[z] === 'undefined') {
     return null
   }
-  if (typeof grid[z][0] === 'undefined') {
+  if (typeof grid[z][y] === 'undefined') {
     return null
   }
-  if (typeof grid[z][0][x] === 'undefined') {
+  if (typeof grid[z][y][x] === 'undefined') {
     return null
   }
 
-  return grid[z][0][x] === 1
+  return grid[z][y][x] === 1
 }
 
-// starting from originX/originZ does a width/depth sized rectangle only occupy 0 slots?
-const canFitRoom = (originX, originZ, width, depth, grid) => {
+// starting from originX/originY/originZ does a width/height/depth sized rectangle only occupy 0 slots?
+const canFitRoom = (originX, originY, originZ, width, height, depth, grid) => {
   for (let z = originZ; z < originZ + depth; z++) {
-    let y = 0
-    for (let x = originX; x < originX + width; x++) {
-      if (isOccupied(x, y, z, grid) !== false) {
-        return false
+    for (let y = originY; y < originY + height; y++) {
+      for (let x = originX; x < originX + width; x++) {
+        if (isOccupied(x, y, z, grid) !== false) {
+          return false
+        }
       }
     }
   }
@@ -67,11 +70,13 @@ const canFitRoom = (originX, originZ, width, depth, grid) => {
 
 // is there a variation of a width/depth sized rectangle containing the position x/z which
 // can occupy only 0 slots?
-const canFitRoomAtPos = (x, z, width, depth, grid) => {
-  for (let j = 0; j < depth; j++) {
-    for (let i = 0; i < width; i++) {
-      if (canFitRoom(x - i, z - j, width, depth, grid)) {
-        return true
+const canFitRoomAtPos = (x, y, z, width, height, depth, grid) => {
+  for (let k = 0; k < depth; k++) {
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
+        if (canFitRoom(x - i, y - j, z - k, width, height, depth, grid)) {
+          return true
+        }
       }
     }
   }
@@ -97,14 +102,15 @@ const isConnected = (x, y, z, grid) => {
   )
 }
 
-const getFittingVariants = (x, y, z, width, depth, grid) => {
+const getFittingVariants = (x, y, z, width, height, depth, grid) => {
   const variations = []
 
   for (let k = 0; k < depth; k++) {
-    let j = 0
-    for (let i = 0; i < width; i++) {
-      if (canFitRoom(x - i, z - k, width, depth, grid)) {
-        variations.push([x - i, y - j, z - k])
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
+        if (canFitRoom(x - i, y - j, z - k, width, height, depth, grid)) {
+          variations.push([x - i, y - j, z - k])
+        }
       }
     }
   }
@@ -131,18 +137,19 @@ export const addRoom = (width, height, depth, grid) => {
   let candidates = []
 
   for (let z = 0; z < grid.length; z++) {
-    let y = 0
-    for (let x = 0; x < grid[z][0].length; x++) {
-      if (grid[z][0][x] !== 1) {
-        if (isConnected(x, y, z, grid)) {
-          candidates.push([x, y, z])
+    for (let y = 0; y < grid[z].length; y++) {
+      for (let x = 0; x < grid[z][y].length; x++) {
+        if (grid[z][y][x] !== 1) {
+          if (isConnected(x, y, z, grid)) {
+            candidates.push([x, y, z])
+          }
         }
       }
     }
   }
 
   candidates = candidates.filter(([x, y, z]) => {
-    return canFitRoomAtPos(x, z, width, depth, grid)
+    return canFitRoomAtPos(x, y, z, width, height, depth, grid)
   })
 
   if (!candidates.length) {
@@ -156,6 +163,7 @@ export const addRoom = (width, height, depth, grid) => {
     candidateY,
     candidateZ,
     width,
+    height,
     depth,
     grid,
   )
@@ -166,6 +174,7 @@ export const addRoom = (width, height, depth, grid) => {
   return true
 }
 
+/*
 const decalOffset = {
   right: [1, 0, 0],
   left: [-1, 0, 0],
@@ -283,8 +292,11 @@ const getBackWalls = (wallSegments) => {
       return walls
     }, [])
 }
+*/
 
 export const renderGrid = (grid, mapData) => {
+  console.log(grid)
+  /*
   const { roomDimensions } = mapData.config
   const radius = getRadius(grid)
   const originX = -radius * UNIT + UNIT / 2
@@ -673,4 +685,5 @@ export const renderGrid = (grid, mapData) => {
       })(mapData)
     },
   )
+  */
 }
