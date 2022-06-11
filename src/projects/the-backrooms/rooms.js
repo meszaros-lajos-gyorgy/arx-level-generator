@@ -41,6 +41,9 @@ export const isOccupied = (x, y, z, grid) => {
   if (typeof grid[z] === 'undefined') {
     return null
   }
+  if (typeof grid[z][0] === 'undefined') {
+    return null
+  }
   if (typeof grid[z][0][x] === 'undefined') {
     return null
   }
@@ -80,9 +83,17 @@ const canFitRoomAtPos = (x, z, width, depth, grid) => {
 const isConnected = (x, y, z, grid) => {
   return (
     isOccupied(x - 1, y, z, grid) ||
+    isOccupied(x - 1, y - 1, z, grid) ||
+    isOccupied(x - 1, y + 1, z, grid) ||
     isOccupied(x + 1, y, z, grid) ||
+    isOccupied(x + 1, y - 1, z, grid) ||
+    isOccupied(x + 1, y + 1, z, grid) ||
     isOccupied(x, y, z - 1, grid) ||
-    isOccupied(x, y, z + 1, grid)
+    isOccupied(x, y - 1, z - 1, grid) ||
+    isOccupied(x, y + 1, z - 1, grid) ||
+    isOccupied(x, y, z + 1, grid) ||
+    isOccupied(x, y - 1, z + 1, grid) ||
+    isOccupied(x, y + 1, z + 1, grid)
   )
 }
 
