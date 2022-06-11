@@ -869,7 +869,7 @@ const generate = async (config) => {
   for (let z = 0; z < grid.length; z++) {
     for (let x = 0; x < grid[z].length; x++) {
       if (isOccupied(x, z, grid)) {
-        floors.push([x, z])
+        floors.push([x, 0, z])
 
         const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
         const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
@@ -959,7 +959,7 @@ const generate = async (config) => {
 
   // TODO: filter 5 of the farthest lootSlots compared to spawn and select a random from that
   const keySlot = pickRandomIdx(lootSlots)
-  const [keyX, keyZ] = lootSlots[keySlot]
+  const [keyX, keyY, keyZ] = lootSlots[keySlot]
   lootSlots.splice(keySlot, 1)
 
   const key = createKey(
@@ -993,7 +993,7 @@ const generate = async (config) => {
 
   const generalLoot = pickRandomLoot(lootSlots.length, config.lootTable)
 
-  lootSlots.forEach(([x, z], idx) => {
+  lootSlots.forEach(([x, y, z], idx) => {
     const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const offsetZ = Math.floor(randomBetween(0, UNIT / 100)) * 100
     const pos = [
