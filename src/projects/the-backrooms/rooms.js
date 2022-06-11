@@ -32,7 +32,7 @@ const addFirstRoom = (width, height, depth, grid) => {
 }
 
 const isEveryCellEmpty = (grid) => {
-  const elementsInGrid = uniq(grid.flat(1))
+  const elementsInGrid = uniq(grid.flat(2))
   return elementsInGrid.length === 1 && elementsInGrid[0] === 0
 }
 
@@ -109,6 +109,7 @@ export const generateGrid = (size) => {
   const [sizeX, sizeY, sizeZ] = [size, size, size]
 
   return times(() => repeat(0, sizeX), sizeZ)
+  // return times(() => times(() => repeat(0, sizeX), sizeY), sizeZ)
 }
 
 export const addRoom = (width, height, depth, grid) => {
