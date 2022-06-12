@@ -2,7 +2,7 @@ import seedrandom from 'seedrandom'
 import aliasNightmare from './projects/alias-nightmare/index'
 import theBackrooms from './projects/the-backrooms/index'
 import onTheIsland from './projects/on-the-island/index'
-import gungame from './projects/gungame/index'
+import arena from './projects/arena/index'
 import { MapConfig } from './types'
 
 const seed: string =
@@ -63,8 +63,8 @@ const project: string = process.env.PROJECT ?? 'alias-nightmare'
         ...config,
       })
       break
-    case 'gungame':
-      await gungame({
+    case 'arena':
+      await arena({
         ...config,
       })
   }

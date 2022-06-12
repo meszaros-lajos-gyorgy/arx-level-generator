@@ -113,7 +113,7 @@ const generate = async (config) => {
   const { origin } = config
 
   const mapData = generateBlankMapData(config)
-  mapData.meta.mapName = 'Gungame'
+  mapData.meta.mapName = 'Arena'
 
   overridePlayerScript()
 
