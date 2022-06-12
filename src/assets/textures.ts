@@ -47,6 +47,12 @@ export const textures = {
       width: 256,
       height: 256,
     },
+    humanAkbaaPavingF: {
+      src: '[STONE]_HUMAN_AKBAA_PAVING_F.jpg',
+      native: true,
+      width: 256,
+      height: 256,
+    },
   },
   skybox: {
     top: {

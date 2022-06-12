@@ -26,12 +26,13 @@ export type Candidate = {
 // pos is relative to origin
 export const plain = (
   pos: Vector3,
-  size,
+  size: number | [number, number],
   facing: 'floor' | 'ceiling' = 'floor',
   onBeforeBumping: (polygons: any[], mapData: MapData) => any[] = identity,
   getConfig: () => {
     textureRotation?: number
     textureFlags?: number
+    quad?: number | null
   } = () => ({}),
 ) => {
   return (mapData) => {
@@ -63,16 +64,16 @@ export const plain = (
         const position: AbsoluteCoords = {
           type: 'absolute',
           coords: [
-            x + 100 * i - (sizeX * 100) / 2 + 100 / 2,
+            x + 100 * i - ((sizeX as number) * 100) / 2 + 100 / 2,
             y,
-            z + 100 * j - (sizeZ * 100) / 2 + 100 / 2,
+            z + 100 * j - ((sizeZ as number) * 100) / 2 + 100 / 2,
           ],
         }
 
         floor(
           position,
           facing,
-          null,
+          config.quad ?? null,
           config.textureRotation ?? 90,
           100,
           config.textureFlags ?? 0,
