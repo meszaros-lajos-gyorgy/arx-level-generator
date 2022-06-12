@@ -9,7 +9,9 @@ import {
 import { textures } from '../../assets/textures'
 import { HFLIP, VFLIP } from '../../constants'
 import {
+  addLight,
   addZone,
+  circleOfVectors,
   finalize,
   generateBlankMapData,
   movePlayerTo,
@@ -20,7 +22,7 @@ import {
 } from '../../helpers'
 import { plain } from '../../prefabs'
 import { disableBumping } from '../../prefabs/plain'
-import { getInjections } from '../../scripting'
+import { declare, getInjections } from '../../scripting'
 import { overridePlayerScript } from '../shared/player'
 import { hideMinimap } from '../shared/reset'
 
@@ -51,22 +53,52 @@ ON CONTROLLEDZONE_ENTER {
   return ref
 }
 
-const createShany = (pos, angle, config) => {
-  // human_base_0094
+const createNPC = (pos, angle, config) => {
+  const type = config.type ?? 'ct'
+  const variant = config.variant ?? 1
+
   const ref = createItem(items.npc.human, {
-    mesh: 'human_female_child/human_female_child.teo',
-    ...config,
+    ...(type === 't' ? { mesh: 'human_priest/human_priest.teo' } : {}),
   })
+
+  if (type === 'ct') {
+    switch (variant) {
+      case 1:
+        declare('string', 'type', 'human_guard_kingdom', ref)
+        declare('string', 'voice', '_vc', ref)
+        break
+      case 2:
+        declare('string', 'type', 'human_guard_ss', ref)
+        declare('string', 'voice', '_vb', ref)
+        break
+    }
+  } else {
+    switch (variant) {
+      case 1:
+        declare('string', 'type', 'human_priest_base', ref)
+        break
+      case 2:
+        declare('string', 'type', 'human_priest_high', ref)
+    }
+  }
 
   addScript((self) => {
     return `
-// component: Shany
+// component: NPC
 ON INIT {
   ${getInjections('init', self)}
   ACCEPT
 }
 ON INITEND {
   ${getInjections('initend', self)}
+  ${
+    type === 't' && variant === 2
+      ? `
+  TWEAK SKIN "npc_human_priest_akbaa_body""npc_Human_priest_fcult_body"
+  TWEAK SKIN "npc_human_priest_akbaa_head""npc_Human_priest_fcult_head"
+  `
+      : ``
+  }
   ACCEPT
 }
     `
@@ -115,7 +147,23 @@ const generate = async (config) => {
     textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
   }))(mapData)
 
-  createShany([100, 0, 100], [0, 0, 0], {})
+  setColor('white', mapData)
+  circleOfVectors([0, -1000, 0], 1000, 3).forEach((pos) => {
+    addLight(
+      pos,
+      {
+        fallstart: 1,
+        fallend: 3000,
+        intensity: 3,
+      },
+      mapData,
+    )
+  })
+
+  createNPC([300, 0, -100], [0, 90, 0], { type: 'ct', variant: 1 })
+  createNPC([300, 0, 100], [0, 90, 0], { type: 'ct', variant: 2 })
+  createNPC([-300, 0, 100], [0, 270, 0], { type: 't', variant: 1 })
+  createNPC([-300, 0, -100], [0, 270, 0], { type: 't', variant: 2 })
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)

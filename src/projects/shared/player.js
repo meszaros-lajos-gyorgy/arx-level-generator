@@ -154,10 +154,13 @@ ON INITEND {
 ON OUCH {
   IF (^#PARAM1 > 20) {
     SPEAK [Player_ouch_strong] NOP
+    ACCEPT
   } ELSE IF (^#PARAM1 > 8) {
     SPEAK [Player_ouch_medium] NOP
+    ACCEPT
   } ELSE IF (^#PARAM1 > 2) {
     SPEAK [Player_ouch] NOP
+    ACCEPT
   }
   ACCEPT
 }
