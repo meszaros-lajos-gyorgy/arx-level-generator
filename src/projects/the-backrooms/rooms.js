@@ -1,7 +1,7 @@
 import { times, repeat, clamp, uniq } from '../../faux-ramda'
 import { textures } from '../../assets/textures'
 import { HFLIP, VFLIP } from '../../constants'
-import { setTexture, pickRandom, move } from '../../helpers'
+import { setTexture, pickRandom, move, setColor } from '../../helpers'
 import { plain, disableBumping } from '../../prefabs/plain'
 import { UNIT } from './constants'
 import wall from '../../prefabs/wall'
@@ -9,7 +9,6 @@ import wall from '../../prefabs/wall'
 export const getRadius = (grid) => (grid.length - 1) / 2
 
 const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
-  console.log(originX, originY, originZ, width, height, depth)
   for (let z = 0; z < depth; z++) {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
@@ -295,13 +294,12 @@ const getBackWalls = (wallSegments) => {
 */
 
 export const renderGrid = (grid, mapData) => {
-  console.log(grid)
-  /*
-  const { roomDimensions } = mapData.config
   const radius = getRadius(grid)
   const originX = -radius * UNIT + UNIT / 2
+  const originY = -radius * UNIT + UNIT / 2
   const originZ = -radius * UNIT + UNIT / 2
 
+  /*
   const wallSegments = []
 
   for (let z = 0; z < grid.length; z++) {
@@ -370,39 +368,85 @@ export const renderGrid = (grid, mapData) => {
       frontWalls[rightAdjacentWallIdx].isLeftCornerConcave = true
     }
   })
+  */
 
   for (let z = 0; z < grid.length; z++) {
-    for (let y = 0; y < grid.length; y++) {
+    for (let y = 0; y < grid[z].length; y++) {
       for (let x = 0; x < grid[z][y].length; x++) {
         if (grid[z][y][x] === 1) {
-          setTexture(textures.backrooms.carpetDirty, mapData)
-          plain(
-            [originX + x * UNIT, 0, -(originZ + z * UNIT)],
-            [UNIT / 100, UNIT / 100],
-            'floor',
-            disableBumping,
-            () => ({
-              textureRotation: pickRandom([0, 90, 180, 270]),
-              textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
-            }),
-          )(mapData)
+          if (isOccupied(x, y - 1, z, grid) !== true) {
+            setTexture(textures.backrooms.carpetDirty, mapData)
+            plain(
+              [
+                originX + x * UNIT,
+                -(originY + y * UNIT),
+                -(originZ + z * UNIT),
+              ],
+              [UNIT / 100, UNIT / 100],
+              'floor',
+              disableBumping,
+              () => ({
+                textureRotation: pickRandom([0, 90, 180, 270]),
+                textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
+              }),
+            )(mapData)
+          }
+          if (isOccupied(x, y + 1, z, grid) !== true) {
+            setTexture(textures.backrooms.ceiling, mapData)
+            plain(
+              [
+                originX + x * UNIT,
+                -(originY + (y + 1) * UNIT),
+                -(originZ + z * UNIT),
+              ],
+              [UNIT / 100, UNIT / 100],
+              'ceiling',
+              disableBumping,
+            )(mapData)
+          }
 
-          setTexture(textures.backrooms.ceiling, mapData)
-          plain(
-            [
-              originX + x * UNIT,
-              -(UNIT * roomDimensions.height),
-              -(originZ + z * UNIT),
-            ],
-            [UNIT / 100, UNIT / 100],
-            'ceiling',
-            disableBumping,
-          )(mapData)
+          setTexture(textures.backrooms.wall, mapData)
+
+          if (isOccupied(x + 1, y, z, grid) !== true) {
+            const coords = [
+              originX + x * UNIT + UNIT / 2,
+              -(originY + y * UNIT),
+              -(originZ + (z + 1) * UNIT) - UNIT / 2,
+            ]
+            wall(coords, 'left', { width: 1, height: 1, unit: UNIT }, mapData)
+          }
+
+          if (isOccupied(x - 1, y, z, grid) !== true) {
+            const coords = [
+              originX + x * UNIT - UNIT / 2,
+              -(originY + y * UNIT),
+              -(originZ + (z + 1) * UNIT) - UNIT / 2,
+            ]
+            wall(coords, 'right', { width: 1, height: 1, unit: UNIT }, mapData)
+          }
+
+          if (isOccupied(x, y, z + 1, grid) !== true) {
+            const coords = [
+              originX + (x - 1) * UNIT - UNIT / 2,
+              -(originY + y * UNIT),
+              -(originZ + (z + 1) * UNIT) + UNIT / 2,
+            ]
+            wall(coords, 'front', { width: 1, height: 1, unit: UNIT }, mapData)
+          }
+          if (isOccupied(x, y, z - 1, grid) !== true) {
+            const coords = [
+              originX + (x - 1) * UNIT - UNIT / 2,
+              -(originY + y * UNIT),
+              -(originZ + z * UNIT) + UNIT / 2,
+            ]
+            wall(coords, 'back', { width: 1, height: 1, unit: UNIT }, mapData)
+          }
         }
       }
     }
   }
 
+  /*
   rightWalls.forEach(
     ({ x, z, width, isLeftCornerConcave, isRightCornerConcave }) => {
       const coords = [
@@ -415,14 +459,14 @@ export const renderGrid = (grid, mapData) => {
         textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
         mapData,
       )
-      wall(coords, 'right', { width, unit: UNIT })(mapData)
+      wall(coords, 'right', { width, unit: UNIT }, mapData)
 
       setTexture(textures.backrooms.moldEdge, mapData)
       wall(move(...decalOffset.right, coords), 'right', {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
       wall(
         move(
           ...decalOffset.right,
@@ -440,14 +484,14 @@ export const renderGrid = (grid, mapData) => {
           textureRotation: 180,
           unit: UNIT,
         },
-      )(mapData)
+      mapData)
 
       if (isLeftCornerConcave) {
         wall(move(...decalOffset.right, coords), 'right', {
           width: 1 / (UNIT / 100),
           textureRotation: 270,
           unit: UNIT,
-        })(mapData)
+        }, mapData)
       }
 
       if (isRightCornerConcave) {
@@ -462,7 +506,7 @@ export const renderGrid = (grid, mapData) => {
             textureRotation: 90,
             unit: UNIT,
           },
-        )(mapData)
+        mapData)
       }
 
       setTexture(textures.backrooms.rails, mapData)
@@ -470,7 +514,7 @@ export const renderGrid = (grid, mapData) => {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
     },
   )
 
@@ -486,14 +530,14 @@ export const renderGrid = (grid, mapData) => {
         textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
         mapData,
       )
-      wall(coords, 'left', { width, unit: UNIT })(mapData)
+      wall(coords, 'left', { width, unit: UNIT }, mapData)
 
       setTexture(textures.backrooms.moldEdge, mapData)
       wall(move(...decalOffset.left, coords), 'left', {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
       wall(
         move(
           ...decalOffset.left,
@@ -511,7 +555,7 @@ export const renderGrid = (grid, mapData) => {
           textureRotation: 180,
           unit: UNIT,
         },
-      )(mapData)
+      mapData)
 
       if (isLeftCornerConcave) {
         wall(
@@ -525,7 +569,7 @@ export const renderGrid = (grid, mapData) => {
             textureRotation: 90,
             unit: UNIT,
           },
-        )(mapData)
+        mapData)
       }
 
       if (isRightCornerConcave) {
@@ -533,7 +577,7 @@ export const renderGrid = (grid, mapData) => {
           width: 1 / (UNIT / 100),
           textureRotation: 270,
           unit: UNIT,
-        })(mapData)
+        }, mapData)
       }
 
       setTexture(textures.backrooms.rails, mapData)
@@ -541,7 +585,7 @@ export const renderGrid = (grid, mapData) => {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
     },
   )
 
@@ -557,14 +601,14 @@ export const renderGrid = (grid, mapData) => {
         textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
         mapData,
       )
-      wall(coords, 'front', { width, unit: UNIT })(mapData)
+      wall(coords, 'front', { width, unit: UNIT }, mapData)
 
       setTexture(textures.backrooms.moldEdge, mapData)
       wall(move(...decalOffset.front, coords), 'front', {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
       wall(
         move(
           ...decalOffset.front,
@@ -582,7 +626,7 @@ export const renderGrid = (grid, mapData) => {
           textureRotation: 180,
           unit: UNIT,
         },
-      )(mapData)
+      mapData)
 
       if (isLeftCornerConcave) {
         wall(
@@ -596,7 +640,7 @@ export const renderGrid = (grid, mapData) => {
             textureRotation: 90,
             unit: UNIT,
           },
-        )(mapData)
+        mapData)
       }
 
       if (isRightCornerConcave) {
@@ -604,7 +648,7 @@ export const renderGrid = (grid, mapData) => {
           width: 1 / (UNIT / 100),
           textureRotation: 270,
           unit: UNIT,
-        })(mapData)
+        }, mapData)
       }
 
       setTexture(textures.backrooms.rails, mapData)
@@ -612,7 +656,7 @@ export const renderGrid = (grid, mapData) => {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
     },
   )
 
@@ -627,14 +671,14 @@ export const renderGrid = (grid, mapData) => {
         textures.backrooms[Math.random() > 0.5 ? 'wall' : 'wall2'],
         mapData,
       )
-      wall(coords, 'back', { width, unit: UNIT })(mapData)
+      wall(coords, 'back', { width, unit: UNIT }, mapData)
 
       setTexture(textures.backrooms.moldEdge, mapData)
       wall(move(...decalOffset.back, coords), 'back', {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
       wall(
         move(
           ...decalOffset.back,
@@ -652,14 +696,14 @@ export const renderGrid = (grid, mapData) => {
           textureRotation: 180,
           unit: UNIT,
         },
-      )(mapData)
+      mapData)
 
       if (isLeftCornerConcave) {
         wall(move(...decalOffset.back, coords), 'back', {
           width: 1 / (UNIT / 100),
           textureRotation: 270,
           unit: UNIT,
-        })(mapData)
+        }, mapData)
       }
 
       if (isRightCornerConcave) {
@@ -674,7 +718,7 @@ export const renderGrid = (grid, mapData) => {
             textureRotation: 90,
             unit: UNIT,
           },
-        )(mapData)
+        mapData)
       }
 
       setTexture(textures.backrooms.rails, mapData)
@@ -682,7 +726,7 @@ export const renderGrid = (grid, mapData) => {
         height: 1,
         width,
         unit: UNIT,
-      })(mapData)
+      }, mapData)
     },
   )
   */

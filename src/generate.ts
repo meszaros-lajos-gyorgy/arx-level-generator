@@ -26,7 +26,7 @@ const project: string = process.env.PROJECT ?? 'alias-nightmare'
       await theBackrooms({
         ...config,
         numberOfRooms: 20,
-        roomDimensions: { width: [1, 5], depth: [1, 5], height: 2 },
+        roomDimensions: { width: [1, 5], depth: [1, 5], height: [1, 5] },
         percentOfLightsOn: 35,
         lootTable: [
           {

@@ -803,14 +803,14 @@ const generate = async (config) => {
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
   */
 
-  const grid = generateGrid(5) // 50*50 = 2500, okay; 50^3 = 12500!!! not okay
+  const grid = generateGrid(20) // 50*50 = 2500, okay; 50^3 = 12500!!! not okay
   addRoom(3, 2, 3, grid)
 
   let roomCounter = 1
   const notFittingCombos = []
   for (let i = 0; i < config.numberOfRooms; i++) {
     const width = Math.round(randomBetween(...config.roomDimensions.width))
-    const height = 2
+    const height = Math.round(randomBetween(...config.roomDimensions.height))
     const depth = Math.round(randomBetween(...config.roomDimensions.depth))
     const hash = `${width}|${height}|${depth}`
     if (notFittingCombos.includes(hash)) {
