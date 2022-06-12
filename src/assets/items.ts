@@ -196,6 +196,10 @@ export const items = {
       src: 'npc/chicken_base/chicken_base.teo',
       native: true,
     },
+    human: {
+      src: 'npc/human_base/human_base.teo',
+      native: true,
+    },
   },
   shape: {
     cube: {

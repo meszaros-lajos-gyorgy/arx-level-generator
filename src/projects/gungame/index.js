@@ -51,6 +51,32 @@ ON CONTROLLEDZONE_ENTER {
   return ref
 }
 
+const createShany = (pos, angle, config) => {
+  // human_base_0094
+  const ref = createItem(items.npc.human, {
+    mesh: 'human_female_child/human_female_child.teo',
+    ...config,
+  })
+
+  addScript((self) => {
+    return `
+// component: Shany
+ON INIT {
+  ${getInjections('init', self)}
+  ACCEPT
+}
+ON INITEND {
+  ${getInjections('initend', self)}
+  ACCEPT
+}
+    `
+  }, ref)
+
+  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  markAsUsed(ref)
+  return ref
+}
+
 const generate = async (config) => {
   const { origin } = config
 
@@ -88,6 +114,8 @@ const generate = async (config) => {
     textureRotation: pickRandom([0, 90, 180, 270]),
     textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
   }))(mapData)
+
+  createShany([100, 0, 100], [0, 0, 0], {})
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)
