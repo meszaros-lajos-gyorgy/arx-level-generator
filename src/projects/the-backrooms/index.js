@@ -850,10 +850,11 @@ const generate = async (config) => {
     ambiences.none,
     5000,
   )(mapData)
-  setColor('#0b0c10', mapData)
   */
-  setColor('#dddddd', mapData)
+  setColor('#0b0c10', mapData)
   renderGrid(grid, mapData)
+
+  addLamp([150, -200, 50], [0, 0, 0], { on: true })(mapData)
 
   /*
   const radius = getRadius(grid)

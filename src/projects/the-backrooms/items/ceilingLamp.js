@@ -10,7 +10,7 @@ import { useTexture, textures } from '../../../assets/textures'
 import { getInjections, declare } from '../../../scripting'
 
 const itemDesc = {
-  src: 'fix_inter/ceiling_lamp/ceiling_lamp.teo',
+  src: 'fix_inter/ceiling-lamp/ceiling-lamp.ftl',
   native: true,
 }
 
@@ -22,7 +22,7 @@ export const defineCeilingLamp = () => {
 
   const ref = createRootItem(itemDesc, {
     interactive: false,
-    mesh: 'polytrans/polytrans.teo',
+    // mesh: 'polytrans/polytrans.teo',
   })
 
   declare('int', 'isOn', 0, ref)
@@ -32,6 +32,12 @@ export const defineCeilingLamp = () => {
   declare('int', 'oldMuted', -1, ref)
   declare('int', 'instantSwitching', 0, ref)
   declare('string', 'caster', '', ref)
+
+  addDependencyAs(
+    'projects/the-backrooms/ceiling-lamp.ftl',
+    'game/graph/obj3d/interactive/fix_inter/ceiling-lamp/ceiling-lamp.ftl',
+    ref,
+  )
 
   addDependencyAs(
     'projects/the-backrooms/sfx/fluorescent-lamp-plink.wav',
@@ -76,13 +82,14 @@ ON INITEND {
   ${getInjections('initend', self)}
   SET ${self.state.oldIsOn} ${self.state.isOn}
 
+
   if (${self.state.isOn} == 1) {
-    TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-light-on"
+    TWEAK SKIN "[metal]_dwarf_grid" "backrooms-[metal]-light-on"
     if (${self.state.muted} == 0) {
       PLAY -lip "fluorescent-lamp-hum" // [l] = loop, [i] = unique, [p] = variable pitch
     }
   } else {
-    TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-light-off"
+    TWEAK SKIN "[metal]_dwarf_grid" "backrooms-[metal]-light-off"
   }
 
   ACCEPT
