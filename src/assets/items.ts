@@ -10,6 +10,7 @@ import {
 import { getRootPath } from '../rootpath'
 import { PLAYER_HEIGHT_ADJUSTMENT } from '../constants'
 import glob from 'tiny-glob'
+import weapons from './items/weapons'
 
 export type InjectableProps = {
   name?: string
@@ -239,6 +240,7 @@ export const items = {
       native: true,
     },
   },
+  weapons,
 }
 
 const usedItems: Record<string, { instances: Item[]; root?: RootItem }> = {}

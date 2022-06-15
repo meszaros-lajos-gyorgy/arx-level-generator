@@ -25,6 +25,7 @@ import { disableBumping } from '../../prefabs/plain'
 import { declare, getInjections } from '../../scripting'
 import { overridePlayerScript } from '../shared/player'
 import { hideMinimap } from '../shared/reset'
+import { createWeapon, defineWeapon } from './items/weapon'
 
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
@@ -116,6 +117,12 @@ const generate = async (config) => {
   mapData.meta.mapName = 'Arena'
 
   overridePlayerScript()
+
+  defineWeapon()
+
+  createWeapon([200, 10, 100], [0, 0, 0], {
+    type: 'club',
+  })
 
   const welcomeMaker = createWelcomeMarker([0, 0, 0], config)
 
