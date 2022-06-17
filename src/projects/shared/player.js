@@ -166,6 +166,7 @@ ON OUCH {
 }
 
 ON DIE {
+  ${getInjections('die', self)}
   PLAY "player_death"
   SET #TMP ^RND_10
   INC #TMP 1
@@ -184,11 +185,6 @@ ON DIE {
   ACCEPT
 }
 
-ON EARTH_QUAKE {
-  PLAY earthQ
-  ACCEPT
-}
-
 ON CRITICAL {
   HEROSAY [player_dbldmg]
   SPEAK [player_attack_1handed_weap] NOP
@@ -197,6 +193,15 @@ ON CRITICAL {
 
 ON SETSPEED {
   SETSPEED ^&PARAM1
+  ACCEPT
+}
+
+ON GLOW {
+  if (^$param1 == "on") {
+    HALO -ocs 0.8 1 1 100 // [o] = active, [c] = color, [s] = radius
+  } else {
+    HALO -f [f] = inactive
+  }
   ACCEPT
 }
     `

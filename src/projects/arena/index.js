@@ -25,7 +25,7 @@ import { disableBumping } from '../../prefabs/plain'
 import { declare, getInjections } from '../../scripting'
 import { overridePlayerScript } from '../shared/player'
 import { hideMinimap } from '../shared/reset'
-import { createWeapon, defineWeapon } from './items/weapon'
+import { createSpawnController } from './items/spawnController'
 
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
@@ -116,15 +116,14 @@ const generate = async (config) => {
   const mapData = generateBlankMapData(config)
   mapData.meta.mapName = 'Arena'
 
-  overridePlayerScript()
-
-  defineWeapon()
-
-  createWeapon([200, 10, 100], [0, 0, 0], {
-    type: 'club',
-  })
-
   const welcomeMaker = createWelcomeMarker([0, 0, 0], config)
+  const spawnCtrl = createSpawnController([10, 0, 10])
+
+  overridePlayerScript({
+    __injections: {
+      die: [`sendevent killed ${spawnCtrl.ref} "player"`],
+    },
+  })
 
   movePlayerTo(
     {
@@ -148,7 +147,7 @@ const generate = async (config) => {
   setColor('#a7a7a7', mapData)
   setTexture(textures.stone.humanAkbaaPavingF, mapData)
 
-  plain([0, 0, 0], 10, 'floor', disableBumping, () => ({
+  plain([0, 0, 0], 20, 'floor', disableBumping, () => ({
     quad: pickRandom([0, 1, 2, 3]),
     textureRotation: pickRandom([0, 90, 180, 270]),
     textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),

@@ -13,6 +13,8 @@ const itemDesc = {
   native: true,
 }
 
+// TODO: add BMP file for icon
+
 export const defineWeapon = () => {
   const ref = createRootItem(itemDesc, {})
 

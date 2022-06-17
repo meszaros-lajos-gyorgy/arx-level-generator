@@ -12,6 +12,11 @@ import { PLAYER_HEIGHT_ADJUSTMENT } from '../constants'
 import glob from 'tiny-glob'
 import weapons from './items/weapons'
 
+export type RenderedInjectableProps = {
+  init?: string[]
+  initend?: string[]
+}
+
 export type InjectableProps = {
   name?: string
   speed?: number
@@ -21,10 +26,7 @@ export type InjectableProps = {
   collision?: boolean
   variant?: string
   mesh?: string
-}
-
-export type RenderedInjectableProps = {
-  init?: string[]
+  __injections?: RenderedInjectableProps
 }
 
 export type ItemRef = {
@@ -290,6 +292,14 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   if (initend.length) {
     result.initend = initend
   }
+
+  Object.entries(props.__injections ?? {}).forEach(([event, injections]) => {
+    if (typeof result[event] === 'undefined') {
+      result[event] = []
+    }
+
+    result[event].push(...injections)
+  })
 
   return result
 }
