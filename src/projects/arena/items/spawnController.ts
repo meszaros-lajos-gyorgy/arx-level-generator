@@ -25,12 +25,15 @@ ON INIT {
 }
 
 ON KILLED {
+  herosay "~^$param1~ was killed"
   IF (^$PARAM1 == "player") {
     IF (${ref.state.ignoreNextKillEvent} == 1) {
       SET ${ref.state.ignoreNextKillEvent} 0
     } ELSE {
       TIMERrespawn -m 1 ${DEATHCAM_TIME} GOTO RESURRECT
     }
+  } ELSE {
+    TIMERrespawn -m 1 ${DEATHCAM_TIME} sendevent custom ~^$param1~ "revive"
   }
   ACCEPT
 }

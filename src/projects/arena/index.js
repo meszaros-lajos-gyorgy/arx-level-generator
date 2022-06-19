@@ -22,9 +22,10 @@ import {
 } from '../../helpers'
 import { plain } from '../../prefabs'
 import { disableBumping } from '../../prefabs/plain'
-import { declare, getInjections } from '../../scripting'
+import { getInjections } from '../../scripting'
 import { overridePlayerScript } from '../shared/player'
 import { hideMinimap } from '../shared/reset'
+import { createNPC, defineNPC } from './items/npc'
 import { createSpawnController } from './items/spawnController'
 
 const createWelcomeMarker = (pos, config) => {
@@ -42,7 +43,7 @@ ON INIT {
 }
 
 ON CONTROLLEDZONE_ENTER {
-  TELEPORT -p ${self.ref}
+  TELEPORT -p self
   ACCEPT
 }
     `
@@ -54,6 +55,7 @@ ON CONTROLLEDZONE_ENTER {
   return ref
 }
 
+/*
 const createNPC = (pos, angle, config) => {
   const type = config.type ?? 'ct'
   const variant = config.variant ?? 1
@@ -109,6 +111,7 @@ ON INITEND {
   markAsUsed(ref)
   return ref
 }
+*/
 
 const generate = async (config) => {
   const { origin } = config
@@ -122,6 +125,12 @@ const generate = async (config) => {
   overridePlayerScript({
     __injections: {
       die: [`sendevent killed ${spawnCtrl.ref} "player"`, 'refuse'],
+    },
+  })
+
+  defineNPC({
+    __injections: {
+      die: [`sendevent killed ${spawnCtrl.ref} ~^me~`, 'refuse'],
     },
   })
 
@@ -167,9 +176,12 @@ const generate = async (config) => {
   })
 
   createNPC([300, 0, -100], [0, 90, 0], { type: 'ct', variant: 1 })
+
+  /*
   createNPC([300, 0, 100], [0, 90, 0], { type: 'ct', variant: 2 })
   createNPC([-300, 0, 100], [0, 270, 0], { type: 't', variant: 1 })
   createNPC([-300, 0, -100], [0, 270, 0], { type: 't', variant: 2 })
+  */
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)

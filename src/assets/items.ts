@@ -17,6 +17,17 @@ export type RenderedInjectableProps = {
   initend?: string[]
 }
 
+export type Materials =
+  | 'stone'
+  | 'wood'
+  | 'metal'
+  | 'cloth'
+  | 'flesh'
+  | 'ice'
+  | 'glass'
+  | 'earth'
+  | 'weapon'
+
 export type InjectableProps = {
   name?: string
   speed?: number
@@ -26,6 +37,7 @@ export type InjectableProps = {
   collision?: boolean
   variant?: string
   mesh?: string
+  material?: Materials
   __injections?: RenderedInjectableProps
 }
 
@@ -269,8 +281,11 @@ const propsToInjections = (props: InjectableProps): RenderedInjectableProps => {
   if (typeof props.collision === 'boolean') {
     init.push(`COLLISION ${props.collision ? 'ON' : 'OFF'}`)
   }
+  if (props.material) {
+    init.push(`SET_MATERIAL "${props.material}"`)
+  }
   if (typeof props.mesh === 'string') {
-    initend.push(`USEMESH ${props.mesh}`)
+    initend.push(`USEMESH "${props.mesh}"`)
   }
   if (props.variant) {
     const tmpScope = {
