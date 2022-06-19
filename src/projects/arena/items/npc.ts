@@ -138,8 +138,8 @@ ON OUCH {
 }
 
 ON DIE {
-  FORCEANIM DIE
   ${getInjections('die', self)}
+  FORCEANIM DIE
   ACCEPT
 }
 

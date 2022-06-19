@@ -130,7 +130,7 @@ const generate = async (config) => {
 
   defineNPC({
     __injections: {
-      die: [`sendevent killed ${spawnCtrl.ref} ~^me~`, 'refuse'],
+      die: [`sendevent killed ${spawnCtrl.ref} ~^me~`],
     },
   })
 
