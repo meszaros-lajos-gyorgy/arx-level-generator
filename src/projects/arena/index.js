@@ -121,7 +121,7 @@ const generate = async (config) => {
 
   overridePlayerScript({
     __injections: {
-      die: [`sendevent killed ${spawnCtrl.ref} "player"`],
+      die: [`sendevent killed ${spawnCtrl.ref} "player"`, 'refuse'],
     },
   })
 

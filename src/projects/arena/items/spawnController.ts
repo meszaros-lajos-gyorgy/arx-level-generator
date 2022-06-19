@@ -5,11 +5,16 @@ import {
   moveTo,
   markAsUsed,
 } from '../../../assets/items'
-import { getInjections } from '../../../scripting'
+import { declare, getInjections } from '../../../scripting'
 import { Vector3 } from '../../../types'
+
+const SPAWN_PROTECT_TIME = 3000
+const DEATHCAM_TIME = 4000
 
 export const createSpawnController = (pos: Vector3) => {
   const ref = createItem(items.marker, {})
+
+  declare('int', 'ignoreNextKillEvent', 0, ref)
 
   addScript((self) => {
     return `
@@ -21,7 +26,11 @@ ON INIT {
 
 ON KILLED {
   IF (^$PARAM1 == "player") {
-    TIMERrespawn -m 1 5000 GOSUB RESURRECT
+    IF (${ref.state.ignoreNextKillEvent} == 1) {
+      SET ${ref.state.ignoreNextKillEvent} 0
+    } ELSE {
+      TIMERrespawn -m 1 ${DEATHCAM_TIME} GOTO RESURRECT
+    }
   }
   ACCEPT
 }
@@ -29,14 +38,18 @@ ON KILLED {
 >>RESURRECT {
   gosub respawn
   gosub spawn_protect_on
-  TIMERspawnprotectoff -m 1 5000 gosub spawn_protect_off
-  return
+  TIMERspawnprotectOff -m 1 ${SPAWN_PROTECT_TIME} goto spawn_protect_off
+  ACCEPT
 }
+
 >>RESPAWN {
+  setplayercontrols on specialfx heal 1
+  SET ${ref.state.ignoreNextKillEvent} 1
+  dodamage player 1
   setplayercontrols on specialfx heal ^player_maxlife
-  // TODO: the player remains in darkened state
   RETURN
 }
+
 >>SPAWN_PROTECT_ON {
   sendevent glow player on
   invulnerability -p on
@@ -45,8 +58,9 @@ ON KILLED {
 >>SPAWN_PROTECT_OFF {
   sendevent glow player off
   invulnerability -p off
-  RETURN
+  ACCEPT
 }
+
     `
   }, ref)
 
