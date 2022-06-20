@@ -7,7 +7,13 @@ import {
   addDependencyAs,
 } from '../../../assets/items'
 import { useTexture, textures } from '../../../assets/textures'
-import { getInjections, declare } from '../../../scripting'
+import {
+  getInjections,
+  declare,
+  FALSE,
+  TRUE,
+  UNDEFINED,
+} from '../../../scripting'
 
 const itemDesc = {
   src: 'fix_inter/ceiling-lamp/ceiling-lamp.ftl',
@@ -18,19 +24,19 @@ export const defineCeilingLamp = () => {
   useTexture(textures.backrooms.ceilingLampOn)
   useTexture(textures.backrooms.ceilingLampOff)
 
-  declare('int', 'powerOn', 1, 'global')
+  declare('bool', 'powerOn', TRUE, 'global')
 
   const ref = createRootItem(itemDesc, {
     interactive: false,
     // mesh: 'polytrans/polytrans.teo',
   })
 
-  declare('int', 'isOn', 0, ref)
-  declare('int', 'oldIsOn', -1, ref)
-  declare('int', 'savedIsOn', -1, ref)
-  declare('int', 'muted', 0, ref)
-  declare('int', 'oldMuted', -1, ref)
-  declare('int', 'instantSwitching', 0, ref)
+  declare('bool', 'isOn', FALSE, ref)
+  declare('bool', 'oldIsOn', UNDEFINED, ref)
+  declare('bool', 'savedIsOn', UNDEFINED, ref)
+  declare('bool', 'muted', FALSE, ref)
+  declare('bool', 'oldMuted', UNDEFINED, ref)
+  declare('bool', 'instantSwitching', FALSE, ref)
   declare('string', 'caster', '', ref)
 
   addDependencyAs(
@@ -83,9 +89,9 @@ ON INITEND {
   SET ${self.state.oldIsOn} ${self.state.isOn}
 
 
-  if (${self.state.isOn} == 1) {
+  if (${self.state.isOn} == ${TRUE}) {
     TWEAK SKIN "[metal]_dwarf_grid" "backrooms-[metal]-light-on"
-    if (${self.state.muted} == 0) {
+    if (${self.state.muted} == ${FALSE}) {
       PLAY -lip "fluorescent-lamp-hum" // [l] = loop, [i] = unique, [p] = variable pitch
     }
   } else {
@@ -96,37 +102,37 @@ ON INITEND {
 }
 
 ON ON {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
-  SET ${self.state.isOn} 1
+  SET ${self.state.isOn} ${TRUE}
   if (^$PARAM1 == "instant") {
-    SET ${self.state.instantSwitching} 1
+    SET ${self.state.instantSwitching} ${TRUE}
   } else {
-    SET ${self.state.instantSwitching} 0
+    SET ${self.state.instantSwitching} ${FALSE}
   }
   GOTO SWITCH
   ACCEPT
 }
 
 ON OFF {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
-  SET ${self.state.isOn} 0
+  SET ${self.state.isOn} ${FALSE}
   if (^$PARAM1 == "instant") {
-    SET ${self.state.instantSwitching} 1
+    SET ${self.state.instantSwitching} ${TRUE}
   } else {
-    SET ${self.state.instantSwitching} 0
+    SET ${self.state.instantSwitching} ${FALSE}
   }
   GOTO SWITCH
   ACCEPT
 }
 
 ON SAVE {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
@@ -135,7 +141,7 @@ ON SAVE {
 }
 
 ON RESTORE {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
@@ -145,26 +151,26 @@ ON RESTORE {
 }
 
 ON RANDOM {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
   IF (^RND_100 > 50) {
-    SET ${self.state.isOn} 1
+    SET ${self.state.isOn} ${TRUE}
   } ELSE {
-    SET ${self.state.isOn} 0
+    SET ${self.state.isOn} ${FALSE}
   }
   if (^$PARAM1 == "instant") {
-    SET ${self.state.instantSwitching} 1
+    SET ${self.state.instantSwitching} ${TRUE}
   } else {
-    SET ${self.state.instantSwitching} 0
+    SET ${self.state.instantSwitching} ${FALSE}
   }
   GOTO SWITCH
   ACCEPT
 }
 
 ON HIT {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
@@ -191,8 +197,8 @@ ON HIT {
     SET ${self.state.caster} ""
   }
 
-  if (${self.state.isOn} == 1) {
-    if (${self.state.instantSwitching} == 1) {
+  if (${self.state.isOn} == ${TRUE}) {
+    if (${self.state.instantSwitching} == ${TRUE}) {
       SET #ANIM 0
     } else {
       SET #ANIM ^RND_5
@@ -204,7 +210,7 @@ ON HIT {
     TIMERonStart -m 1 #ANIM GOSUB TURN_ON_START
     TIMERonEnd -m 1 #ANIM2 GOSUB TURN_ON_END
   } else {
-    if (${self.state.instantSwitching} == 1) {
+    if (${self.state.instantSwitching} == ${TRUE}) {
       SET #ANIM 0
     } else {
       SET #ANIM ^RND_5
@@ -222,7 +228,7 @@ ON HIT {
 
 >>TURN_ON_START {
   SPELLCAST -smfx 1 IGNIT self // [s] = no anim, [m] = no draw, [f] = no mana required, [x] = no sound
-  if (${self.state.muted} == 0) {
+  if (${self.state.muted} == ${FALSE}) {
     PLAY "fluorescent-lamp-startup"
   }
   RETURN
@@ -230,7 +236,7 @@ ON HIT {
 
 >>TURN_ON_END {
   TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-light-on"
-  if (${self.state.muted} == 0) {
+  if (${self.state.muted} == ${FALSE}) {
     PLAY -lip "fluorescent-lamp-hum" // [l] = loop, [i] = unique, [p] = variable pitch
     PLAY "fluorescent-lamp-plink"
   }
@@ -244,7 +250,7 @@ ON HIT {
 
 >>TURN_OFF_END {
   TWEAK SKIN "[stone]_ground_caves_wet05" "backrooms-[metal]-light-off"
-  if (${self.state.muted} == 0) {
+  if (${self.state.muted} == ${FALSE}) {
     PLAY -s "fluorescent-lamp-hum" // [s] = stop (only if unique)
     SET #TMP ^RND_100
     IF (#TMP < 33) {
@@ -259,21 +265,21 @@ ON HIT {
 }
 
 ON MUTE {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
-  SET ${self.state.muted} 1
+  SET ${self.state.muted} ${TRUE}
   GOTO VOLUME
   ACCEPT
 }
 
 ON UNMUTE {
-  if (#powerOn == 0) {
+  if (#powerOn == ${FALSE}) {
     ACCEPT
   }
 
-  SET ${self.state.muted} 0
+  SET ${self.state.muted} ${FALSE}
   GOTO VOLUME
   ACCEPT
 }
@@ -285,7 +291,7 @@ ON UNMUTE {
 
   SET ${self.state.oldMuted} ${self.state.muted}
 
-  IF (${self.state.muted} == 1) {
+  IF (${self.state.muted} == ${TRUE}) {
     GOSUB MUTE
   } ELSE {
     GOSUB UNMUTE
@@ -303,7 +309,7 @@ ON UNMUTE {
 }
 
 >>UNMUTE {
-  IF (${self.state.isOn} == 1) {
+  IF (${self.state.isOn} == ${TRUE}) {
     PLAY -lip "fluorescent-lamp-hum" // [l] = loop, [i] = unique, [p] = variable pitch
   }
 
@@ -318,8 +324,8 @@ ON UNMUTE {
 export const createCeilingLamp = (pos, angle = [0, 0, 0], config = {}) => {
   const ref = createItem(itemDesc, {})
 
-  declare('int', 'muted', config.muted ?? false ? 1 : 0, ref)
-  declare('int', 'isOn', config.on ?? false ? 1 : 0, ref)
+  declare('bool', 'muted', config.muted ?? false ? TRUE : FALSE, ref)
+  declare('bool', 'isOn', config.on ?? false ? TRUE : FALSE, ref)
 
   addScript((self) => {
     return `

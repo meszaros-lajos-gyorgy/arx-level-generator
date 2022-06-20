@@ -5,7 +5,7 @@ import {
   moveTo,
   markAsUsed,
 } from '../../../assets/items'
-import { declare, getInjections } from '../../../scripting'
+import { declare, FALSE, getInjections, TRUE } from '../../../scripting'
 import { Vector3 } from '../../../types'
 
 const SPAWN_PROTECT_TIME = 3000
@@ -14,7 +14,7 @@ const DEATHCAM_TIME = 4000
 export const createSpawnController = (pos: Vector3) => {
   const ref = createItem(items.marker, {})
 
-  declare('int', 'ignoreNextKillEvent', 0, ref)
+  declare('bool', 'ignoreNextKillEvent', FALSE, ref)
 
   addScript((self) => {
     return `
@@ -27,8 +27,8 @@ ON INIT {
 ON KILLED {
   herosay "~^$param1~ was killed"
   IF (^$PARAM1 == "player") {
-    IF (${ref.state.ignoreNextKillEvent} == 1) {
-      SET ${ref.state.ignoreNextKillEvent} 0
+    IF (${ref.state.ignoreNextKillEvent} == ${TRUE}) {
+      SET ${ref.state.ignoreNextKillEvent} ${FALSE}
     } ELSE {
       TIMERrespawn -m 1 ${DEATHCAM_TIME} GOTO RESURRECT
     }
@@ -47,7 +47,7 @@ ON KILLED {
 
 >>RESPAWN {
   setplayercontrols on specialfx heal 1
-  SET ${ref.state.ignoreNextKillEvent} 1
+  SET ${ref.state.ignoreNextKillEvent} ${TRUE}
   dodamage player 1
   setplayercontrols on specialfx heal ^player_maxlife
   RETURN

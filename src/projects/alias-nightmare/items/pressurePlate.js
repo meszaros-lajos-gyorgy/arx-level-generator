@@ -1,9 +1,11 @@
 import { addScript, createItem, items } from '../../../assets/items'
-import { declare, getInjections } from '../../../scripting'
+import { declare, FALSE, getInjections, TRUE } from '../../../scripting'
 
 export const createPressurePlate = (id, eventBus) => {
   const ref = createItem(items.mechanisms.pressurePlate)
-  declare('int', 'onme', 0, ref)
+
+  declare('bool', 'onMe', FALSE, ref)
+
   addScript((self) => {
     return `
 // component: island.${id}
@@ -20,8 +22,8 @@ ON INITEND {
 
 >>TOP {
   IF ( ^$OBJONTOP == "NONE" ) {
-    IF ( ${self.state.onme} == 1 ) {
-      SET ${self.state.onme} 0
+    IF ( ${self.state.onMe} == ${TRUE} ) {
+      SET ${self.state.onMe} ${FALSE}
       PLAYANIM ACTION2
       SENDEVENT CUSTOM ${eventBus.ref} "${id}.released"
     }
@@ -31,8 +33,8 @@ ON INITEND {
   // HEROSAY ^$OBJONTOP
   // HEROSAY #~^$objontop~___weight
 
-  IF ( ${self.state.onme} == 0 ) {
-    SET ${self.state.onme} 1
+  IF ( ${self.state.onMe} == ${FALSE} ) {
+    SET ${self.state.onMe} ${TRUE}
     PLAYANIM ACTION1
     SENDEVENT CUSTOM ${eventBus.ref} "${id}.pressed"
   }

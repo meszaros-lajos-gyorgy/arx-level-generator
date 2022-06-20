@@ -42,7 +42,7 @@ import {
   items,
   addDependencyAs,
 } from '../../assets/items'
-import { getInjections, declare, color } from '../../scripting'
+import { getInjections, declare, color, FALSE, TRUE } from '../../scripting'
 import {
   generateGrid,
   addRoom,
@@ -175,9 +175,9 @@ const createWelcomeMarker = (pos, config) => {
     ref,
   )
 
-  declare('int', 'hasAam', 0, ref)
-  declare('int', 'hasFolgora', 0, ref)
-  declare('int', 'hasTaar', 0, ref)
+  declare('bool', 'hasAam', FALSE, ref)
+  declare('bool', 'hasFolgora', FALSE, ref)
+  declare('bool', 'hasTaar', FALSE, ref)
 
   addScript((self) => {
     return `
@@ -201,18 +201,18 @@ ON CONTROLLEDZONE_ENTER {
 
 ON GOT_RUNE {
   IF (^$PARAM1 == "aam") {
-    SET ${self.state.hasAam} 1
+    SET ${self.state.hasAam} ${TRUE}
   }
   IF (^$PARAM1 == "folgora") {
-    SET ${self.state.hasFolgora} 1
+    SET ${self.state.hasFolgora} ${TRUE}
   }
   IF (^$PARAM1 == "taar") {
-    SET ${self.state.hasTaar} 1
+    SET ${self.state.hasTaar} ${TRUE}
   }
 
-  IF (${self.state.hasAam} == 1) {
-    IF (${self.state.hasFolgora} == 1) {
-      IF (${self.state.hasTaar} == 1) {
+  IF (${self.state.hasAam} == ${TRUE}) {
+    IF (${self.state.hasFolgora} == ${TRUE}) {
+      IF (${self.state.hasTaar} == ${TRUE}) {
         GOSUB TUTORIAL_LIGHT
       }
     }
@@ -299,9 +299,9 @@ const createJumpscareController = (pos, lampCtrl, ambientLights, config) => {
   declare('int', 'magicCntr', 0, ref)
   declare('int', 'harmfulAlmondWaterCounter', 0, ref)
   declare('int', 'previousHarmfulAlmondWaterCounter', -1, ref)
-  declare('int', 'hadTutorialPowerout', 0, ref)
-  declare('int', 'whisperEnabled', 1, ref)
-  declare('int', 'hadBabyHallucination', 0, ref)
+  declare('bool', 'hadTutorialPowerout', FALSE, ref)
+  declare('bool', 'isWhisperEnabled', TRUE, ref)
+  declare('bool', 'hadBabyHallucination', FALSE, ref)
 
   addScript((self) => {
     return `
@@ -349,8 +349,8 @@ ON PICKUP {
 
   if (^$PARAM1 == "key:exit") {
     if (#powerOn == 1) {
-      if (${self.state.hadBabyHallucination} == 0) {
-        set ${self.state.hadBabyHallucination} 1
+      if (${self.state.hadBabyHallucination} == ${FALSE}) {
+        set ${self.state.hadBabyHallucination} ${TRUE}
         GOSUB BABY
       }
     }
@@ -387,8 +387,8 @@ ON POWEROUT {
   SENDEVENT SAVE ${lampCtrl.ref} NOP
   SENDEVENT OFF ${lampCtrl.ref} NOP
 
-  IF(${self.state.hadTutorialPowerout} == 0) {
-    SET ${self.state.hadTutorialPowerout} 1
+  IF(${self.state.hadTutorialPowerout} == ${FALSE}) {
+    SET ${self.state.hadTutorialPowerout} ${TRUE}
     TIMERtutorial -m 1 2000 GOSUB TUTORIAL_POWEROUT
   }
 
@@ -396,67 +396,67 @@ ON POWEROUT {
 }
 
 >>WHISPER_NOEXIT {
-  IF (${self.state.whisperEnabled} == 0) {
+  IF (${self.state.isWhisperEnabled} == ${FALSE}) {
     RETURN
   }
-  SET ${self.state.whisperEnabled} 0
+  SET ${self.state.isWhisperEnabled} ${FALSE}
   SPEAK -p [whisper--no-exit] TIMERspeakAgain -m 1 200 SET ${
-    self.state.whisperEnabled
-  } 1
+    self.state.isWhisperEnabled
+  } ${TRUE}
   HEROSAY [whisper--no-exit]
   RETURN
 }
 
 >>WHISPER_DRINK1 {
-  IF (${self.state.whisperEnabled} == 0) {
+  IF (${self.state.isWhisperEnabled} == ${FALSE}) {
     RETURN
   }
-  SET ${self.state.whisperEnabled} 0
+  SET ${self.state.isWhisperEnabled} ${FALSE}
   SPEAK -p [whisper--drink-the-almond-water] TIMERspeakAgain -m 1 200 SET ${
-    self.state.whisperEnabled
-  } 1
+    self.state.isWhisperEnabled
+  } ${TRUE}
   HEROSAY [whisper--drink-the-almond-water]
   RETURN
 }
 
 >>WHISPER_DRINK2 {
-  IF (${self.state.whisperEnabled} == 0) {
+  IF (${self.state.isWhisperEnabled} == ${FALSE}) {
     RETURN
   }
-  SET ${self.state.whisperEnabled} 0
+  SET ${self.state.isWhisperEnabled} ${FALSE}
   SPEAK -p [whisper--drink-it] TIMERspeakAgain -m 1 200 SET ${
-    self.state.whisperEnabled
-  } 1
+    self.state.isWhisperEnabled
+  } ${TRUE}
   HEROSAY [whisper--drink-it]
   RETURN
 }
 
 >>WHISPER_SMELL {
-  IF (${self.state.whisperEnabled} == 0) {
+  IF (${self.state.isWhisperEnabled} == ${FALSE}) {
     RETURN
   }
-  SET ${self.state.whisperEnabled} 0
+  SET ${self.state.isWhisperEnabled} ${FALSE}
   SPEAK -p [whisper--do-you-smell-it] TIMERspeakAgain -m 1 200 SET ${
-    self.state.whisperEnabled
-  } 1
+    self.state.isWhisperEnabled
+  } ${TRUE}
   HEROSAY [whisper--do-you-smell-it]
   RETURN
 }
 
 >>WHISPER_MAGIC {
-  IF (${self.state.whisperEnabled} == 0) {
+  IF (${self.state.isWhisperEnabled} == ${FALSE}) {
     RETURN
   }
-  SET ${self.state.whisperEnabled} 0
+  SET ${self.state.isWhisperEnabled} ${FALSE}
   SPEAK -p [whisper--magic-wont-save-you] TIMERspeakAgain -m 1 200 SET ${
-    self.state.whisperEnabled
-  } 1
+    self.state.isWhisperEnabled
+  } ${TRUE}
   HEROSAY [whisper--magic-wont-save-you]
   RETURN
 }
 
 >>BABY {
-  SET ${self.state.whisperEnabled} 0
+  SET ${self.state.isWhisperEnabled} ${FALSE}
   PLAY -o "magic_spell_slow_down"
   PLAY -o "strange_noise1"
   PLAY -oil "player_heartb"
@@ -482,14 +482,14 @@ ON POWEROUT {
   TIMERlampUnmute -m 1 15000 SENDEVENT UNMUTE ${lampCtrl.ref} NOP
   TIMERend -m 1 15500 SENDEVENT RESTORE ${lampCtrl.ref} NOP
   TIMERspeedrestore -m 1 15500 SENDEVENT SETSPEED player 1 SET ${
-    self.state.whisperEnabled
-  } 1
+    self.state.isWhisperEnabled
+  } ${TRUE}
 
   RETURN
 }
 
 >>OUTRO {
-  SET ${self.state.whisperEnabled} 0
+  SET ${self.state.isWhisperEnabled} ${FALSE}
   TIMERmute -m 1 1500 SENDEVENT MUTE ${lampCtrl.ref} NOP
   PLAYERINTERFACE HIDE
   SETPLAYERCONTROLS OFF
@@ -557,8 +557,8 @@ const createExit = (
   declare('int', 'lockpickability', 100, ref)
   declare('string', 'type', 'Door_Ylsides', ref)
   declare('string', 'key', key.ref, ref)
-  declare('int', 'open', 0, ref)
-  declare('int', 'unlock', 0, ref)
+  declare('bool', 'open', FALSE, ref)
+  declare('bool', 'unlock', FALSE, ref)
   addDependencyAs(
     'projects/the-backrooms/sfx/backrooms-outro.wav',
     'sfx/backrooms-outro.wav',
@@ -579,11 +579,11 @@ ON LOAD {
 }
 
 ON ACTION {
-  IF (${self.state.unlock} == 0) {
+  IF (${self.state.unlock} == ${FALSE}) {
     ACCEPT
   }
 
-  IF (${self.state.open} == 1) {
+  IF (${self.state.open} == ${TRUE}) {
     ACCEPT
   }
 
@@ -602,7 +602,7 @@ ON ACTION {
 const createKey = (pos, angle = [0, 0, 0], jumpscareCtrl) => {
   const ref = createItem(items.keys.oliverQuest, { name: '[key--exit]' })
 
-  declare('int', 'pickedUp', 0, ref)
+  declare('bool', 'hadBeenPickedUp', FALSE, ref)
 
   addScript((self) => {
     return `
@@ -614,8 +614,8 @@ ON INIT {
 }
 
 ON INVENTORYIN {
-  IF (${self.state.pickedUp} == 0) {
-    SET ${self.state.pickedUp} 0
+  IF (${self.state.hadBeenPickedUp} == ${FALSE}) {
+    SET ${self.state.hadBeenPickedUp} ${TRUE}
     SENDEVENT PICKUP ${jumpscareCtrl.ref} "key:exit"
   }
 
@@ -645,7 +645,7 @@ const createAlmondWater = (
     ref,
   )
   declare('string', 'variant', variant, ref)
-  declare('int', 'pickedUp', 0, ref)
+  declare('bool', 'hadBeenPickedUp', FALSE, ref)
 
   addScript((self) => {
     return `
@@ -660,8 +660,8 @@ ON IDENTIFY {
 }
 
 ON INVENTORYIN {
-  IF (${self.state.pickedUp} == 0) {
-    SET ${self.state.pickedUp} 0
+  IF (${self.state.hadBeenPickedUp} == ${FALSE}) {
+    SET ${self.state.hadBeenPickedUp} ${TRUE}
     SENDEVENT PICKUP ${jumpscareCtrl.ref} "almondwater:${variant}"
   }
 

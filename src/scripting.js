@@ -3,6 +3,10 @@ import { roundToNDecimals } from './helpers'
 
 export const SCRIPT_EOL = '\r\n'
 
+export const TRUE = 1
+export const FALSE = 0
+export const UNDEFINED = -1
+
 const toFloat = (colorChannel) => {
   return roundToNDecimals(6, colorChannel / 256)
 }
@@ -21,6 +25,7 @@ export const declare = (type, name, initialValue, scope) => {
   let value = initialValue
   if (scope === 'global') {
     switch (type) {
+      case 'bool':
       case 'int':
         globalScope.state[name] = `#${name}`
         break
@@ -41,6 +46,7 @@ export const declare = (type, name, initialValue, scope) => {
     }
   } else {
     switch (type) {
+      case 'bool':
       case 'int':
         scope.state[name] = `§${name}`
         break
@@ -51,6 +57,7 @@ export const declare = (type, name, initialValue, scope) => {
         scope.state[name] = `£${name}`
         value = `"${initialValue}"`
         break
+      case 'public bool':
       case 'public int':
         scope.state[name] = `#${scope.ref}___${name}`
         break

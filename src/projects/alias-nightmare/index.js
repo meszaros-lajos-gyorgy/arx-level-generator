@@ -23,7 +23,7 @@ import {
   addScript,
   addDependencyAs,
 } from '../../assets/items'
-import { declare, color, getInjections } from '../../scripting'
+import { declare, color, getInjections, FALSE, TRUE } from '../../scripting'
 import bridges from './bridges'
 import { createSmellyFlower } from './items/smellyFlower'
 import { createStatue, defineStatue } from './items/statue'
@@ -36,7 +36,9 @@ import { overridePlayerScript } from '../shared/player'
 
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
-  declare('int', 'hadIntro', 0, ref)
+
+  declare('bool', 'hadIntro', FALSE, ref)
+
   addDependencyAs(
     'reset/map.bmp',
     `graph/levels/level${config.levelIdx}/map.bmp`,
@@ -59,9 +61,9 @@ const createWelcomeMarker = (pos, config) => {
     ACCEPT
   }
   ON CONTROLLEDZONE_ENTER {
-    if (${self.state.hadIntro} == 0) {
+    if (${self.state.hadIntro} == ${FALSE}) {
       TELEPORT -p ${self.ref}
-      SET ${self.state.hadIntro} 1
+      SET ${self.state.hadIntro} ${TRUE}
       SETPLAYERCONTROLS OFF
       // TIMERfade 1 2 worldfade IN 2000
       GOTO READY // TIMERmove -m 1 10 SPEAK -p [alia_nightmare2] GOTO READY
@@ -89,7 +91,8 @@ const createWelcomeMarker = (pos, config) => {
 const createFallSaver = (pos, target) => {
   const ref = createItem(items.marker)
 
-  declare('int', 'isCatching', 0, ref)
+  declare('bool', 'isCatching', FALSE, ref)
+
   addDependencyAs(
     'projects/alias-nightmare/sfx/uru-link.wav',
     `sfx/uru-link.wav`,
@@ -105,10 +108,10 @@ ON INIT {
 }
 
 ON CONTROLLEDZONE_ENTER {
-  IF (${self.state.isCatching} == 1) {
+  IF (${self.state.isCatching} == ${TRUE}) {
     ACCEPT
   }
-  SET ${self.state.isCatching} 1
+  SET ${self.state.isCatching} ${TRUE}
   GOSUB FADEOUT
   TIMERfadein -m 1 300 GOSUB FADEIN NOP
   ACCEPT
@@ -122,7 +125,7 @@ ON CONTROLLEDZONE_ENTER {
 
 >>FADEIN {
   TELEPORT -p ${target.ref}
-  SET ${self.state.isCatching} 0
+  SET ${self.state.isCatching} ${FALSE}
   TIMERfadein -m 1 2000 WORLDFADE IN 1000
   RETURN
 }
