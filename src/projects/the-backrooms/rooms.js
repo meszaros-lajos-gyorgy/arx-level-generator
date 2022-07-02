@@ -1,4 +1,4 @@
-import { times, repeat, clamp, uniq } from '../../faux-ramda'
+import { times, repeat, clamp, uniq, isEven } from '../../faux-ramda'
 import { textures } from '../../assets/textures'
 import { HFLIP, VFLIP } from '../../constants'
 import { setTexture, pickRandom, move, setColor } from '../../helpers'
@@ -6,7 +6,12 @@ import { plain, disableBumping } from '../../prefabs/plain'
 import { UNIT } from './constants'
 import wall from '../../prefabs/wall'
 
-export const getRadius = (grid) => (grid.length - 1) / 2
+export const getRadius = (grid) => {
+  const sizeX = (grid[0][0].length - 1) / 2
+  const sizeY = (grid[0].length - 1) / 2
+  const sizeZ = (grid.length - 1) / 2
+  return [sizeX, sizeY, sizeZ]
+}
 
 const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
   for (let z = 0; z < depth; z++) {
@@ -19,15 +24,15 @@ const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
 }
 
 const addFirstRoom = (width, height, depth, grid) => {
-  const radius = getRadius(grid)
+  const [radiusX, radiusY, radiusZ] = getRadius(grid)
 
-  width = clamp(1, radius * 2 + 1, width)
-  height = clamp(1, radius * 2 + 1, height)
-  depth = clamp(1, radius * 2 + 1, depth)
+  width = clamp(1, radiusX * 2 + 1, width)
+  height = clamp(1, radiusY * 2 + 1, height)
+  depth = clamp(1, radiusZ * 2 + 1, depth)
 
-  const originX = radius - Math.floor(width / 2)
-  const originY = radius - Math.floor(height / 2)
-  const originZ = radius - Math.floor(depth / 2)
+  const originX = radiusX - Math.floor(width / 2)
+  const originY = radiusY - Math.floor(height / 2)
+  const originZ = radiusZ - Math.floor(depth / 2)
 
   insertRoom(originX, originY, originZ, width, height, depth, grid)
 }
@@ -117,12 +122,16 @@ const getFittingVariants = (x, y, z, width, height, depth, grid) => {
   return variations
 }
 
-export const generateGrid = (size) => {
-  if (size % 2 === 0) {
-    size++
+export const generateGrid = (sizeX, sizeY, sizeZ) => {
+  if (isEven(sizeX)) {
+    sizeX++
   }
-
-  const [sizeX, sizeY, sizeZ] = [size, size, size]
+  if (isEven(sizeY)) {
+    sizeY++
+  }
+  if (isEven(sizeZ)) {
+    sizeZ++
+  }
 
   return times(() => times(() => repeat(0, sizeX), sizeY), sizeZ)
 }
@@ -294,10 +303,10 @@ const getBackWalls = (wallSegments) => {
 */
 
 export const renderGrid = (grid, mapData) => {
-  const radius = getRadius(grid)
-  const originX = -radius * UNIT + UNIT / 2
-  const originY = -radius * UNIT + UNIT / 2
-  const originZ = -radius * UNIT + UNIT / 2
+  const [radiusX, radiusY, radiusZ] = getRadius(grid)
+  const originX = -radiusX * UNIT + UNIT / 2
+  const originY = -radiusY * UNIT + UNIT / 2
+  const originZ = -radiusZ * UNIT + UNIT / 2
 
   /*
   const wallSegments = []

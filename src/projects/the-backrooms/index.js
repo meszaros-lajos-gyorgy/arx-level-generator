@@ -807,7 +807,7 @@ const generate = async (config) => {
 
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
 
-  const grid = generateGrid(20) // 50*50 = 2500, okay; 50^3 = 12500!!! not okay
+  const grid = generateGrid(20, 3, 20)
   addRoom(3, 2, 3, grid)
 
   let roomCounter = 1

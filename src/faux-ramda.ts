@@ -71,3 +71,5 @@ export const partition = <T>(
 ): [T[], T[]] => {
   return [values.filter(fn), values.filter(complement(fn))]
 }
+
+export const isEven = (n: number) => n % 2 === 0
