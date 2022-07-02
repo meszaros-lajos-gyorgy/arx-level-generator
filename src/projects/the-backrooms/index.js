@@ -167,7 +167,13 @@ const createWelcomeMarker = (pos, config) => {
 
   useWillowModifiedFont(ref)
 
-  addDependencyAs('projects/the-backrooms/graph/**/*.{jpg,bmp}', 'graph', ref)
+  const uiTheme = 'vhs' // vhs | steampunk
+
+  addDependencyAs(
+    `projects/the-backrooms/ui/${uiTheme}/graph/**/*.{jpg,bmp}`,
+    'graph',
+    ref,
+  )
 
   addDependencyAs(
     'projects/the-backrooms/loading.bmp',
@@ -799,9 +805,7 @@ const generate = async (config) => {
 
   overridePlayerScript()
 
-  /*
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
-  */
 
   const grid = generateGrid(20) // 50*50 = 2500, okay; 50^3 = 12500!!! not okay
   addRoom(3, 2, 3, grid)
@@ -830,7 +834,6 @@ const generate = async (config) => {
   const mapData = generateBlankMapData(config)
   mapData.meta.mapName = 'The Backrooms'
 
-  /*
   movePlayerTo(
     {
       type: 'relative',
@@ -850,7 +853,6 @@ const generate = async (config) => {
     ambiences.none,
     5000,
   )(mapData)
-  */
   setColor('#0b0c10', mapData)
   renderGrid(grid, mapData)
 
