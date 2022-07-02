@@ -88,21 +88,16 @@ const canFitRoomAtPos = (x, y, z, width, height, depth, grid) => {
   return false
 }
 
-// is the x/z slot surrounded by at least 1 slot containing 1? (north/south/east/west, no diagonals)
+// is the x/y/z slot surrounded by at least 1 slot containing 1?
+// (north/south/east/west/top/bottom, no diagonals)
 const isConnected = (x, y, z, grid) => {
   return (
     isOccupied(x - 1, y, z, grid) ||
-    isOccupied(x - 1, y - 1, z, grid) ||
-    isOccupied(x - 1, y + 1, z, grid) ||
     isOccupied(x + 1, y, z, grid) ||
-    isOccupied(x + 1, y - 1, z, grid) ||
-    isOccupied(x + 1, y + 1, z, grid) ||
+    isOccupied(x, y - 1, z, grid) ||
+    isOccupied(x, y + 1, z, grid) ||
     isOccupied(x, y, z - 1, grid) ||
-    isOccupied(x, y - 1, z - 1, grid) ||
-    isOccupied(x, y + 1, z - 1, grid) ||
-    isOccupied(x, y, z + 1, grid) ||
-    isOccupied(x, y - 1, z + 1, grid) ||
-    isOccupied(x, y + 1, z + 1, grid)
+    isOccupied(x, y, z + 1, grid)
   )
 }
 

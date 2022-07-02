@@ -811,6 +811,7 @@ const generate = async (config) => {
   addRoom(3, 2, 3, grid)
 
   let roomCounter = 1
+
   const notFittingCombos = []
   for (let i = 0; i < config.numberOfRooms; i++) {
     const width = Math.round(randomBetween(...config.roomDimensions.width))
@@ -853,10 +854,11 @@ const generate = async (config) => {
     ambiences.none,
     5000,
   )(mapData)
-  setColor('#0b0c10', mapData)
+  // setColor('#0b0c10', mapData)
+  setColor('#777777', mapData)
   renderGrid(grid, mapData)
 
-  addLamp([150, -200, 50], [0, 0, 0], { on: true })(mapData)
+  // addLamp([150, -200, 50], [0, 0, 0], { on: true })(mapData)
 
   /*
   const radius = getRadius(grid)
