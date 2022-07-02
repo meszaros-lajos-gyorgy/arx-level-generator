@@ -521,12 +521,12 @@ export const randomBetween = (min: number, max: number) => {
   return Math.random() * (max - min) + min
 }
 
-export const pickRandoms = (n, set) => {
+export const pickRandoms = <T>(n: number, set: T[]) => {
   if (set.length <= n) {
     return set
   } else {
     let remaining = set.slice()
-    let matches = []
+    let matches: T[] = []
     for (let i = 0; i < n; i++) {
       let idx = Math.floor(randomBetween(0, remaining.length))
       matches = matches.concat(remaining.splice(idx, 1))
@@ -535,12 +535,12 @@ export const pickRandoms = (n, set) => {
   }
 }
 
-export const pickRandom = (set) => {
+export const pickRandom = <T>(set: T[]) => {
   return pickRandoms(1, set)[0]
 }
 
-export const pickRandomIdx = (set) => {
-  return pickRandom(Object.keys(set))
+export const pickRandomIdx = <T>(set: T[]) => {
+  return pickRandom([...set.keys()])
 }
 
 const cross = (u: Vector3, v: Vector3): Vector3 => {
@@ -757,18 +757,35 @@ export const randomSort = <T>(items: T[]) => {
   return sortedItems
 }
 
-export const pickRandomLoot = (amount: number, lootTable: any[]) => {
-  const weights = lootTable.map(({ weight }) => weight)
+// guaranteePresenceOfAll=true will sort items with smaller weights to the beginning of the weightedSet
+// so they will always be present in the list of items, no matter how heavy other items are
+// this way the item with weight=1 will be guaranteed to show up in the selected list
+export const pickWeightedRandoms = (
+  amount: number,
+  set: { weight: number }[],
+  guaranteePresenceOfAll = false,
+) => {
+  const weights = set.map(({ weight }) => weight)
   const totalWeight = sum(weights)
   const percentages = weights.map((weight) => weight / totalWeight)
 
-  const weightedLootTable = percentages
-    .map((weight, idx) => ({ idx, weight: Math.ceil(weight * amount) }))
-    .sort((a, b) => a.weight - b.weight)
-    .flatMap(({ weight, idx }) => repeat(lootTable[idx], weight))
+  const weightedSet = percentages
+    .map((weight, idx) => ({
+      idx,
+      originalWeight: set[idx].weight,
+      weight: Math.ceil(weight * amount),
+    }))
+    .sort((a, b) => {
+      if (guaranteePresenceOfAll) {
+        return a.originalWeight - b.originalWeight
+      } else {
+        return b.originalWeight - a.originalWeight
+      }
+    })
+    .flatMap(({ weight, idx }) => repeat(set[idx], weight))
     .slice(0, amount)
 
-  return randomSort(weightedLootTable)
+  return randomSort(weightedSet)
 }
 
 export const roundToNDecimals = (decimals: number, x: number) => {

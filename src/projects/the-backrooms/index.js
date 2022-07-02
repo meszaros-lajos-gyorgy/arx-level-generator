@@ -23,9 +23,10 @@ import {
   toRgba,
   toFloatRgb,
   addZone,
-  pickRandomLoot,
+  pickWeightedRandoms,
   sortByDistance,
   pickRandomIdx,
+  pickRandom,
 } from '../../helpers'
 import { defineCeilingLamp, createCeilingLamp } from './items/ceilingLamp'
 import {
@@ -807,16 +808,26 @@ const generate = async (config) => {
 
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
 
-  const grid = generateGrid(20, 3, 20)
+  const grid = generateGrid(20, 10, 20)
   addRoom(3, 2, 3, grid)
+
+  const roomTypes = [
+    { dimensions: [4, 2, 4], weight: 2 },
+    { dimensions: [1, 1, 5], weight: 1 },
+    { dimensions: [6, 1, 1], weight: 1 },
+    { dimensions: [1, 7, 1], weight: 1 },
+    { dimensions: [3, 3, 2], weight: 4 },
+    { dimensions: [3, 2, 2], weight: 4 },
+    { dimensions: [2, 2, 3], weight: 4 },
+  ]
 
   let roomCounter = 1
 
   const notFittingCombos = []
   for (let i = 0; i < config.numberOfRooms; i++) {
-    const width = Math.round(randomBetween(...config.roomDimensions.width))
-    const height = Math.round(randomBetween(...config.roomDimensions.height))
-    const depth = Math.round(randomBetween(...config.roomDimensions.depth))
+    const {
+      dimensions: [width, height, depth],
+    } = pickWeightedRandoms(1, roomTypes, true)[0]
     const hash = `${width}|${height}|${depth}`
     if (notFittingCombos.includes(hash)) {
       continue
@@ -979,11 +990,11 @@ const generate = async (config) => {
     jumpscareCtrl,
   )
 
-  const wallPlugTypes = pickRandomLoot(20, [
+  const wallPlugTypes = pickWeightedRandoms(20, [
     { variant: 'clean', weight: 7 },
     { variant: 'old', weight: 4 },
     { variant: 'broken', weight: 1 },
-  ])
+  ], true)
 
   pickRandoms(21, wallSegments).forEach((wallSegment, idx) => {
     if (idx === 0) {
@@ -1002,7 +1013,7 @@ const generate = async (config) => {
     )
   })
 
-  const generalLoot = pickRandomLoot(lootSlots.length, config.lootTable)
+  const generalLoot = pickWeightedRandoms(lootSlots.length, config.lootTable, true)
 
   lootSlots.forEach(([x, y, z], idx) => {
     const offsetX = Math.floor(randomBetween(0, UNIT / 100)) * 100
