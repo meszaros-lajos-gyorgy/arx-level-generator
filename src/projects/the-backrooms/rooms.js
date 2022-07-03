@@ -6,6 +6,18 @@ import { plain, disableBumping } from '../../prefabs/plain'
 import { UNIT } from './constants'
 import wall from '../../prefabs/wall'
 
+export const OCCUPIED = 1 << 0
+export const CONNECT_LEFT = 1 << 1
+export const CONNECT_RIGHT = 1 << 2
+export const CONNECT_TOP = 1 << 3
+export const CONNECT_BOTTOM = 1 << 4
+export const CONNECT_FRONT = 1 << 5
+export const CONNECT_BACK = 1 << 6
+export const CONNECT_X = CONNECT_LEFT | CONNECT_RIGHT
+export const CONNECT_Y = CONNECT_TOP | CONNECT_BOTTOM
+export const CONNECT_Z = CONNECT_FRONT | CONNECT_BACK
+export const CONNECT_ALL = CONNECT_X | CONNECT_Y | CONNECT_Z
+
 export const getRadius = (grid) => {
   const sizeX = (grid[0][0].length - 1) / 2
   const sizeY = (grid[0].length - 1) / 2
@@ -13,17 +25,26 @@ export const getRadius = (grid) => {
   return [sizeX, sizeY, sizeZ]
 }
 
-const insertRoom = (originX, originY, originZ, width, height, depth, grid) => {
+const insertRoom = (
+  originX,
+  originY,
+  originZ,
+  width,
+  height,
+  depth,
+  connectivity,
+  grid,
+) => {
   for (let z = 0; z < depth; z++) {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
-        grid[originZ + z][originY + y][originX + x] = 1
+        grid[originZ + z][originY + y][originX + x] = OCCUPIED | connectivity
       }
     }
   }
 }
 
-const addFirstRoom = (width, height, depth, grid) => {
+const addFirstRoom = (width, height, depth, connectivity, grid) => {
   const [radiusX, radiusY, radiusZ] = getRadius(grid)
 
   width = clamp(1, radiusX * 2 + 1, width)
@@ -34,7 +55,16 @@ const addFirstRoom = (width, height, depth, grid) => {
   const originY = radiusY - Math.floor(height / 2)
   const originZ = radiusZ - Math.floor(depth / 2)
 
-  insertRoom(originX, originY, originZ, width, height, depth, grid)
+  insertRoom(
+    originX,
+    originY,
+    originZ,
+    width,
+    height,
+    depth,
+    connectivity,
+    grid,
+  )
 }
 
 const isEveryCellEmpty = (grid) => {
@@ -54,7 +84,7 @@ export const isOccupied = (x, y, z, grid) => {
     return null
   }
 
-  return grid[z][y][x] === 1
+  return grid[z][y][x] > 0
 }
 
 // starting from originX/originY/originZ does a width/height/depth sized rectangle only occupy 0 slots?
@@ -88,16 +118,28 @@ const canFitRoomAtPos = (x, y, z, width, height, depth, grid) => {
   return false
 }
 
-// is the x/y/z slot surrounded by at least 1 slot containing 1?
+// is the x/y/z slot surrounded by at least 1 slot containing > 0?
 // (north/south/east/west/top/bottom, no diagonals)
-const isConnected = (x, y, z, grid) => {
+const isConnected = (x, y, z, connectivity, grid) => {
   return (
-    isOccupied(x - 1, y, z, grid) ||
-    isOccupied(x + 1, y, z, grid) ||
-    isOccupied(x, y - 1, z, grid) ||
-    isOccupied(x, y + 1, z, grid) ||
-    isOccupied(x, y, z - 1, grid) ||
-    isOccupied(x, y, z + 1, grid)
+    (isOccupied(x - 1, y, z, grid) &&
+      connectivity & CONNECT_RIGHT &&
+      grid[z][y][x - 1] & CONNECT_LEFT) ||
+    (isOccupied(x + 1, y, z, grid) &&
+      connectivity & CONNECT_LEFT &&
+      grid[z][y][x + 1] & CONNECT_RIGHT) ||
+    (isOccupied(x, y - 1, z, grid) &&
+      connectivity & CONNECT_BOTTOM &&
+      grid[z][y - 1][x] & CONNECT_TOP) ||
+    (isOccupied(x, y + 1, z, grid) &&
+      connectivity & CONNECT_TOP &&
+      grid[z][y + 1][x] & CONNECT_BOTTOM) ||
+    (isOccupied(x, y, z - 1, grid) &&
+      connectivity & CONNECT_BACK &&
+      grid[z - 1][y][x] & CONNECT_FRONT) ||
+    (isOccupied(x, y, z + 1, grid) &&
+      connectivity & CONNECT_FRONT &&
+      grid[z + 1][y][x] & CONNECT_BACK)
   )
 }
 
@@ -131,9 +173,9 @@ export const generateGrid = (sizeX, sizeY, sizeZ) => {
   return times(() => times(() => repeat(0, sizeX), sizeY), sizeZ)
 }
 
-export const addRoom = (width, height, depth, grid) => {
+export const addRoom = (width, height, depth, connectivity, grid) => {
   if (isEveryCellEmpty(grid)) {
-    addFirstRoom(width, height, depth, grid)
+    addFirstRoom(width, height, depth, connectivity, grid)
     return true
   }
 
@@ -143,7 +185,7 @@ export const addRoom = (width, height, depth, grid) => {
     for (let y = 0; y < grid[z].length; y++) {
       for (let x = 0; x < grid[z][y].length; x++) {
         if (grid[z][y][x] !== 1) {
-          if (isConnected(x, y, z, grid)) {
+          if (isConnected(x, y, z, connectivity, grid)) {
             candidates.push([x, y, z])
           }
         }
@@ -173,7 +215,7 @@ export const addRoom = (width, height, depth, grid) => {
 
   const [startX, startY, startZ] = pickRandom(variants)
 
-  insertRoom(startX, startY, startZ, width, height, depth, grid)
+  insertRoom(startX, startY, startZ, width, height, depth, connectivity, grid)
   return true
 }
 
@@ -377,7 +419,7 @@ export const renderGrid = (grid, mapData) => {
   for (let z = 0; z < grid.length; z++) {
     for (let y = 0; y < grid[z].length; y++) {
       for (let x = 0; x < grid[z][y].length; x++) {
-        if (grid[z][y][x] === 1) {
+        if (grid[z][y][x] > 0) {
           if (isOccupied(x, y - 1, z, grid) !== true) {
             setTexture(textures.backrooms.carpetDirty, mapData)
             plain(

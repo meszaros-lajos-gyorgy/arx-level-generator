@@ -50,6 +50,11 @@ import {
   getRadius,
   isOccupied,
   renderGrid,
+  CONNECT_X,
+  CONNECT_Y,
+  CONNECT_Z,
+  CONNECT_ALL,
+  CONNECT_BOTTOM,
 } from './rooms'
 import {
   defineCeilingDiffuser,
@@ -808,16 +813,26 @@ const generate = async (config) => {
 
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
 
-  const grid = generateGrid(20, 10, 20)
-  addRoom(3, 2, 3, grid)
+  const grid = generateGrid(20, 20, 20)
+  addRoom(3, 2, 3, CONNECT_ALL ^ CONNECT_BOTTOM, grid)
 
   const roomTypes = [
-    { dimensions: [1, 1, 7], weight: 1 },
-    { dimensions: [7, 1, 1], weight: 1 },
-    { dimensions: [1, 7, 1], weight: 1 },
-    { dimensions: [1, 2, 1], weight: 10 },
-    { dimensions: [2, 1, 1], weight: 10 },
-    { dimensions: [1, 1, 2], weight: 10 },
+    {
+      dimensions: [5, 1, 1],
+      weight: 10,
+      connectivity: CONNECT_X,
+    },
+    {
+      dimensions: [1, 5, 1],
+      weight: 5,
+      connectivity: CONNECT_Y,
+    },
+    {
+      dimensions: [1, 1, 5],
+      weight: 10,
+      connectivity: CONNECT_Z,
+    },
+    { dimensions: [2, 2, 2], weight: 1, connectivity: CONNECT_ALL },
   ]
 
   let roomCounter = 1
@@ -826,14 +841,13 @@ const generate = async (config) => {
 
   const notFittingCombos = []
   for (let i = 0; i < config.numberOfRooms; i++) {
-    const {
-      dimensions: [width, height, depth],
-    } = rooms[i]
+    const room = rooms[i]
+    const [width, height, depth] = room.dimensions
     const hash = `${width}|${height}|${depth}`
     if (notFittingCombos.includes(hash)) {
       continue
     }
-    const newRoomAdded = addRoom(width, height, depth, grid)
+    const newRoomAdded = addRoom(width, height, depth, room.connectivity, grid)
     if (newRoomAdded) {
       roomCounter++
     } else {
