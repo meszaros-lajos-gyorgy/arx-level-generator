@@ -88,7 +88,16 @@ export const isOccupied = (x, y, z, grid) => {
 }
 
 // starting from originX/originY/originZ does a width/height/depth sized rectangle only occupy 0 slots?
-const canFitRoom = (originX, originY, originZ, width, height, depth, grid) => {
+const canFitRoom = (
+  originX,
+  originY,
+  originZ,
+  width,
+  height,
+  depth,
+  connectivity,
+  grid,
+) => {
   for (let z = originZ; z < originZ + depth; z++) {
     for (let y = originY; y < originY + height; y++) {
       for (let x = originX; x < originX + width; x++) {
@@ -99,16 +108,87 @@ const canFitRoom = (originX, originY, originZ, width, height, depth, grid) => {
     }
   }
 
+  if (!(connectivity & CONNECT_LEFT)) {
+    for (let z = originZ; z < originZ + depth; z++) {
+      for (let y = originY; y < originY + height; y++) {
+        if (isOccupied(originX - 1, y, z, grid)) {
+          return false
+        }
+      }
+    }
+  }
+
+  if (!(connectivity & CONNECT_RIGHT)) {
+    for (let z = originZ; z < originZ + depth; z++) {
+      for (let y = originY; y < originY + height; y++) {
+        if (isOccupied(originX + width, y, z, grid)) {
+          return false
+        }
+      }
+    }
+  }
+
+  if (!(connectivity & CONNECT_TOP)) {
+    for (let z = originZ; z < originZ + depth; z++) {
+      for (let x = originX; x < originX + width; x++) {
+        if (isOccupied(x, originY - 1, z, grid)) {
+          return false
+        }
+      }
+    }
+  }
+
+  if (!(connectivity & CONNECT_BOTTOM)) {
+    for (let z = originZ; z < originZ + depth; z++) {
+      for (let x = originX; x < originX + width; x++) {
+        if (isOccupied(x, originY + height, z, grid)) {
+          return false
+        }
+      }
+    }
+  }
+
+  if (!(connectivity & CONNECT_FRONT)) {
+    for (let y = originY; y < originY + height; y++) {
+      for (let x = originX; x < originX + width; x++) {
+        if (isOccupied(x, y, originZ - 1, grid)) {
+          return false
+        }
+      }
+    }
+  }
+
+  if (!(connectivity & CONNECT_BACK)) {
+    for (let y = originY; y < originY + height; y++) {
+      for (let x = originX; x < originX + width; x++) {
+        if (isOccupied(x, y, originZ + depth, grid)) {
+          return false
+        }
+      }
+    }
+  }
+
   return true
 }
 
-// is there a variation of a width/depth sized rectangle containing the position x/z which
+// is there a variation of a width/height/depth sized rectangle containing the position x/y/z which
 // can occupy only 0 slots?
-const canFitRoomAtPos = (x, y, z, width, height, depth, grid) => {
+const canFitRoomAtPos = (x, y, z, width, height, depth, connectivity, grid) => {
   for (let k = 0; k < depth; k++) {
     for (let j = 0; j < height; j++) {
       for (let i = 0; i < width; i++) {
-        if (canFitRoom(x - i, y - j, z - k, width, height, depth, grid)) {
+        if (
+          canFitRoom(
+            x - i,
+            y - j,
+            z - k,
+            width,
+            height,
+            depth,
+            connectivity,
+            grid,
+          )
+        ) {
           return true
         }
       }
@@ -143,13 +223,33 @@ const isConnected = (x, y, z, connectivity, grid) => {
   )
 }
 
-const getFittingVariants = (x, y, z, width, height, depth, grid) => {
+const getFittingVariants = (
+  x,
+  y,
+  z,
+  width,
+  height,
+  depth,
+  connectivity,
+  grid,
+) => {
   const variations = []
 
   for (let k = 0; k < depth; k++) {
     for (let j = 0; j < height; j++) {
       for (let i = 0; i < width; i++) {
-        if (canFitRoom(x - i, y - j, z - k, width, height, depth, grid)) {
+        if (
+          canFitRoom(
+            x - i,
+            y - j,
+            z - k,
+            width,
+            height,
+            depth,
+            connectivity,
+            grid,
+          )
+        ) {
           variations.push([x - i, y - j, z - k])
         }
       }
@@ -194,9 +294,7 @@ export const addRoom = (width, height, depth, connectivity, grid) => {
   }
 
   candidates = candidates.filter(([x, y, z]) => {
-    // TODO: also filter adjacent cells' connectivity
-    // TODO: also filter out diagonal connections
-    return canFitRoomAtPos(x, y, z, width, height, depth, grid)
+    return canFitRoomAtPos(x, y, z, width, height, depth, connectivity, grid)
   })
 
   if (!candidates.length) {
@@ -212,6 +310,7 @@ export const addRoom = (width, height, depth, connectivity, grid) => {
     width,
     height,
     depth,
+    connectivity,
     grid,
   )
 
@@ -422,6 +521,7 @@ export const renderGrid = (grid, mapData) => {
     for (let y = 0; y < grid[z].length; y++) {
       for (let x = 0; x < grid[z][y].length; x++) {
         if (grid[z][y][x] > 0) {
+          setColor('white', mapData)
           if (isOccupied(x, y - 1, z, grid) !== true) {
             setTexture(textures.backrooms.carpetDirty, mapData)
             plain(
@@ -454,7 +554,7 @@ export const renderGrid = (grid, mapData) => {
           }
 
           setTexture(textures.backrooms.wall, mapData)
-
+          // setColor('red', mapData)
           if (isOccupied(x + 1, y, z, grid) !== true) {
             const coords = [
               originX + x * UNIT + UNIT / 2,
@@ -464,6 +564,7 @@ export const renderGrid = (grid, mapData) => {
             wall(coords, 'left', { width: 1, height: 1, unit: UNIT }, mapData)
           }
 
+          // setColor('yellow', mapData)
           if (isOccupied(x - 1, y, z, grid) !== true) {
             const coords = [
               originX + x * UNIT - UNIT / 2,
@@ -473,6 +574,7 @@ export const renderGrid = (grid, mapData) => {
             wall(coords, 'right', { width: 1, height: 1, unit: UNIT }, mapData)
           }
 
+          // setColor('blue', mapData)
           if (isOccupied(x, y, z + 1, grid) !== true) {
             const coords = [
               originX + (x - 1) * UNIT - UNIT / 2,
@@ -481,6 +583,7 @@ export const renderGrid = (grid, mapData) => {
             ]
             wall(coords, 'front', { width: 1, height: 1, unit: UNIT }, mapData)
           }
+          // setColor('green', mapData)
           if (isOccupied(x, y, z - 1, grid) !== true) {
             const coords = [
               originX + (x - 1) * UNIT - UNIT / 2,

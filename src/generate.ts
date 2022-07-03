@@ -26,7 +26,7 @@ const project: string = process.env.PROJECT ?? 'alias-nightmare'
     case 'the-backrooms':
       await theBackrooms({
         ...config,
-        numberOfRooms: 20,
+        numberOfRooms: 50,
         percentOfLightsOn: 35,
         lootTable: [
           {

@@ -813,26 +813,26 @@ const generate = async (config) => {
 
   const welcomeMarker = createWelcomeMarker([0, 0, 0], config)
 
-  const grid = generateGrid(20, 20, 20)
+  const grid = generateGrid(20, 2, 20)
   addRoom(3, 2, 3, CONNECT_ALL ^ CONNECT_BOTTOM, grid)
 
   const roomTypes = [
     {
-      dimensions: [5, 1, 1],
+      dimensions: [5, 2, 2],
       weight: 10,
       connectivity: CONNECT_X,
     },
     {
-      dimensions: [1, 5, 1],
+      dimensions: [2, 5, 2],
       weight: 5,
       connectivity: CONNECT_Y,
     },
     {
-      dimensions: [1, 1, 5],
+      dimensions: [2, 2, 5],
       weight: 10,
       connectivity: CONNECT_Z,
     },
-    { dimensions: [2, 2, 2], weight: 1, connectivity: CONNECT_ALL },
+    { dimensions: [2, 2, 2], weight: 100, connectivity: CONNECT_ALL },
   ]
 
   let roomCounter = 1
