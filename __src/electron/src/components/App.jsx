@@ -108,11 +108,6 @@ const App = () => {
           await theBackroomsGenerator({
             ...config,
             percentOfLightsOn: 30,
-            roomDimensions: {
-              width: [1, 5],
-              depth: [1, 5],
-              height: [1, 5],
-            },
             lootTable: [
               {
                 name: 'almondWater',

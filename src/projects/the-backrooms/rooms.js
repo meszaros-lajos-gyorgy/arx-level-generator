@@ -476,7 +476,7 @@ export const renderGrid = (grid, mapData) => {
           ...decalOffset.right,
           move(
             0,
-            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            -(UNIT * 2 - UNIT / 2),
             0,
             coords,
           ),
@@ -547,7 +547,7 @@ export const renderGrid = (grid, mapData) => {
           ...decalOffset.left,
           move(
             0,
-            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            -(UNIT * 2 - UNIT / 2),
             0,
             coords,
           ),
@@ -618,7 +618,7 @@ export const renderGrid = (grid, mapData) => {
           ...decalOffset.front,
           move(
             0,
-            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            -(UNIT * 2 - UNIT / 2),
             0,
             coords,
           ),
@@ -688,7 +688,7 @@ export const renderGrid = (grid, mapData) => {
           ...decalOffset.back,
           move(
             0,
-            -(UNIT * mapData.config.roomDimensions.height - UNIT / 2),
+            -(UNIT * 2 - UNIT / 2),
             0,
             coords,
           ),

@@ -14,11 +14,6 @@ const TheBackrooms = ({ onGenerateBtnClick, ...props }) => {
         onGenerateBtnClick({
           numberOfRooms,
           percentOfLightsOn,
-          roomDimensions: {
-            width: [1, 5],
-            depth: [1, 5],
-            height: Math.floor(roomHeight / 2),
-          },
           ...config,
         })
       }}

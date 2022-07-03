@@ -812,22 +812,23 @@ const generate = async (config) => {
   addRoom(3, 2, 3, grid)
 
   const roomTypes = [
-    { dimensions: [4, 2, 4], weight: 2 },
-    { dimensions: [1, 1, 5], weight: 1 },
-    { dimensions: [6, 1, 1], weight: 1 },
+    { dimensions: [1, 1, 7], weight: 1 },
+    { dimensions: [7, 1, 1], weight: 1 },
     { dimensions: [1, 7, 1], weight: 1 },
-    { dimensions: [3, 3, 2], weight: 4 },
-    { dimensions: [3, 2, 2], weight: 4 },
-    { dimensions: [2, 2, 3], weight: 4 },
+    { dimensions: [1, 2, 1], weight: 10 },
+    { dimensions: [2, 1, 1], weight: 10 },
+    { dimensions: [1, 1, 2], weight: 10 },
   ]
 
   let roomCounter = 1
+
+  const rooms = pickWeightedRandoms(config.numberOfRooms, roomTypes, true)
 
   const notFittingCombos = []
   for (let i = 0; i < config.numberOfRooms; i++) {
     const {
       dimensions: [width, height, depth],
-    } = pickWeightedRandoms(1, roomTypes, true)[0]
+    } = rooms[i]
     const hash = `${width}|${height}|${depth}`
     if (notFittingCombos.includes(hash)) {
       continue
