@@ -194,6 +194,8 @@ export const addRoom = (width, height, depth, connectivity, grid) => {
   }
 
   candidates = candidates.filter(([x, y, z]) => {
+    // TODO: also filter adjacent cells' connectivity
+    // TODO: also filter out diagonal connections
     return canFitRoomAtPos(x, y, z, width, height, depth, grid)
   })
 
