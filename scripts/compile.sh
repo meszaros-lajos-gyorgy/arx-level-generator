@@ -16,17 +16,17 @@ cd "$OUTPUTDIR/game/graph/levels/level$LEVEL"
 
 echo "FTS"
 
-cat fast.fts.json | from-json --ext=fts | implode -b -l --offset=280 --debug --output=fast.fts
+cat fast.fts.json | arx-convert --from=json --to=fts | implode -b -l --offset=280 --debug --output=fast.fts
 
 cd "$OUTPUTDIR/graph/levels/level$LEVEL"
 
 echo "LLF"
 
-cat level$LEVEL.llf.json | from-json --ext=dlf | implode -b -l --offset=0 --debug --output=level$LEVEL.llf
+cat level$LEVEL.llf.json | arx-convert --from=json --to=dlf | implode -b -l --offset=0 --debug --output=level$LEVEL.llf
 
 echo "DLF"
 
-cat level$LEVEL.dlf.json | from-json --ext=dlf | implode -b -l --offset=8520 --debug --output=level$LEVEL.dlf
+cat level$LEVEL.dlf.json | arx-convert --from=json --to=dlf | implode -b -l --offset=8520 --debug --output=level$LEVEL.dlf
 
 echo "done"
 
