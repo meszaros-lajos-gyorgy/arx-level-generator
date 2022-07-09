@@ -22,7 +22,7 @@ cd "$OUTPUTDIR/graph/levels/level$LEVEL"
 
 echo "LLF"
 
-cat level$LEVEL.llf.json | arx-convert --from=json --to=dlf | implode -b -l --offset=0 --debug --output=level$LEVEL.llf
+cat level$LEVEL.llf.json | arx-convert --from=json --to=llf | implode -b -l --offset=0 --debug --output=level$LEVEL.llf
 
 echo "DLF"
 
