@@ -16,28 +16,40 @@ ON INIT {
 }
 
 ON INITEND {
-  TIMERontop -im 0 100 GOTO TOP
+  TIMERontop -im 0 1000 GOTO TOP
   ACCEPT
 }
 
 >>TOP {
-  IF ( ^$OBJONTOP == "NONE" ) {
-    IF ( ${self.state.onMe} == ${TRUE} ) {
-      SET ${self.state.onMe} ${FALSE}
-      PLAYANIM ACTION2
-      SENDEVENT CUSTOM ${eventBus.ref} "${id}.released"
-    }
-    ACCEPT
+  IF ( ^$OBJONTOP != "NONE" ) {
+    SET $tmp ^$OBJONTOP
+    
+    HEROSAY $tmp
+    POP $obj1 $tmp
+    POP $obj2 $tmp
+    POP $obj3 $tmp
+    HEROSAY "1: ~$obj1~"
+    HEROSAY "2: ~$obj2~"
+    HEROSAY "3: ~$obj3~"
   }
 
-  // HEROSAY ^$OBJONTOP
-  // HEROSAY #~^$objontop~___weight
+  // IF ( ^$OBJONTOP == "NONE" ) {
+  //   IF ( ${self.state.onMe} == ${TRUE} ) {
+  //     SET ${self.state.onMe} ${FALSE}
+  //     PLAYANIM ACTION2
+  //     SENDEVENT CUSTOM ${eventBus.ref} "${id}.released"
+  //   }
+  //   ACCEPT
+  // }
 
-  IF ( ${self.state.onMe} == ${FALSE} ) {
-    SET ${self.state.onMe} ${TRUE}
-    PLAYANIM ACTION1
-    SENDEVENT CUSTOM ${eventBus.ref} "${id}.pressed"
-  }
+  // // HEROSAY ^$OBJONTOP
+  // // HEROSAY #~^$objontop~___weight
+
+  // IF ( ${self.state.onMe} == ${FALSE} ) {
+  //   SET ${self.state.onMe} ${TRUE}
+  //   PLAYANIM ACTION1
+  //   SENDEVENT CUSTOM ${eventBus.ref} "${id}.pressed"
+  // }
   ACCEPT
 }
   `

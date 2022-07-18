@@ -228,10 +228,10 @@ const generate = async (config) => {
     weight: 1,
     scale: 0.7,
   })
-  // createStone(move(-200, -10, 0, islands[0].pos), [0, 0, 0], {
-  //   weight: 3,
-  //   scale: 1.2,
-  // })
+  createStone(move(-200, -10, 0, islands[0].pos), [0, 0, 0], {
+    weight: 3,
+    scale: 1.2,
+  })
   // createStone(move(-200, -10, -100, islands[0].pos), [0, 0, 0], {
   //   weight: 2,
   //   scale: 0.9,
