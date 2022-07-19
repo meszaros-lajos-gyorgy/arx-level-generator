@@ -7,13 +7,15 @@ import {
   markAsUsed,
   moveTo,
 } from '../../../assets/items'
-import { getInjections } from '../../../scripting'
+import { declare, getInjections } from '../../../scripting'
 import { RotationVector3, Vector3 } from '../../../types'
 
 const itemDesc: ItemDefinition = {
   src: 'npc/npc/npc.teo',
   native: true,
 }
+
+export type NPC_TYPE = 'arx guard' | 'rebel guard'
 
 export const defineNPC = (config: InjectableProps = {}) => {
   const ref = createRootItem(itemDesc, {
@@ -23,11 +25,16 @@ export const defineNPC = (config: InjectableProps = {}) => {
     mesh: 'human_base/human_base.teo',
   })
 
+  declare('string', 'type', 'arx guard', ref)
+  declare('int', 'painTolerance', 1, ref)
+  declare('int', 'lastTimeSayingOuch', 0, ref)
+
   addScript((self) => {
     return `
 // component: npc
 ON INIT {
   ${getInjections('init', self)}
+  SETGORE OFF
   ACCEPT
 }
 
@@ -130,6 +137,8 @@ ON INITEND {
   loadanim MISSILE_STRIKE             "human_fight_attack_bow_strike"
   loadanim ACTION1                    "human_misc_kick_rat"
 
+  GOSUB SET_TYPE
+
   IF (§respawning == 1) {
     SET §respawning 0
     PLAYANIM -12 DIE
@@ -142,20 +151,52 @@ ON INITEND {
 
 
 ON OUCH {
-  HEROSAY "ouch! (damage = ~^&PARAM1~)"
+  IF (^&PARAM1 < ${self.state.painTolerance}) {
+    FORCEANIM HIT_SHORT
+  } ELSE {
+    SET #TMP ^GAMESECONDS
+    DEC #TMP ${self.state.lastTimeSayingOuch}
+    IF (#TMP > 4) {
+      FORCEANIM HIT
+      SET ${self.state.lastTimeSayingOuch} ^GAMESECONDS
+    }
+    
+    SET &TMP ${self.state.painTolerance}
+    MUL &TMP 3
+
+    IF (^#PARAM1 >= &TMP) {
+      RANDOM 50 {
+        SPEAK -a ~£ouch_strong~ NOP
+      }
+    } ELSE {
+      SET &TMP ${self.state.painTolerance}
+      MUL &TMP 2
+      IF (^#PARAM1 >= &TMP) {
+        RANDOM 50 { 
+          SPEAK -a ~£ouch_medium~ NOP
+        }
+      } ELSE {
+        RANDOM 50 {
+          SPEAK -a ~£ouch~ NOP
+        }
+      }
+    }
+  }
+
   ACCEPT
 }
 
 ON DIE {
   ${getInjections('die', self)}
   SET §respawning 1
+  SPEAK ~£dying~ NOP
   TIMERrevive -m 1 100 REVIVE -i
   ACCEPT
 }
 
 ON RESPAWN {
   COLLISION ON
-  PLAYANIM -12l WAIT
+  PLAYANIM -12 none
   sendevent glow self on
   ACCEPT
 }
@@ -174,20 +215,77 @@ ON SPAWN_PROTECT_OFF {
   invulnerability off
   ACCEPT
 }
+
+>>SET_TYPE {
+  IF (${self.state.type} == "arx guard") {
+    TWEAK ALL "human_chainmail"
+    TWEAK SKIN "npc_human_chainmail_body" "npc_human_chainmail_guard_body"
+    TWEAK SKIN "npc_human_chainmail_hero_head" "npc_human_chainmail_guard_head"
+    SET_ARMOR_MATERIAL METAL_CHAIN
+    SET_STEP_MATERIAL Foot_metal_chain
+    SET ${self.state.painTolerance} 4
+    
+    SET £dying [human_male_dying]
+    SET £ouch [Human_guard_ouch]
+    SET £ouch_medium [Human_guard_ouch_medium]
+    SET £ouch_strong [Human_guard_ouch_strong]
+
+    SETNAME [description_guard]
+    
+    SETWEAPON CLUB
+    SET_NPC_STAT damages ${10 + 3}
+
+    SET_NPC_STAT armor_class 18
+    SET_NPC_STAT absorb 40
+    SET_NPC_STAT tohit 70
+    SET_NPC_STAT aimtime 1000
+    SET_NPC_STAT life 60
+  }
+  IF (${self.state.type} == "rebel guard") {
+    TWEAK ALL "human_chainmail"
+    TWEAK SKIN "npc_human_chainmail_body" "npc_human_chainmail_sacred_body"
+    TWEAK SKIN "npc_human_chainmail_hero_head" "npc_human_chainmail_sacred_head"
+    SET_ARMOR_MATERIAL METAL_CHAIN
+    SET_STEP_MATERIAL Foot_metal_chain
+    SET ${self.state.painTolerance} 4
+
+    SET £dying [human_male_dying]
+    SET £ouch [Human_guard_ouch]
+    SET £ouch_medium [Human_guard_ouch_medium]
+    SET £ouch_strong [Human_guard_ouch_strong]
+
+    SETNAME [description_guard]
+    
+    SETWEAPON CLUB
+    SET_NPC_STAT damages ${10 + 3}
+
+    SET_NPC_STAT armor_class 18
+    SET_NPC_STAT absorb 40
+    SET_NPC_STAT tohit 70
+    SET_NPC_STAT aimtime 1000
+    SET_NPC_STAT life 60
+  }
+
+  RETURN
+}
     `
   }, ref)
 
   return ref
 }
 
-type NPCProps = {}
+type NPCProps = {
+  type: NPC_TYPE
+}
 
 export const createNPC = (
   pos: Vector3,
   angle: RotationVector3 = [0, 0, 0],
-  config: NPCProps = {},
+  config: NPCProps = { type: 'arx guard' },
 ) => {
   const ref = createItem(itemDesc, {})
+
+  declare('string', 'type', config.type, ref)
 
   addScript((self) => {
     return `

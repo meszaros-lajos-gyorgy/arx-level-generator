@@ -12,7 +12,7 @@ const SPAWN_PROTECT_TIME = 3000
 
 // this has to be <= 7000 otherwise the player will fade out to the main menu after dying
 // TODO: find a way to fake player's death animation without triggering the fadeout (immediately respawn him)
-const DEATHCAM_TIME = 4000
+const DEATHCAM_TIME = 5000
 
 export const createSpawnController = (pos: Vector3, spawnPoints: any[]) => {
   const ref = createItem(items.marker, {})

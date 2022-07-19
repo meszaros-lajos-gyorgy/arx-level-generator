@@ -8,6 +8,7 @@ import {
 } from '../../assets/items'
 import { textures } from '../../assets/textures'
 import { HFLIP, VFLIP } from '../../constants'
+import { identity } from '../../faux-ramda'
 import {
   addLight,
   addZone,
@@ -156,7 +157,7 @@ const generate = async (config) => {
   setColor('#a7a7a7', mapData)
   setTexture(textures.stone.humanAkbaaPavingF, mapData)
 
-  plain([0, 0, 0], 20, 'floor', disableBumping, () => ({
+  plain([0, 0, 0], 20, 'floor', identity, () => ({
     quad: pickRandom([0, 1, 2, 3]),
     textureRotation: pickRandom([0, 90, 180, 270]),
     textureFlags: pickRandom([0, HFLIP, VFLIP, HFLIP | VFLIP]),
@@ -175,13 +176,13 @@ const generate = async (config) => {
     )
   })
 
-  createNPC([300, 0, -100], [0, 90, 0], { type: 'ct', variant: 1 })
+  createNPC([-200, 0, 300], [0, 180, 0], {
+    type: 'rebel guard',
+  })
 
-  /*
-  createNPC([300, 0, 100], [0, 90, 0], { type: 'ct', variant: 2 })
-  createNPC([-300, 0, 100], [0, 270, 0], { type: 't', variant: 1 })
-  createNPC([-300, 0, -100], [0, 270, 0], { type: 't', variant: 2 })
-  */
+  createNPC([200, 0, 300], [0, 180, 0], {
+    type: 'arx guard',
+  })
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)
