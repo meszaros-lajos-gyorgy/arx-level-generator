@@ -129,31 +129,51 @@ ON INITEND {
   loadanim MISSILE_STRIKE_CYCLE       "human_fight_attack_bow_cycle"
   loadanim MISSILE_STRIKE             "human_fight_attack_bow_strike"
   loadanim ACTION1                    "human_misc_kick_rat"
+
+  IF (§respawning == 1) {
+    SET §respawning 0
+    PLAYANIM -12 DIE
+    invulnerability on
+    COLLISION OFF
+  }
+
   ACCEPT
 }
 
+
 ON OUCH {
-  HEROSAY "ouch! (damage = ~^#PARAM1~)"
+  HEROSAY "ouch! (damage = ~^&PARAM1~)"
   ACCEPT
 }
 
 ON DIE {
   ${getInjections('die', self)}
-  FORCEANIM DIE
+  SET §respawning 1
+  TIMERrevive -m 1 100 REVIVE -i
   ACCEPT
 }
 
-ON CUSTOM {
-  // NOT RUNNING WHEN DEAD...
-  herosay "custom event, ~^$param1~"
-  REVIVE -i
+ON RESPAWN {
+  COLLISION ON
+  PLAYANIM -12l WAIT
+  sendevent glow self on
   ACCEPT
 }
 
-// ON LIVEAGAIN {
-//   herosay "live again"
-//   ACCEPT
-// }
+ON GLOW {
+  if (^$param1 == "on") {
+    HALO -ocs 0.8 1 1 30 // [o] = active, [c] = color, [s] = radius
+  } else {
+    HALO -f // [f] = inactive
+  }
+  ACCEPT
+}
+
+ON SPAWN_PROTECT_OFF {
+  sendevent glow self off
+  invulnerability off
+  ACCEPT
+}
     `
   }, ref)
 

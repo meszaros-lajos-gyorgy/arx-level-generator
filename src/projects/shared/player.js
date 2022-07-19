@@ -198,7 +198,7 @@ ON SETSPEED {
 
 ON GLOW {
   if (^$param1 == "on") {
-    HALO -ocs 0.8 1 1 100 // [o] = active, [c] = color, [s] = radius
+    HALO -ocs 0.8 1 1 30 // [o] = active, [c] = color, [s] = radius
   } else {
     HALO -f // [f] = inactive
   }

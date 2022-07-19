@@ -9,9 +9,12 @@ import { declare, FALSE, getInjections, TRUE } from '../../../scripting'
 import { Vector3 } from '../../../types'
 
 const SPAWN_PROTECT_TIME = 3000
+
+// this has to be <= 7000 otherwise the player will fade out to the main menu after dying
+// TODO: find a way to fake player's death animation without triggering the fadeout (immediately respawn him)
 const DEATHCAM_TIME = 4000
 
-export const createSpawnController = (pos: Vector3) => {
+export const createSpawnController = (pos: Vector3, spawnPoints: any[]) => {
   const ref = createItem(items.marker, {})
 
   declare('bool', 'ignoreNextKillEvent', FALSE, ref)
@@ -25,7 +28,6 @@ ON INIT {
 }
 
 ON KILLED {
-  herosay "~^$param1~ was killed"
   IF (^$PARAM1 == "player") {
     IF (${ref.state.ignoreNextKillEvent} == ${TRUE}) {
       SET ${ref.state.ignoreNextKillEvent} ${FALSE}
@@ -33,7 +35,12 @@ ON KILLED {
       TIMERrespawn -m 1 ${DEATHCAM_TIME} GOTO RESURRECT
     }
   } ELSE {
-    TIMERrespawn -m 1 ${DEATHCAM_TIME} sendevent custom ~^$param1~ "revive"
+    // TODO: need some sort of queue here for the targets
+    SET £target ^$param1
+    TIMERrespawn -m 1 ${DEATHCAM_TIME} sendevent respawn £target nop
+    TIMERspawnprotectOff -m 1 ${
+      DEATHCAM_TIME + SPAWN_PROTECT_TIME
+    } sendevent spawn_protect_off £target nop
   }
   ACCEPT
 }
@@ -63,7 +70,6 @@ ON KILLED {
   invulnerability -p off
   ACCEPT
 }
-
     `
   }, ref)
 
