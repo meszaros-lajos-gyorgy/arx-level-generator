@@ -22,12 +22,11 @@ import {
   setTexture,
 } from '../../helpers'
 import { plain } from '../../prefabs'
-import { disableBumping } from '../../prefabs/plain'
 import { getInjections } from '../../scripting'
 import { overridePlayerScript } from '../shared/player'
 import { hideMinimap } from '../shared/reset'
 import { createNPC, defineNPC } from './items/npc'
-import { createSpawnController } from './items/spawnController'
+import { createRespawnController } from './items/respawnController'
 
 const createWelcomeMarker = (pos, config) => {
   const ref = createItem(items.marker)
@@ -56,64 +55,6 @@ ON CONTROLLEDZONE_ENTER {
   return ref
 }
 
-/*
-const createNPC = (pos, angle, config) => {
-  const type = config.type ?? 'ct'
-  const variant = config.variant ?? 1
-
-  const ref = createItem(items.npc.human, {
-    ...(type === 't' ? { mesh: 'human_priest/human_priest.teo' } : {}),
-  })
-
-  if (type === 'ct') {
-    switch (variant) {
-      case 1:
-        declare('string', 'type', 'human_guard_kingdom', ref)
-        declare('string', 'voice', '_vc', ref)
-        break
-      case 2:
-        declare('string', 'type', 'human_guard_ss', ref)
-        declare('string', 'voice', '_vb', ref)
-        break
-    }
-  } else {
-    switch (variant) {
-      case 1:
-        declare('string', 'type', 'human_priest_base', ref)
-        break
-      case 2:
-        declare('string', 'type', 'human_priest_high', ref)
-    }
-  }
-
-  addScript((self) => {
-    return `
-// component: NPC
-ON INIT {
-  ${getInjections('init', self)}
-  ACCEPT
-}
-ON INITEND {
-  ${getInjections('initend', self)}
-  ${
-    type === 't' && variant === 2
-      ? `
-  TWEAK SKIN "npc_human_priest_akbaa_body""npc_Human_priest_fcult_body"
-  TWEAK SKIN "npc_human_priest_akbaa_head""npc_Human_priest_fcult_head"
-  `
-      : ``
-  }
-  ACCEPT
-}
-    `
-  }, ref)
-
-  moveTo({ type: 'relative', coords: pos }, angle, ref)
-  markAsUsed(ref)
-  return ref
-}
-*/
-
 const generate = async (config) => {
   const { origin } = config
 
@@ -121,7 +62,7 @@ const generate = async (config) => {
   mapData.meta.mapName = 'Arena'
 
   const welcomeMaker = createWelcomeMarker([0, 0, 0], config)
-  const spawnCtrl = createSpawnController([10, 0, 10])
+  const spawnCtrl = createRespawnController([10, 0, 10])
 
   overridePlayerScript({
     __injections: {

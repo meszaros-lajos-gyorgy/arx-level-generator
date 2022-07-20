@@ -149,7 +149,6 @@ ON INITEND {
   ACCEPT
 }
 
-
 ON OUCH {
   IF (^&PARAM1 < ${self.state.painTolerance}) {
     FORCEANIM HIT_SHORT
