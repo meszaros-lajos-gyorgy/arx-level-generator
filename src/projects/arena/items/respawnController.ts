@@ -6,7 +6,13 @@ import {
   markAsUsed,
   ItemRef,
 } from '../../../assets/items'
-import { declare, FALSE, getInjections, TRUE } from '../../../scripting'
+import {
+  declare,
+  FALSE,
+  getInjections,
+  SCRIPT_EOL,
+  TRUE,
+} from '../../../scripting'
 import { Vector3 } from '../../../types'
 
 const SPAWN_PROTECT_TIME = 3000
@@ -15,20 +21,24 @@ const SPAWN_PROTECT_TIME = 3000
 // TODO: find a way to fake player's death animation without triggering the fadeout (immediately respawn him)
 const DEATHCAM_TIME = 5000
 
-export const createRespawnController = (pos: Vector3, gameCtrl: ItemRef) => {
+export const createRespawnController = (
+  pos: Vector3,
+  numberOfBots: number,
+  gameCtrl: ItemRef,
+) => {
   const ref = createItem(items.marker, {})
 
   declare('bool', 'ignoreNextKillEvent', FALSE, ref)
-  declare('int', 'respawnTimerCntr', 0, ref)
-  declare('int', 'spawnProtectTimerCntr', 0, ref)
+  declare('int', 'respawnTimerCntr', 1, ref)
+  declare('int', 'spawnProtectTimerCntr', 1, ref)
 
   declare('int', 'respawnQueueSize', 0, ref)
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= numberOfBots; i++) {
     declare('string', `respawnQueueItem${i}`, '', ref)
   }
 
   declare('int', 'spawnProtectQueueSize', 0, ref)
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= numberOfBots; i++) {
     declare('string', `spawnProtectQueueItem${i}`, '', ref)
   }
 
@@ -56,76 +66,86 @@ ON KILLED {
     
     INC ${self.state.respawnQueueSize} 1
     SET "£respawnQueueItem~${self.state.respawnQueueSize}~" £victimID
-
-    INC ${self.state.respawnTimerCntr} 1
-    IF (${self.state.respawnTimerCntr} == 9) {
-      SET ${self.state.respawnTimerCntr} 1
-    }
-
-    ${[1, 2, 3, 4, 5, 6, 7, 8]
+    ${[...Array(numberOfBots).keys()]
       .map((i) => {
         return `
-    IF (${self.state.respawnTimerCntr} == ${i}) {
-      TIMERrespawnNpc${i} -m 1 ${DEATHCAM_TIME} GOTO RESURRECT_NPC
+    IF (${self.state.respawnTimerCntr} == ${i + 1}) {
+      TIMERrespawnNpc${i + 1} -m 1 ${DEATHCAM_TIME} GOTO RESURRECT_NPC
     }`
       })
       .join('')}
+
+    INC ${self.state.respawnTimerCntr} 1
+    IF (${self.state.respawnTimerCntr} == ${numberOfBots + 1}) {
+      SET ${self.state.respawnTimerCntr} 1
+    }
   }
 
   ACCEPT
 }
 
 >>RESURRECT_NPC {
-  sendevent respawn £respawnQueueItem1 nop
+  if (${self.state.respawnQueueSize} > 0) {
+    HEROSAY "resurrect npc"
+    sendevent respawn £respawnQueueItem1 nop
 
-  INC ${self.state.spawnProtectQueueSize} 1
-  SET "£spawnProtectQueueItem~${
-    self.state.spawnProtectQueueSize
-  }~" £respawnQueueItem1
+    INC ${self.state.spawnProtectQueueSize} 1
+    SET "£spawnProtectQueueItem~${
+      self.state.spawnProtectQueueSize
+    }~" £respawnQueueItem1
 
-  // move respawn queue to the left
-  SET £respawnQueueItem1 £respawnQueueItem2
-  SET £respawnQueueItem2 £respawnQueueItem3
-  SET £respawnQueueItem3 £respawnQueueItem4
-  SET £respawnQueueItem4 £respawnQueueItem5
-  SET £respawnQueueItem5 £respawnQueueItem6
-  SET £respawnQueueItem6 £respawnQueueItem7
-  SET £respawnQueueItem7 £respawnQueueItem8
-  SET £respawnQueueItem8 ""
+    // move respawn queue to the left
+${[...Array(numberOfBots).keys()]
+  .map((i) => {
+    if (i === numberOfBots - 1) {
+      return `    SET £respawnQueueItem${i + 1} ""`
+    } else {
+      return `    SET £respawnQueueItem${i + 1} £respawnQueueItem${i + 2}`
+    }
+  })
+  .join(SCRIPT_EOL)}
 
-  DEC ${self.state.respawnQueueSize} 1
-
-  INC ${self.state.spawnProtectTimerCntr} 1
-  IF (${self.state.spawnProtectTimerCntr} == 9) {
-    SET ${self.state.spawnProtectTimerCntr} 1
+    DEC ${self.state.respawnQueueSize} 1
+    ${[...Array(numberOfBots).keys()]
+      .map((i) => {
+        return `
+    IF (${self.state.spawnProtectTimerCntr} == ${i + 1}) {
+      TIMERspawnProtectOffNpc${
+        i + 1
+      } -m 1 ${SPAWN_PROTECT_TIME} GOTO SPAWN_PROTECT_OFF_NPC
+    }`
+      })
+      .join('')}
+    
+    INC ${self.state.spawnProtectTimerCntr} 1
+    IF (${self.state.spawnProtectTimerCntr} == ${numberOfBots + 1}) {
+      SET ${self.state.spawnProtectTimerCntr} 1
+    }
   }
-
-  ${[1, 2, 3, 4, 5, 6, 7, 8]
-    .map((i) => {
-      return `
-  IF (${self.state.spawnProtectTimerCntr} == ${i}) {
-    TIMERspawnProtectOffNpc${i} -m 1 ${SPAWN_PROTECT_TIME} GOTO SPAWN_PROTECT_OFF_NPC
-  }`
-    })
-    .join('')}
 
   ACCEPT
 }
 
 >>SPAWN_PROTECT_OFF_NPC {
-  sendevent spawn_protect_off £spawnProtectQueueItem1 nop
+  if (${self.state.spawnProtectQueueSize} > 0) {
+    HEROSAY -d "spawn protect off npc ~${self.state.spawnProtectQueueSize}~"
+    sendevent spawn_protect_off £spawnProtectQueueItem1 nop
 
   // move spawn protection queue to the left
-  SET £spawnProtectQueueItem1 £spawnProtectQueueItem2
-  SET £spawnProtectQueueItem2 £spawnProtectQueueItem3
-  SET £spawnProtectQueueItem3 £spawnProtectQueueItem4
-  SET £spawnProtectQueueItem4 £spawnProtectQueueItem5
-  SET £spawnProtectQueueItem5 £spawnProtectQueueItem6
-  SET £spawnProtectQueueItem6 £spawnProtectQueueItem7
-  SET £spawnProtectQueueItem7 £spawnProtectQueueItem8
-  SET £spawnProtectQueueItem8 ""
-  
-  DEC ${self.state.spawnProtectQueueSize} 1
+${[...Array(numberOfBots).keys()]
+  .map((i) => {
+    if (i === numberOfBots - 1) {
+      return `    SET £spawnProtectQueueItem${i + 1} ""`
+    } else {
+      return `    SET £spawnProtectQueueItem${i + 1} £spawnProtectQueueItem${
+        i + 2
+      }`
+    }
+  })
+  .join(SCRIPT_EOL)}
+
+    DEC ${self.state.spawnProtectQueueSize} 1
+  }
 
   ACCEPT
 }
