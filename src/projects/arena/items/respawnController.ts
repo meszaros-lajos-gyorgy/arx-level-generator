@@ -86,7 +86,6 @@ ON KILLED {
 
 >>RESURRECT_NPC {
   if (${self.state.respawnQueueSize} > 0) {
-    HEROSAY "resurrect npc"
     sendevent respawn £respawnQueueItem1 nop
 
     INC ${self.state.spawnProtectQueueSize} 1
@@ -128,7 +127,6 @@ ${[...Array(numberOfBots).keys()]
 
 >>SPAWN_PROTECT_OFF_NPC {
   if (${self.state.spawnProtectQueueSize} > 0) {
-    HEROSAY -d "spawn protect off npc ~${self.state.spawnProtectQueueSize}~"
     sendevent spawn_protect_off £spawnProtectQueueItem1 nop
 
   // move spawn protection queue to the left

@@ -137,6 +137,8 @@ ON INITEND {
   loadanim MISSILE_STRIKE             "human_fight_attack_bow_strike"
   loadanim ACTION1                    "human_misc_kick_rat"
 
+  BEHAVIOR FRIENDLY
+  SETTARGET PLAYER
   GOSUB SET_TYPE
 
   IF (§respawning == 1) {

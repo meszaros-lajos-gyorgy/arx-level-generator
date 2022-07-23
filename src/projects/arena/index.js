@@ -109,7 +109,7 @@ const generate = async (config) => {
     coords: [-10, 0, -10],
   })
 
-  const numberOfBots = 10
+  const numberOfBots = 100
 
   const respawnCtrl = createRespawnController(
     [10, 0, 10],
@@ -131,18 +131,16 @@ const generate = async (config) => {
 
   const welcomeMaker = createWelcomeMarker([0, 0, 0], config)
 
-  const bots = circleOfVectors([0, 0, 0], 300, numberOfBots).map(
-    (pos, i, arr) => {
-      return createNPC(
-        { type: 'relative', coords: pos },
-        [0, 180 - i * Math.floor(360 / arr.length), 0],
-        {
-          type: pickRandom(['rebel guard', 'arx guard']),
-          groups: ['bot'],
-        },
-      )
-    },
-  )
+  const bots = circleOfVectors([0, 0, 0], 300, numberOfBots).map((pos, i) => {
+    return createNPC(
+      { type: 'relative', coords: pos },
+      [0, 180 - i * Math.floor(360 / numberOfBots), 0],
+      {
+        type: pickRandom(['rebel guard', 'arx guard']),
+        groups: ['bot'],
+      },
+    )
+  })
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)
