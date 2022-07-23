@@ -56,6 +56,7 @@ export const tiers: WeaponData[] = [
     damage: 7,
   },
   {
+    // TODO: need quiver
     weapon: 'bow',
     damage: 6,
   },

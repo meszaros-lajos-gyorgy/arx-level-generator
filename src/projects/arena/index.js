@@ -125,16 +125,12 @@ const generate = async (config) => {
 
   const welcomeMaker = createWelcomeMarker([0, 0, 0], config)
 
-  const bots = [
-    createNPC({ type: 'relative', coords: [-200, 0, 300] }, [0, 180, 0], {
-      type: 'rebel guard',
+  const bots = circleOfVectors([0, 0, 0], 150, 5).map((pos) => {
+    return createNPC({ type: 'relative', coords: pos }, [0, 0, 0], {
+      type: pickRandom(['rebel guard', 'arx guard']),
       groups: ['bot'],
-    }),
-    createNPC({ type: 'relative', coords: [200, 0, 300] }, [0, 180, 0], {
-      type: 'arx guard',
-      groups: ['bot'],
-    }),
-  ]
+    })
+  })
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)
