@@ -11,6 +11,8 @@ export const overridePlayerScript = (props = {}) => {
 
   const ref = createRootItem(items.npc.player, props)
 
+  declare('string', 'lastEquippedWeaponId', 'none', ref)
+
   addScript((self) => {
     return `
 // component: player
@@ -202,6 +204,16 @@ ON GLOW {
   } else {
     HALO -f // [f] = inactive
   }
+  ACCEPT
+}
+
+ON CHANGE_WEAPON {
+  if (${self.state.lastEquippedWeaponId} != "") {
+    destroy ${self.state.lastEquippedWeaponId}
+  }
+  spawn item "weapons/~^$PARAM1~/~^$PARAM1~" player
+  sendevent INVENTORYUSE ~^last_spawned~ nop
+  set ${self.state.lastEquippedWeaponId} ~^last_spawned~
   ACCEPT
 }
     `

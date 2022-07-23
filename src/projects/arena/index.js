@@ -25,6 +25,7 @@ import { plain } from '../../prefabs'
 import { getInjections } from '../../scripting'
 import { overridePlayerScript } from '../shared/player'
 import { hideMinimap } from '../shared/reset'
+import { createGungameController } from './gamemodes/gungame'
 import { createNPC, defineNPC } from './items/npc'
 import { createRespawnController } from './items/respawnController'
 
@@ -61,21 +62,6 @@ const generate = async (config) => {
   const mapData = generateBlankMapData(config)
   mapData.meta.mapName = 'Arena'
 
-  const welcomeMaker = createWelcomeMarker([0, 0, 0], config)
-  const spawnCtrl = createRespawnController([10, 0, 10])
-
-  overridePlayerScript({
-    __injections: {
-      die: [`sendevent killed ${spawnCtrl.ref} "player"`, 'refuse'],
-    },
-  })
-
-  defineNPC({
-    __injections: {
-      die: [`sendevent killed ${spawnCtrl.ref} ~^me~`],
-    },
-  })
-
   movePlayerTo(
     {
       type: 'relative',
@@ -83,6 +69,7 @@ const generate = async (config) => {
     },
     mapData,
   )
+
   setColor('#333333', mapData)
   addZone(
     {
@@ -117,13 +104,37 @@ const generate = async (config) => {
     )
   })
 
-  createNPC([-200, 0, 300], [0, 180, 0], {
-    type: 'rebel guard',
+  const gungameCtrl = createGungameController({
+    type: 'relative',
+    coords: [-10, 0, -10],
   })
 
-  createNPC([200, 0, 300], [0, 180, 0], {
-    type: 'arx guard',
+  const respawnCtrl = createRespawnController([10, 0, 10], gungameCtrl)
+
+  overridePlayerScript({
+    __injections: {
+      die: [`sendevent killed ${respawnCtrl.ref} "player ~^sender~"`, 'refuse'],
+    },
   })
+
+  defineNPC({
+    __injections: {
+      die: [`sendevent killed ${respawnCtrl.ref} "~^me~ ~^sender~"`],
+    },
+  })
+
+  const welcomeMaker = createWelcomeMarker([0, 0, 0], config)
+
+  const bots = [
+    createNPC({ type: 'relative', coords: [-200, 0, 300] }, [0, 180, 0], {
+      type: 'rebel guard',
+      groups: ['bot'],
+    }),
+    createNPC({ type: 'relative', coords: [200, 0, 300] }, [0, 180, 0], {
+      type: 'arx guard',
+      groups: ['bot'],
+    }),
+  ]
 
   const finalizedMapData = finalize(mapData)
   return saveToDisk(finalizedMapData)

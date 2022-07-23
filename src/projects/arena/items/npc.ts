@@ -7,8 +7,8 @@ import {
   markAsUsed,
   moveTo,
 } from '../../../assets/items'
-import { declare, getInjections } from '../../../scripting'
-import { RotationVector3, Vector3 } from '../../../types'
+import { declare, getInjections, SCRIPT_EOL } from '../../../scripting'
+import { RelativeCoords, RotationVector3 } from '../../../types'
 
 const itemDesc: ItemDefinition = {
   src: 'npc/npc/npc.teo',
@@ -230,15 +230,12 @@ ON SPAWN_PROTECT_OFF {
     SET £ouch_strong [Human_guard_ouch_strong]
 
     SETNAME [description_guard]
-    
-    SETWEAPON CLUB
-    SET_NPC_STAT damages ${10 + 3}
 
     SET_NPC_STAT armor_class 18
     SET_NPC_STAT absorb 40
     SET_NPC_STAT tohit 70
     SET_NPC_STAT aimtime 1000
-    SET_NPC_STAT life 60
+    SET_NPC_STAT life 10
   }
   IF (${self.state.type} == "rebel guard") {
     TWEAK ALL "human_chainmail"
@@ -254,18 +251,21 @@ ON SPAWN_PROTECT_OFF {
     SET £ouch_strong [Human_guard_ouch_strong]
 
     SETNAME [description_guard]
-    
-    SETWEAPON CLUB
-    SET_NPC_STAT damages ${10 + 3}
 
     SET_NPC_STAT armor_class 18
     SET_NPC_STAT absorb 40
     SET_NPC_STAT tohit 70
     SET_NPC_STAT aimtime 1000
-    SET_NPC_STAT life 60
+    SET_NPC_STAT life 10
   }
 
   RETURN
+}
+
+ON CHANGE_WEAPON {
+  SETWEAPON ~^$PARAM1~
+  SET_NPC_STAT damages ^#PARAM2 // + 10
+  ACCEPT
 }
     `
   }, ref)
@@ -275,12 +275,13 @@ ON SPAWN_PROTECT_OFF {
 
 type NPCProps = {
   type: NPC_TYPE
+  groups: string[]
 }
 
 export const createNPC = (
-  pos: Vector3,
+  pos: RelativeCoords,
   angle: RotationVector3 = [0, 0, 0],
-  config: NPCProps = { type: 'arx guard' },
+  config: NPCProps = { type: 'arx guard', groups: ['bot'] },
 ) => {
   const ref = createItem(itemDesc, {})
 
@@ -291,6 +292,7 @@ export const createNPC = (
 // component: npc
 ON INIT {
   ${getInjections('init', self)}
+  ${config.groups.map((group) => `  SETGROUP "${group}"`).join(SCRIPT_EOL)}
   ACCEPT
 }
 
@@ -301,7 +303,7 @@ ON INITEND {
     `
   }, ref)
 
-  moveTo({ type: 'relative', coords: pos }, angle, ref)
+  moveTo(pos, angle, ref)
   markAsUsed(ref)
 
   return ref
