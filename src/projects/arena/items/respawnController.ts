@@ -38,12 +38,12 @@ ON KILLED {
     IF (${ref.state.ignoreNextKillEvent} == ${TRUE}) {
       SET ${ref.state.ignoreNextKillEvent} ${FALSE}
     } ELSE {
-      sendevent died gameCtrl £victimID £killerID
+      sendevent died gameCtrl "~£victimID~ ~£killerID~"
       TIMERrespawn -m 1 ${DEATHCAM_TIME} GOTO RESURRECT
     }
   } ELSE {
     // TODO: need some sort of queue here for the targets
-    sendevent died gameCtrl £victimID £killerID
+    sendevent died gameCtrl "~£victimID~ ~£killerID~"
     TIMERrespawn -m 1 ${DEATHCAM_TIME} sendevent respawn £victimID nop
     TIMERspawnprotectOff -m 1 ${
       DEATHCAM_TIME + SPAWN_PROTECT_TIME
